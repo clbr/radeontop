@@ -24,7 +24,7 @@ LDFLAGS += $(shell pkg-config --libs pciaccess)
 # On some distros, you might have to change this to ncursesw
 LDFLAGS += -lncurses
 
-.PHONY: all clean install
+.PHONY: all clean install man
 
 all: $(bin)
 
@@ -46,3 +46,6 @@ trans:
 install: all
 	install -D -m755 $(bin) $(DESTDIR)/$(PREFIX)/sbin/$(bin)
 	make -C translations install PREFIX=$(PREFIX)
+
+man:
+	a2x -f manpage radeontop.asc
