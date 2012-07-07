@@ -80,7 +80,7 @@ puts("\n\n<stat>");
 	if (grbm_status & S_008010_VC_BUSY) puts("Vertex Cache busy");
 	if (grbm_status & (S_008010_VGT_BUSY|S_008010_VGT_BUSY_NO_DMA))
 		puts("Vertex Grouper and Tesselator busy");
-	if (grbm_status & S_008010_GUI_ACTIVE) puts("gui? busy");
+	if (grbm_status & S_008010_GUI_ACTIVE) puts("Graphics pipe busy");
 	if (grbm_status & S_008010_TA03_BUSY) puts("Texture Addresser busy");
 	if (grbm_status & S_008010_TC_BUSY) puts("Texture Cache busy");
 	if (grbm_status & S_008010_SX_BUSY) puts("Shader Export busy");
