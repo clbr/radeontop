@@ -33,3 +33,7 @@ clean:
 
 version.h: .git
 	./getver.sh
+
+trans:
+	xgettext -o translations/radeontop.pot -k_ *.c \
+	--package-name radeontop
