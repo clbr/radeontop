@@ -18,8 +18,8 @@
 #include <getopt.h>
 
 const void *area;
-unsigned int ticks = 60;
-unsigned char color = 0;
+static unsigned int ticks = 60;
+static unsigned char color = 0;
 
 void die(const char *why) {
 	puts(why);
@@ -81,6 +81,10 @@ int main(int argc, char **argv) {
 	initbits(family);
 
 	// runtime
+	collect(ticks);
+
+	printf("Collecting data, please wait....\n");
+
 	unsigned int grbm_status = readgrbm();
 
 	if (grbm_status & bits.ee) puts("Event Engine busy");

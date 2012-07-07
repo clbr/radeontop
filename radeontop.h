@@ -33,6 +33,7 @@
 
 // radeontop.c
 void die(const char *why);
+unsigned int readgrbm();
 
 extern const void *area;
 
@@ -40,6 +41,11 @@ extern const void *area;
 unsigned int init_pci();
 int getfamily(unsigned int id);
 void initbits(int fam);
+
+// ticks.c
+void collect(const unsigned int ticks);
+
+extern struct bits_t *results;
 
 // chips
 enum radeon_family {
