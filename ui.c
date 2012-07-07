@@ -102,6 +102,8 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 		float cb = 100.0 * (float) results->cb / ticks;
 
 		mvhline(3, 0, ACS_HLINE, w);
+		mvvline(1, (w/2) + 1, ACS_VLINE, h);
+		mvaddch(3, (w/2) + 1, ACS_PLUS);
 
 		printright(2, hw, _("Graphics pipe %.2f%%"), gui);
 
