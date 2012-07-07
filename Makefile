@@ -1,5 +1,5 @@
 bin = radeontop
-src = radeontop.c detect.c
+src = $(wildcard *.c)
 obj = $(src:.c=.o)
 
 CFLAGS ?= -Os
@@ -13,6 +13,8 @@ LDFLAGS += $(shell pkg-config --libs pciaccess)
 .PHONY: all clean
 
 all: $(bin)
+
+$(obj): $(wildcard *.h)
 
 $(bin): $(obj)
 	gcc -o $(bin) $(CFLAGS) $(LDFLAGS) $(obj)
