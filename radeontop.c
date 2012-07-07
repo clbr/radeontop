@@ -90,7 +90,7 @@ puts("\n\n<stat>");
 	if (grbm_status & S_008010_SC_BUSY) puts("Scan Converter busy");
 	if (grbm_status & S_008010_PA_BUSY) puts("Primitive Assembly busy");
 	if (grbm_status & S_008010_DB03_BUSY) puts("Depth Block busy");
-	if (grbm_status & S_008010_CR_BUSY) puts("cr busy");
+	if (grbm_status & S_008010_CR_BUSY) puts("Clip Rectangle busy");
 	if (grbm_status & S_008010_CB03_BUSY) puts("Color Block busy");
 puts("\n<stat2>");
 	if (grbm_status2 & S_008014_SPI0_BUSY) puts("Shader Interpolator 0 busy");
