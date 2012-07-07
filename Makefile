@@ -44,5 +44,5 @@ trans:
 	--package-name radeontop
 
 install: all
-	install -D -m755 $(bin) $(DESTDIR)/$(PREFIX)/sbin
-	make -C translations install
+	install -D -m755 $(bin) $(DESTDIR)/$(PREFIX)/sbin/$(bin)
+	make -C translations install PREFIX=$(PREFIX)
