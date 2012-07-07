@@ -47,10 +47,16 @@ unsigned int init_pci() {
 	if (!dev)
 		die("Can't find Radeon cards");
 
-	area = (void *) dev->regions[2].base_addr;
 	if (!dev->regions[2].size) die("Can't get the register area size");
 
-	printf("Found area %p, size %lu\n", area, dev->regions[2].size);
+//	printf("Found area %p, size %lu\n", area, dev->regions[2].size);
+
+	int mem = open("/dev/mem", O_RDONLY);
+	if (mem < 0) die("Can't open /dev/mem");
+
+	area = mmap(NULL, 4, PROT_READ, MAP_PRIVATE, mem,
+			dev->regions[2].base_addr + 0x8000);
+	if (area == MAP_FAILED) die("mmap");
 
 	return dev->device_id;
 }

@@ -16,10 +16,6 @@
 
 #include "radeontop.h"
 
-const unsigned long start = 0xfebe0000;
-
-#define GRBM_STATUS                                     0x8010
-
 #define  S_008010_EE_BUSY                     (1 << 10)
 #define  S_008010_VC_BUSY                     (1 << 11)
 #define  S_008010_VGT_BUSY_NO_DMA             (1 << 16)
@@ -46,8 +42,11 @@ void die(const char *why) {
 	exit(1);
 }
 
-unsigned int readint() {
-	unsigned int *inta = area;
+unsigned int readgrbm() {
+
+	void *ptr = area + 0x10;
+
+	unsigned int *inta = ptr;
 
 	return *inta;
 }
@@ -56,15 +55,7 @@ int main() {
 
 	unsigned int pciaddr = init_pci();
 
-	int mem = open("/dev/mem", O_RDONLY);
-	if (mem < 0) die("can't open devmem");
-
-	area = mmap(NULL, 65536, PROT_READ, MAP_PRIVATE, mem, start);
-	if (area == MAP_FAILED) die("mmap");
-
-	area += GRBM_STATUS;
-
-	unsigned int grbm_status = readint();
+	unsigned int grbm_status = readgrbm();
 
 	printf("grbm_status: %u\n", grbm_status);
 
@@ -86,6 +77,7 @@ puts("\n\n<stat>");
 	if (grbm_status & S_008010_CR_BUSY) puts("Clip Rectangle busy");
 	if (grbm_status & S_008010_CB03_BUSY) puts("Color Block busy");
 
-	munmap(area, 65536);
+
+	munmap(area, 4);
 	return 0;
 }
