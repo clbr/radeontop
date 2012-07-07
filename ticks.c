@@ -34,22 +34,23 @@ static void *collector(void *arg) {
 	while (1) {
 		unsigned int stat = readgrbm();
 
-		if (stat & bits.ee) puts("Event Engine busy");
-		if (stat & bits.vc) puts("Vertex Cache busy");
-		if (stat & bits.vgt)
-			puts("Vertex Grouper and Tesselator busy");
-		if (stat & bits.gui) puts("Graphics pipe busy");
-		if (stat & bits.ta) puts("Texture Addresser busy");
-		if (stat & bits.tc) puts("Texture Cache busy");
-		if (stat & bits.sx) puts("Shader Export busy");
-		if (stat & bits.sh) puts("Sequencer Instruction Cache busy");
-		if (stat & bits.spi) puts("Shader Interpolator busy");
-		if (stat & bits.smx) puts("Shader Memory Exchange busy");
-		if (stat & bits.sc) puts("Scan Converter busy");
-		if (stat & bits.pa) puts("Primitive Assembly busy");
-		if (stat & bits.db) puts("Depth Block busy");
-		if (stat & bits.cr) puts("Clip Rectangle busy");
-		if (stat & bits.cb) puts("Color Block busy");
+		memset(&history[cur], 0, sizeof(struct bits_t));
+
+		if (stat & bits.ee) history[cur].ee = 1;
+		if (stat & bits.vc) history[cur].vc = 1;
+		if (stat & bits.vgt) history[cur].vgt = 1;
+		if (stat & bits.gui) history[cur].gui = 1;
+		if (stat & bits.ta) history[cur].ta = 1;
+		if (stat & bits.tc) history[cur].tc = 1;
+		if (stat & bits.sx) history[cur].sx = 1;
+		if (stat & bits.sh) history[cur].sh = 1;
+		if (stat & bits.spi) history[cur].spi = 1;
+		if (stat & bits.smx) history[cur].smx = 1;
+		if (stat & bits.sc) history[cur].sc = 1;
+		if (stat & bits.pa) history[cur].pa = 1;
+		if (stat & bits.db) history[cur].db = 1;
+		if (stat & bits.cr) history[cur].cr = 1;
+		if (stat & bits.cb) history[cur].cb = 1;
 
 
 		usleep(sleeptime);
