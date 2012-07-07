@@ -36,6 +36,24 @@ static void printcenter(const unsigned int y, const unsigned int width,
 	free(ptr);
 }
 
+static void printright(const unsigned int y, const unsigned int width,
+				const char * const fmt, ...) {
+
+	char *ptr;
+	va_list ap;
+	va_start(ap, fmt);
+
+	const unsigned int len = vasprintf(&ptr, fmt, ap);
+
+	unsigned x = (width - len);
+	if (len > width) x = 0;
+
+	mvprintw(y, x, "%s", ptr);
+
+	va_end(ap);
+	free(ptr);
+}
+
 void present(const unsigned int ticks, const char card[], const unsigned int color) {
 
 	while(!results)
@@ -48,6 +66,8 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 
 	unsigned int w, h;
 	getmaxyx(stdscr, h, w);
+
+	const unsigned int hw = w/2;
 
 	while(1) {
 
@@ -74,21 +94,21 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 		float cr = 100.0 * (float) results->cr / ticks;
 		float cb = 100.0 * (float) results->cb / ticks;
 
-		printf(_("Event Engine %.2f%%\n"), ee);
-		printf(_("Vertex Cache %.2f%%\n"), vc);
-		printf(_("Vertex Grouper + Tesselator %.2f%%\n"), vgt);
-		printf(_("Graphics pipe %.2f%%\n"), gui);
-		printf(_("Texture Addresser %.2f%%\n"), ta);
-		printf(_("Texture Cache %.2f%%\n"), tc);
-		printf(_("Shader Export %.2f%%\n"), sx);
-		printf(_("Sequencer Instruction Cache %.2f%%\n"), sh);
-		printf(_("Shader Interpolator %.2f%%\n"), spi);
-		printf(_("Shader Memory Exchange %.2f%%\n"), smx);
-		printf(_("Scan Converter %.2f%%\n"), sc);
-		printf(_("Primitive Assembly %.2f%%\n"), pa);
-		printf(_("Depth Block %.2f%%\n"), db);
-		printf(_("Clip Rectangle %.2f%%\n"), cr);
-		printf(_("Color Block %.2f%%\n"), cb);
+		printright(2, hw, _("Event Engine %.2f%%\n"), ee);
+		printright(3, hw, _("Vertex Cache %.2f%%\n"), vc);
+		printright(4, hw, _("Vertex Grouper + Tesselator %.2f%%\n"), vgt);
+		printright(5, hw, _("Graphics pipe %.2f%%\n"), gui);
+		printright(6, hw, _("Texture Addresser %.2f%%\n"), ta);
+		printright(7, hw, _("Texture Cache %.2f%%\n"), tc);
+		printright(8, hw, _("Shader Export %.2f%%\n"), sx);
+		printright(9, hw, _("Sequencer Instruction Cache %.2f%%\n"), sh);
+		printright(10, hw, _("Shader Interpolator %.2f%%\n"), spi);
+		printright(11, hw, _("Shader Memory Exchange %.2f%%\n"), smx);
+		printright(12, hw, _("Scan Converter %.2f%%\n"), sc);
+		printright(13, hw, _("Primitive Assembly %.2f%%\n"), pa);
+		printright(14, hw, _("Depth Block %.2f%%\n"), db);
+		printright(15, hw, _("Clip Rectangle %.2f%%\n"), cr);
+		printright(16, hw, _("Color Block %.2f%%\n"), cb);
 
 		refresh();
 
