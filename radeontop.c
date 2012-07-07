@@ -15,12 +15,24 @@
 */
 
 #include "radeontop.h"
+#include <getopt.h>
 
 const void *area;
+unsigned int ticks = 60;
+unsigned char color = 0;
 
 void die(const char *why) {
 	puts(why);
 	exit(1);
+}
+
+static void help(const char * const me) {
+	printf("\n\tUsage: %s [-ch] [-t ticks]\n\n"
+		"-c --color		Enable colors\n"
+		"-h --help		Show this help\n"
+		"-t --ticks 50		Samples per second (default %u)\n",
+		me, ticks);
+	die("");
 }
 
 unsigned int readgrbm() {
@@ -32,16 +44,44 @@ unsigned int readgrbm() {
 	return *inta;
 }
 
-int main() {
+int main(int argc, char **argv) {
 
+	// opts
+	const struct option opts[] = {
+		{"color", 0, 0, 'c'},
+		{"help", 0, 0, 'h'},
+		{"ticks", 1, 0, 't'},
+		{0, 0, 0, 0}
+	};
+
+	while (1) {
+		int c = getopt_long(argc, argv, "cht:", opts, NULL);
+		if (c == -1) break;
+
+		switch(c) {
+			case 'h':
+			case '?':
+				help(argv[0]);
+			break;
+			case 't':
+				ticks = atoi(optarg);
+			break;
+			case 'c':
+				color = 1;
+			break;
+		}
+	}
+
+	// init
 	const unsigned int pciaddr = init_pci();
-
-	unsigned int grbm_status = readgrbm();
 
 	const int family = getfamily(pciaddr);
 	const char * const cardname = family_str[family];
 
 	initbits(family);
+
+	// runtime
+	unsigned int grbm_status = readgrbm();
 
 	if (grbm_status & bits.ee) puts("Event Engine busy");
 	if (grbm_status & bits.vc) puts("Vertex Cache busy");
