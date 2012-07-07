@@ -25,7 +25,8 @@ void die(const char * const why) {
 }
 
 static void help(const char * const me, const unsigned int ticks) {
-	printf("\n\tUsage: %s [-ch] [-t ticks]\n\n"
+	printf("\n\tRadeonTop for R600 and above.\n\n"
+		"\tUsage: %s [-ch] [-t ticks]\n\n"
 		"-c --color		Enable colors\n"
 		"-h --help		Show this help\n"
 		"-t --ticks 50		Samples per second (default %u)\n",
