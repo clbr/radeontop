@@ -36,6 +36,7 @@ extern void *area;
 // detect.c
 unsigned int init_pci();
 int getfamily(unsigned int id);
+void initbits(int fam);
 
 // chips
 enum radeon_family {
@@ -71,5 +72,26 @@ enum radeon_family {
 };
 
 extern const char * const family_str[];
+
+// bits
+struct bits_t {
+	unsigned int ee;
+	unsigned int vc;
+	unsigned int vgt;
+	unsigned int gui;
+	unsigned int ta;
+	unsigned int tc;
+	unsigned int sx;
+	unsigned int sh;
+	unsigned int spi;
+	unsigned int smx;
+	unsigned int sc;
+	unsigned int pa;
+	unsigned int db;
+	unsigned int cb;
+	unsigned int cr;
+};
+
+extern struct bits_t bits;
 
 #endif

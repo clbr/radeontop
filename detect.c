@@ -17,6 +17,8 @@
 #include "radeontop.h"
 #include <pciaccess.h>
 
+struct bits_t bits;
+
 unsigned int init_pci() {
 
 	int ret = pci_system_init();
@@ -70,4 +72,29 @@ int getfamily(unsigned int id) {
 	}
 
 	return 0;
+}
+
+void initbits(int fam) {
+
+	// The majority of these is the same from R600 to Southern Islands.
+
+	bits.ee = (1 << 10);
+	bits.vc = (1 << 11);
+	bits.vgt = (1 << 16) | (1 << 17);
+	bits.ta = (1 << 14);
+	bits.tc = (1 << 19);
+	bits.sx = (1 << 20);
+	bits.sh = (1 << 21);
+	bits.spi = (1 << 22);
+	bits.smx = (1 << 23);
+	bits.sc = (1 << 24);
+	bits.pa = (1 << 25);
+	bits.db = (1 << 26);
+	bits.cr = (1 << 27);
+	bits.cb = (1 << 30);
+	bits.gui = (1 << 31);
+
+	// R600 has a different texture bit
+	if (fam < RV770)
+		bits.ta = (1 << 18);
 }
