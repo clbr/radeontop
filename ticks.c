@@ -21,7 +21,7 @@ struct bits_t *results = NULL;
 
 static void *collector(void *arg) {
 
-	const unsigned int ticks = *(unsigned int *) arg;
+	const unsigned int ticks = * ((unsigned int *) arg);
 
 	struct bits_t res[2];
 
@@ -60,7 +60,7 @@ static void *collector(void *arg) {
 	return NULL;
 }
 
-void collect(unsigned int ticks) {
+void collect(unsigned int *ticks) {
 
 	// Start a thread collecting data
 	pthread_t tid;
@@ -70,5 +70,5 @@ void collect(unsigned int ticks) {
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
-	pthread_create(&tid, &attr, collector, &ticks);
+	pthread_create(&tid, &attr, collector, ticks);
 }

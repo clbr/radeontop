@@ -43,7 +43,7 @@ int getfamily(unsigned int id);
 void initbits(int fam);
 
 // ticks.c
-void collect(unsigned int ticks);
+void collect(unsigned int *ticks);
 
 extern struct bits_t *results;
 

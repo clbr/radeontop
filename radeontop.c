@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
 	initbits(family);
 
 	// runtime
-	collect(ticks);
+	collect(&ticks);
 
 	printf("Collecting data, please wait....\n");
 
