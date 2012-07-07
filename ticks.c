@@ -27,7 +27,7 @@ static void *collector(void *arg) {
 
 	// Save one second's worth of history
 	struct bits_t *history = calloc(ticks, sizeof(struct bits_t));
-	unsigned int cur = 0;
+	unsigned int cur = 0, curres = 0;
 
 	const useconds_t sleeptime = 1e6 / ticks;
 
@@ -55,6 +55,37 @@ static void *collector(void *arg) {
 		usleep(sleeptime);
 		cur++;
 		cur %= ticks;
+
+		// One second has passed, we have one sec's worth of data
+		if (cur == 0) {
+			unsigned int i;
+
+			memset(&res[curres], 0, sizeof(struct bits_t));
+
+			for (i = 0; i < ticks; i++) {
+				res[curres].ee += history[i].ee;
+				res[curres].vc += history[i].vc;
+				res[curres].vgt += history[i].vgt;
+				res[curres].gui += history[i].gui;
+				res[curres].ta += history[i].ta;
+				res[curres].tc += history[i].tc;
+				res[curres].sx += history[i].sx;
+				res[curres].sh += history[i].sh;
+				res[curres].spi += history[i].spi;
+				res[curres].smx += history[i].smx;
+				res[curres].sc += history[i].sc;
+				res[curres].pa += history[i].pa;
+				res[curres].db += history[i].db;
+				res[curres].cb += history[i].cb;
+				res[curres].cr += history[i].cr;
+			}
+
+			// Atomically write it to the pointer
+			__sync_bool_compare_and_swap(&results, results, &res[curres]);
+
+			curres++;
+			curres %= 2;
+		}
 	}
 
 	return NULL;
