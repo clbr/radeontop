@@ -71,21 +71,21 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 		float cr = 100.0 * (float) results->cr / ticks;
 		float cb = 100.0 * (float) results->cb / ticks;
 
-		printf("Event Engine %.2f%%\n", ee);
-		printf("Vertex Cache %.2f%%\n", vc);
-		printf("Vertex Grouper + Tesselator %.2f%%\n", vgt);
-		printf("Graphics pipe %.2f%%\n", gui);
-		printf("Texture Addresser %.2f%%\n", ta);
-		printf("Texture Cache %.2f%%\n", tc);
-		printf("Shader Export %.2f%%\n", sx);
-		printf("Sequencer Instruction Cache %.2f%%\n", sh);
-		printf("Shader Interpolator %.2f%%\n", spi);
-		printf("Shader Memory Exchange %.2f%%\n", smx);
-		printf("Scan Converter %.2f%%\n", sc);
-		printf("Primitive Assembly %.2f%%\n", pa);
-		printf("Depth Block %.2f%%\n", db);
-		printf("Clip Rectangle %.2f%%\n", cr);
-		printf("Color Block %.2f%%\n", cb);
+		printf(_("Event Engine %.2f%%\n"), ee);
+		printf(_("Vertex Cache %.2f%%\n"), vc);
+		printf(_("Vertex Grouper + Tesselator %.2f%%\n"), vgt);
+		printf(_("Graphics pipe %.2f%%\n"), gui);
+		printf(_("Texture Addresser %.2f%%\n"), ta);
+		printf(_("Texture Cache %.2f%%\n"), tc);
+		printf(_("Shader Export %.2f%%\n"), sx);
+		printf(_("Sequencer Instruction Cache %.2f%%\n"), sh);
+		printf(_("Shader Interpolator %.2f%%\n"), spi);
+		printf(_("Shader Memory Exchange %.2f%%\n"), smx);
+		printf(_("Scan Converter %.2f%%\n"), sc);
+		printf(_("Primitive Assembly %.2f%%\n"), pa);
+		printf(_("Depth Block %.2f%%\n"), db);
+		printf(_("Clip Rectangle %.2f%%\n"), cr);
+		printf(_("Color Block %.2f%%\n"), cb);
 
 		refresh();
 
