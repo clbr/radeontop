@@ -41,6 +41,7 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 	initscr();
 	noecho();
 	halfdelay(10);
+	curs_set(0);
 
 	unsigned int w, h;
 	getmaxyx(stdscr, h, w);
@@ -49,7 +50,8 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 
 		clear();
 		attron(A_REVERSE);
-		printcenter(0, w, _("radeontop %s, running on %s, %u samples/sec\n"),
+		hline(' ', w);
+		printcenter(0, w, _("radeontop %s, running on %s, %u samples/sec"),
 			VERSION, card, 	ticks);
 		attroff(A_REVERSE);
 
