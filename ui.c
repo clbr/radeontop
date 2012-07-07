@@ -122,46 +122,46 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 
 		unsigned int start = 4;
 
-		percentage(start, w, ee);
+		percentage(start, w, ee, color);
 		printright(start++, hw, _("Event Engine %.2f%%"), ee);
 
-		percentage(start, w, vc);
+		percentage(start, w, vc, color);
 		printright(start++, hw, _("Vertex Cache %.2f%%"), vc);
 
-		percentage(start, w, vgt);
+		percentage(start, w, vgt, color);
 		printright(start++, hw, _("Vertex Grouper + Tesselator %.2f%%"), vgt);
 
-		percentage(start, w, ta);
+		percentage(start, w, ta, color);
 		printright(start++, hw, _("Texture Addresser %.2f%%"), ta);
 
-		percentage(start, w, tc);
+		percentage(start, w, tc, color);
 		printright(start++, hw, _("Texture Cache %.2f%%"), tc);
 
-		percentage(start, w, sx);
+		percentage(start, w, sx, color);
 		printright(start++, hw, _("Shader Export %.2f%%"), sx);
 
-		percentage(start, w, sh);
+		percentage(start, w, sh, color);
 		printright(start++, hw, _("Sequencer Instruction Cache %.2f%%"), sh);
 
-		percentage(start, w, spi);
+		percentage(start, w, spi, color);
 		printright(start++, hw, _("Shader Interpolator %.2f%%"), spi);
 
-		percentage(start, w, smx);
+		percentage(start, w, smx, color);
 		printright(start++, hw, _("Shader Memory Exchange %.2f%%"), smx);
 
-		percentage(start, w, sc);
+		percentage(start, w, sc, color);
 		printright(start++, hw, _("Scan Converter %.2f%%"), sc);
 
-		percentage(start, w, pa);
+		percentage(start, w, pa, color);
 		printright(start++, hw, _("Primitive Assembly %.2f%%"), pa);
 
-		percentage(start, w, db);
+		percentage(start, w, db, color);
 		printright(start++, hw, _("Depth Block %.2f%%"), db);
 
-		percentage(start, w, cb);
+		percentage(start, w, cb, color);
 		printright(start++, hw, _("Color Block %.2f%%"), cb);
 
-		percentage(start, w, cr);
+		percentage(start, w, cr, color);
 		printright(start++, hw, _("Clip Rectangle %.2f%%"), cr);
 
 		refresh();
