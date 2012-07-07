@@ -91,7 +91,7 @@ puts("\n\n<stat>");
 	if (grbm_status & S_008010_PA_BUSY) puts("pa busy");
 	if (grbm_status & S_008010_DB03_BUSY) puts("db03 busy");
 	if (grbm_status & S_008010_CR_BUSY) puts("cr busy");
-	if (grbm_status & S_008010_CB03_BUSY) puts("cb03 busy");
+	if (grbm_status & S_008010_CB03_BUSY) puts("Color Block busy");
 puts("\n<stat2>");
 	if (grbm_status2 & S_008014_SPI0_BUSY) puts("Shader Interpolator 0 busy");
 	if (grbm_status2 & S_008014_SPI1_BUSY) puts("Shader Interpolator 1 busy");
@@ -104,10 +104,10 @@ puts("\n<stat2>");
 	if (grbm_status2 & S_008014_DB1_BUSY) puts("db1 busy");
 	if (grbm_status2 & S_008014_DB2_BUSY) puts("db2 busy");
 	if (grbm_status2 & S_008014_DB3_BUSY) puts("db3 busy");
-	if (grbm_status2 & S_008014_CB0_BUSY) puts("cb0 busy");
-	if (grbm_status2 & S_008014_CB1_BUSY) puts("cb1 busy");
-	if (grbm_status2 & S_008014_CB2_BUSY) puts("cb2 busy");
-	if (grbm_status2 & S_008014_CB3_BUSY) puts("cb3 busy");
+	if (grbm_status2 & S_008014_CB0_BUSY) puts("Color Block 0 busy");
+	if (grbm_status2 & S_008014_CB1_BUSY) puts("Color Block 1 busy");
+	if (grbm_status2 & S_008014_CB2_BUSY) puts("Color Block 2 busy");
+	if (grbm_status2 & S_008014_CB3_BUSY) puts("Color Block 3 busy");
 
 
 	munmap(area, 65536);
