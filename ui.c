@@ -42,21 +42,21 @@ void present(const unsigned int ticks, const char card[]) {
 		float cr = 100.0 * (float) results->cr / ticks;
 		float cb = 100.0 * (float) results->cb / ticks;
 
-		printf("Event Engine busy %.2f\n", ee);
-		printf("Vertex Cache busy %.2f\n", vc);
-		printf("Vertex Grouper and Tesselator busy %.2f\n", vgt);
-		printf("Graphics pipe busy %.2f\n", gui);
-		printf("Texture Addresser busy %.2f\n", ta);
-		printf("Texture Cache busy %.2f\n", tc);
-		printf("Shader Export busy %.2f\n", sx);
-		printf("Sequencer Instruction Cache busy %.2f\n", sh);
-		printf("Shader Interpolator busy %.2f\n", spi);
-		printf("Shader Memory Exchange busy %.2f\n", smx);
-		printf("Scan Converter busy %.2f\n", sc);
-		printf("Primitive Assembly busy %.2f\n", pa);
-		printf("Depth Block busy %.2f\n", db);
-		printf("Clip Rectangle busy %.2f\n", cr);
-		printf("Color Block busy %.2f\n", cb);
+		printf("Event Engine %.2f%%\n", ee);
+		printf("Vertex Cache %.2f%%\n", vc);
+		printf("Vertex Grouper + Tesselator %.2f%%\n", vgt);
+		printf("Graphics pipe %.2f%%\n", gui);
+		printf("Texture Addresser %.2f%%\n", ta);
+		printf("Texture Cache %.2f%%\n", tc);
+		printf("Shader Export %.2f%%\n", sx);
+		printf("Sequencer Instruction Cache %.2f%%\n", sh);
+		printf("Shader Interpolator %.2f%%\n", spi);
+		printf("Shader Memory Exchange %.2f%%\n", smx);
+		printf("Scan Converter %.2f%%\n", sc);
+		printf("Primitive Assembly %.2f%%\n", pa);
+		printf("Depth Block %.2f%%\n", db);
+		printf("Clip Rectangle %.2f%%\n", cr);
+		printf("Color Block %.2f%%\n", cb);
 
 		int c = getchar();
 		if (c == 'q') break;
