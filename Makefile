@@ -3,7 +3,7 @@ src = $(wildcard *.c)
 obj = $(src:.c=.o)
 
 CFLAGS ?= -Os
-CFLAGS += -Wall -Wextra
+CFLAGS += -Wall -Wextra -pthread
 CFLAGS += -ffunction-sections -fdata-sections
 CFLAGS += $(shell pkg-config --cflags pciaccess)
 
