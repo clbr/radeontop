@@ -23,7 +23,7 @@ unsigned int init_pci() {
 
 	int ret = pci_system_init();
 	if (ret)
-		die("Failed to init pciaccess");
+		die(_("Failed to init pciaccess"));
 
 	struct pci_id_match match;
 
@@ -49,18 +49,18 @@ unsigned int init_pci() {
 	pci_iterator_destroy(iter);
 
 	if (!dev)
-		die("Can't find Radeon cards");
+		die(_("Can't find Radeon cards"));
 
-	if (!dev->regions[2].size) die("Can't get the register area size");
+	if (!dev->regions[2].size) die(_("Can't get the register area size"));
 
 //	printf("Found area %p, size %lu\n", area, dev->regions[2].size);
 
 	int mem = open("/dev/mem", O_RDONLY);
-	if (mem < 0) die("Can't open /dev/mem, are you root?");
+	if (mem < 0) die(_("Can't open /dev/mem, are you root?"));
 
 	area = mmap(NULL, 4, PROT_READ, MAP_PRIVATE, mem,
 			dev->regions[2].base_addr + 0x8000);
-	if (area == MAP_FAILED) die("mmap");
+	if (area == MAP_FAILED) die(_("mmap failed"));
 
 	return dev->device_id;
 }

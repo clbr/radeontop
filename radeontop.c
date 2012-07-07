@@ -25,11 +25,11 @@ void die(const char * const why) {
 }
 
 static void help(const char * const me, const unsigned int ticks) {
-	printf("\n\tRadeonTop for R600 and above.\n\n"
+	printf(_("\n\tRadeonTop for R600 and above.\n\n"
 		"\tUsage: %s [-ch] [-t ticks]\n\n"
 		"-c --color		Enable colors\n"
 		"-h --help		Show this help\n"
-		"-t --ticks 50		Samples per second (default %u)\n",
+		"-t --ticks 50		Samples per second (default %u)\n"),
 		me, ticks);
 	die("");
 }
@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
 
 	const int family = getfamily(pciaddr);
 	if (!family)
-		puts("Unknown Radeon card. <= R500 won't work, new cards might.");
+		puts(_("Unknown Radeon card. <= R500 won't work, new cards might."));
 
 	const char * const cardname = family_str[family];
 
@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
 	// runtime
 	collect(&ticks);
 
-	printf("Collecting data, please wait....\n");
+	printf(_("Collecting data, please wait....\n"));
 
 	present(ticks, cardname, color);
 
