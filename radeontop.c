@@ -10,7 +10,7 @@ const unsigned long start = 0xfebe0000;
 #define GRBM_STATUS                                     0x8010
 #define GRBM_STATUS2                                    0x8014
 
-#define  S_008010_GRBM_EE_BUSY                (1 << 10)
+#define  S_008010_EE_BUSY                     (1 << 10)
 #define  S_008010_VC_BUSY                     (1 << 11)
 #define  S_008010_VGT_BUSY_NO_DMA             (1 << 16)
 #define  S_008010_VGT_BUSY                    (1 << 17)
@@ -76,6 +76,7 @@ int main() {
 	printf("grbm_status2: %u\n", grbm_status2);
 
 puts("\n\n<stat>");
+	if (grbm_status & S_008010_EE_BUSY) puts("ee busy");
 	if (grbm_status & S_008010_VC_BUSY) puts("vc busy");
 	if (grbm_status & S_008010_VGT_BUSY) puts("vgt busy");
 	if (grbm_status & S_008010_GUI_ACTIVE) puts("gui busy");
