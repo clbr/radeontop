@@ -21,3 +21,6 @@ $(bin): $(obj)
 
 clean:
 	rm -f *.o $(bin)
+
+version.h: .git
+	./getver.sh

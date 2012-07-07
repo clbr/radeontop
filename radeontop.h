@@ -17,6 +17,8 @@
 #ifndef RADEONTOP_H
 #define RADEONTOP_H
 
+#include "version.h"
+
 #include <stdio.h>
 #include <sys/mman.h>
 #include <stdlib.h>
