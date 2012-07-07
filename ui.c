@@ -27,7 +27,10 @@ static void printcenter(const unsigned int y, const unsigned int width,
 
 	const unsigned int len = vasprintf(&ptr, fmt, ap);
 
-	mvprintw(y, (width - len)/2, "%s", ptr);
+	unsigned x = (width - len)/2;
+	if (len > width) x = 0;
+
+	mvprintw(y, x, "%s", ptr);
 
 	va_end(ap);
 	free(ptr);
