@@ -53,9 +53,12 @@ unsigned int readgrbm() {
 
 int main() {
 
-	unsigned int pciaddr = init_pci();
+	const unsigned int pciaddr = init_pci();
 
 	unsigned int grbm_status = readgrbm();
+
+	const int family = getfamily(pciaddr);
+	const char * const cardname = family_str[family];
 
 	printf("grbm_status: %u\n", grbm_status);
 
