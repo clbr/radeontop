@@ -17,6 +17,10 @@
 #include "radeontop.h"
 #include <getopt.h>
 
+#ifdef ENABLE_NLS
+#include <locale.h>
+#endif
+
 const void *area;
 
 void die(const char * const why) {
@@ -47,6 +51,13 @@ int main(int argc, char **argv) {
 
 	unsigned int ticks = 60;
 	unsigned char color = 0;
+
+	// Translations
+#ifdef ENABLE_NLS
+	setlocale(LC_ALL, "");
+	bindtextdomain("radeontop", "/usr/share/locale");
+	textdomain("radeontop");
+#endif
 
 	// opts
 	const struct option opts[] = {
