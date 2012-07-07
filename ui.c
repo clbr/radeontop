@@ -15,6 +15,7 @@
 */
 
 #include "radeontop.h"
+#include <ncurses.h>
 
 void present(const unsigned int ticks, const char card[], const unsigned int color) {
 
