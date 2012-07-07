@@ -77,6 +77,9 @@ int main(int argc, char **argv) {
 	const unsigned int pciaddr = init_pci();
 
 	const int family = getfamily(pciaddr);
+	if (!family)
+		puts("Unknown Radeon card. <= R500 won't work, new cards might.");
+
 	const char * const cardname = family_str[family];
 
 	initbits(family);
