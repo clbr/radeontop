@@ -63,20 +63,24 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 	noecho();
 	halfdelay(10);
 	curs_set(0);
+	clear();
+
 
 	unsigned int w, h;
 	getmaxyx(stdscr, h, w);
 
 	const unsigned int hw = w/2;
 
+	attron(A_REVERSE);
+	mvhline(0, 0, ' ', w);
+	printcenter(0, w, _("radeontop %s, running on %s, %u samples/sec"),
+			VERSION, card, 	ticks);
+	attroff(A_REVERSE);
+
 	while(1) {
 
-		clear();
-		attron(A_REVERSE);
-		hline(' ', w);
-		printcenter(0, w, _("radeontop %s, running on %s, %u samples/sec"),
-			VERSION, card, 	ticks);
-		attroff(A_REVERSE);
+		move(2, 0);
+		clrtobot();
 
 		float ee = 100.0 * (float) results->ee / ticks;
 		float vc = 100.0 * (float) results->vc / ticks;
@@ -94,21 +98,23 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 		float cr = 100.0 * (float) results->cr / ticks;
 		float cb = 100.0 * (float) results->cb / ticks;
 
-		printright(2, hw, _("Event Engine %.2f%%\n"), ee);
-		printright(3, hw, _("Vertex Cache %.2f%%\n"), vc);
-		printright(4, hw, _("Vertex Grouper + Tesselator %.2f%%\n"), vgt);
-		printright(5, hw, _("Graphics pipe %.2f%%\n"), gui);
-		printright(6, hw, _("Texture Addresser %.2f%%\n"), ta);
-		printright(7, hw, _("Texture Cache %.2f%%\n"), tc);
-		printright(8, hw, _("Shader Export %.2f%%\n"), sx);
-		printright(9, hw, _("Sequencer Instruction Cache %.2f%%\n"), sh);
-		printright(10, hw, _("Shader Interpolator %.2f%%\n"), spi);
-		printright(11, hw, _("Shader Memory Exchange %.2f%%\n"), smx);
-		printright(12, hw, _("Scan Converter %.2f%%\n"), sc);
-		printright(13, hw, _("Primitive Assembly %.2f%%\n"), pa);
-		printright(14, hw, _("Depth Block %.2f%%\n"), db);
-		printright(15, hw, _("Clip Rectangle %.2f%%\n"), cr);
-		printright(16, hw, _("Color Block %.2f%%\n"), cb);
+		mvhline(3, 0, ACS_HLINE, w);
+
+		printright(2, hw, _("Graphics pipe %.2f%%\n"), gui);
+		printright(4, hw, _("Event Engine %.2f%%\n"), ee);
+		printright(5, hw, _("Vertex Cache %.2f%%\n"), vc);
+		printright(6, hw, _("Vertex Grouper + Tesselator %.2f%%\n"), vgt);
+		printright(7, hw, _("Texture Addresser %.2f%%\n"), ta);
+		printright(8, hw, _("Texture Cache %.2f%%\n"), tc);
+		printright(9, hw, _("Shader Export %.2f%%\n"), sx);
+		printright(10, hw, _("Sequencer Instruction Cache %.2f%%\n"), sh);
+		printright(11, hw, _("Shader Interpolator %.2f%%\n"), spi);
+		printright(12, hw, _("Shader Memory Exchange %.2f%%\n"), smx);
+		printright(13, hw, _("Scan Converter %.2f%%\n"), sc);
+		printright(14, hw, _("Primitive Assembly %.2f%%\n"), pa);
+		printright(15, hw, _("Depth Block %.2f%%\n"), db);
+		printright(16, hw, _("Clip Rectangle %.2f%%\n"), cr);
+		printright(17, hw, _("Color Block %.2f%%\n"), cb);
 
 		refresh();
 
