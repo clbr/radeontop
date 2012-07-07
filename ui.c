@@ -16,7 +16,7 @@
 
 #include "radeontop.h"
 
-void present(const unsigned int ticks, const char card[]) {
+void present(const unsigned int ticks, const char card[], const unsigned int color) {
 
 	while(!results)
 		usleep(16000);
