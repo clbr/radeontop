@@ -86,7 +86,7 @@ puts("\n\n<stat>");
 	if (grbm_status & S_008010_SX_BUSY) puts("Shader Export busy");
 	if (grbm_status & S_008010_SH_BUSY) puts("sh busy");
 	if (grbm_status & S_008010_SPI03_BUSY) puts("spi busy");
-	if (grbm_status & S_008010_SMX_BUSY) puts("smx busy");
+	if (grbm_status & S_008010_SMX_BUSY) puts("Shader Memory Exchange busy");
 	if (grbm_status & S_008010_SC_BUSY) puts("sc busy");
 	if (grbm_status & S_008010_PA_BUSY) puts("pa busy");
 	if (grbm_status & S_008010_DB03_BUSY) puts("db03 busy");
