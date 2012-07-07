@@ -54,6 +54,19 @@ static void printright(const unsigned int y, const unsigned int width,
 	free(ptr);
 }
 
+static void percentage(const unsigned int y, const unsigned int w, const float p,
+			const unsigned char color) {
+
+	const unsigned int x = (w/2) + 2;
+	unsigned int len = w - x - 1;
+
+	len = len * (p / 100.0);
+
+	attron(A_REVERSE);
+	mvhline(y, x, ' ', len);
+	attroff(A_REVERSE);
+}
+
 void present(const unsigned int ticks, const char card[], const unsigned int color) {
 
 	// This does not need to be atomic. A delay here is acceptable.
@@ -109,19 +122,46 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 
 		unsigned int start = 4;
 
+		percentage(start, w, ee);
 		printright(start++, hw, _("Event Engine %.2f%%"), ee);
+
+		percentage(start, w, vc);
 		printright(start++, hw, _("Vertex Cache %.2f%%"), vc);
+
+		percentage(start, w, vgt);
 		printright(start++, hw, _("Vertex Grouper + Tesselator %.2f%%"), vgt);
+
+		percentage(start, w, ta);
 		printright(start++, hw, _("Texture Addresser %.2f%%"), ta);
+
+		percentage(start, w, tc);
 		printright(start++, hw, _("Texture Cache %.2f%%"), tc);
+
+		percentage(start, w, sx);
 		printright(start++, hw, _("Shader Export %.2f%%"), sx);
+
+		percentage(start, w, sh);
 		printright(start++, hw, _("Sequencer Instruction Cache %.2f%%"), sh);
+
+		percentage(start, w, spi);
 		printright(start++, hw, _("Shader Interpolator %.2f%%"), spi);
+
+		percentage(start, w, smx);
 		printright(start++, hw, _("Shader Memory Exchange %.2f%%"), smx);
+
+		percentage(start, w, sc);
 		printright(start++, hw, _("Scan Converter %.2f%%"), sc);
+
+		percentage(start, w, pa);
 		printright(start++, hw, _("Primitive Assembly %.2f%%"), pa);
+
+		percentage(start, w, db);
 		printright(start++, hw, _("Depth Block %.2f%%"), db);
+
+		percentage(start, w, cb);
 		printright(start++, hw, _("Color Block %.2f%%"), cb);
+
+		percentage(start, w, cr);
 		printright(start++, hw, _("Clip Rectangle %.2f%%"), cr);
 
 		refresh();
