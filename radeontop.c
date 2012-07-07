@@ -83,7 +83,7 @@ puts("\n\n<stat>");
 	if (grbm_status & S_008010_GUI_ACTIVE) puts("gui busy");
 	if (grbm_status & S_008010_TA03_BUSY) puts("Texture Addresser 03 busy");
 	if (grbm_status & S_008010_TC_BUSY) puts("Texture Cache busy");
-	if (grbm_status & S_008010_SX_BUSY) puts("sx busy");
+	if (grbm_status & S_008010_SX_BUSY) puts("Shader Export busy");
 	if (grbm_status & S_008010_SH_BUSY) puts("sh busy");
 	if (grbm_status & S_008010_SPI03_BUSY) puts("spi busy");
 	if (grbm_status & S_008010_SMX_BUSY) puts("smx busy");
