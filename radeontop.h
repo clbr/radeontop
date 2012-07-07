@@ -33,6 +33,7 @@ extern void *area;
 
 // detect.c
 unsigned int init_pci();
+int getfamily(unsigned int id);
 
 // chips
 enum radeon_family {
