@@ -24,6 +24,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#define GRBM_STATUS 0x8010
+
 // radeontop.c
 void die(const char *why);
 
@@ -65,38 +67,6 @@ enum radeon_family {
 	VERDE,
 };
 
-#define str(a) #a
-
-const char * const family_str[] = {
-	str(UNKNOWN_CHIP),
-	str(R600),
-	str(RV610),
-	str(RV630),
-	str(RV670),
-	str(RV620),
-	str(RV635),
-	str(RS780),
-	str(RS880),
-	str(RV770),
-	str(RV730),
-	str(RV710),
-	str(RV740),
-	str(CEDAR),
-	str(REDWOOD),
-	str(JUNIPER),
-	str(CYPRESS),
-	str(HEMLOCK),
-	str(PALM),
-	str(SUMO),
-	str(SUMO2),
-	str(BARTS),
-	str(TURKS),
-	str(CAICOS),
-	str(CAYMAN),
-	str(ARUBA),
-	str(TAHITI),
-	str(PITCAIRN),
-	str(VERDE),
-};
+extern const char * const family_str[];
 
 #endif
