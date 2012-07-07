@@ -14,7 +14,7 @@ const unsigned long start = 0xfebe0000;
 #define  S_008010_VC_BUSY                     (1 << 11)
 #define  S_008010_VGT_BUSY_NO_DMA             (1 << 16)
 #define  S_008010_VGT_BUSY                    (1 << 17)
-#define  S_008010_TA03_BUSY                   (1 << 18)
+#define  S_008010_TA03_BUSY                   (1 << 14)
 #define  S_008010_TC_BUSY                     (1 << 19)
 #define  S_008010_SX_BUSY                     (1 << 20)
 #define  S_008010_SH_BUSY                     (1 << 21)
