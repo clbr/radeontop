@@ -18,6 +18,8 @@ endif
 
 LDFLAGS += -Wl,-O1 -Wl,-gc-sections
 LDFLAGS += $(shell pkg-config --libs pciaccess)
+
+# On some distros, you might have to change this to ncursesw
 LDFLAGS += -lncurses
 
 .PHONY: all clean
