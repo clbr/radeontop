@@ -15,10 +15,11 @@
 */
 
 #include "radeontop.h"
+#include <pthread.h>
 
 struct bits_t *results = NULL;
 
-static void collector(void *arg) {
+static void *collector(void *arg) {
 
 	const unsigned int ticks = *(unsigned int *) arg;
 
@@ -31,9 +32,19 @@ static void collector(void *arg) {
 	while (1) {
 		unsigned int stat = readgrbm();
 	}
+
+	return NULL;
 }
 
-void collect(const unsigned int ticks) {
+void collect(unsigned int ticks) {
 
 	// Start a thread collecting data
+	pthread_t tid;
+	pthread_attr_t attr;
+
+	// We don't care to join this thread
+	pthread_attr_init(&attr);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+	pthread_create(&tid, &attr, collector, &ticks);
 }
