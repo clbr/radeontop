@@ -85,25 +85,7 @@ int main(int argc, char **argv) {
 
 	printf("Collecting data, please wait....\n");
 
-	unsigned int grbm_status = readgrbm();
-
-	if (grbm_status & bits.ee) puts("Event Engine busy");
-	if (grbm_status & bits.vc) puts("Vertex Cache busy");
-	if (grbm_status & bits.vgt)
-		puts("Vertex Grouper and Tesselator busy");
-	if (grbm_status & bits.gui) puts("Graphics pipe busy");
-	if (grbm_status & bits.ta) puts("Texture Addresser busy");
-	if (grbm_status & bits.tc) puts("Texture Cache busy");
-	if (grbm_status & bits.sx) puts("Shader Export busy");
-	if (grbm_status & bits.sh) puts("Sequencer Instruction Cache busy");
-	if (grbm_status & bits.spi) puts("Shader Interpolator busy");
-	if (grbm_status & bits.smx) puts("Shader Memory Exchange busy");
-	if (grbm_status & bits.sc) puts("Scan Converter busy");
-	if (grbm_status & bits.pa) puts("Primitive Assembly busy");
-	if (grbm_status & bits.db) puts("Depth Block busy");
-	if (grbm_status & bits.cr) puts("Clip Rectangle busy");
-	if (grbm_status & bits.cb) puts("Color Block busy");
-
+	sleep(10);
 
 	munmap((void *) area, 4);
 	return 0;
