@@ -76,11 +76,11 @@ int main() {
 	printf("grbm_status2: %u\n", grbm_status2);
 
 puts("\n\n<stat>");
-	if (grbm_status & S_008010_EE_BUSY) puts("ee busy");
+	if (grbm_status & S_008010_EE_BUSY) puts("Event Engine busy");
 	if (grbm_status & S_008010_VC_BUSY) puts("vc busy");
 	if (grbm_status & S_008010_VGT_BUSY) puts("vgt busy");
 	if (grbm_status & S_008010_GUI_ACTIVE) puts("gui busy");
-	if (grbm_status & S_008010_TA03_BUSY) puts("ta03 busy");
+	if (grbm_status & S_008010_TA03_BUSY) puts("Texture Addresser 03 busy");
 	if (grbm_status & S_008010_TC_BUSY) puts("tc busy");
 	if (grbm_status & S_008010_SX_BUSY) puts("sx busy");
 	if (grbm_status & S_008010_SH_BUSY) puts("sh busy");
@@ -96,9 +96,9 @@ puts("\n<stat2>");
 	if (grbm_status2 & S_008014_SPI1_BUSY) puts("spi1 busy");
 	if (grbm_status2 & S_008014_SPI2_BUSY) puts("spi2 busy");
 	if (grbm_status2 & S_008014_SPI3_BUSY) puts("spi3 busy");
-	if (grbm_status2 & S_008014_TA0_BUSY) puts("ta0 busy");
-	if (grbm_status2 & S_008014_TA1_BUSY) puts("ta1 busy");
-	if (grbm_status2 & S_008014_TA2_BUSY) puts("ta2 busy");
+	if (grbm_status2 & S_008014_TA0_BUSY) puts("Texture Addresser 0 busy");
+	if (grbm_status2 & S_008014_TA1_BUSY) puts("Texture Addresser 1 busy");
+	if (grbm_status2 & S_008014_TA2_BUSY) puts("Texture Addresser 2 busy");
 	if (grbm_status2 & S_008014_DB0_BUSY) puts("db0 busy");
 	if (grbm_status2 & S_008014_DB1_BUSY) puts("db1 busy");
 	if (grbm_status2 & S_008014_DB2_BUSY) puts("db2 busy");
