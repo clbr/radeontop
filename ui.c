@@ -16,6 +16,22 @@
 
 #include "radeontop.h"
 #include <ncurses.h>
+#include <stdarg.h>
+
+static void printcenter(const unsigned int y, const unsigned int width,
+				const char * const fmt, ...) {
+
+	char *ptr;
+	va_list ap;
+	va_start(ap, fmt);
+
+	const unsigned int len = vasprintf(&ptr, fmt, ap);
+
+	mvprintw(y, (width - len)/2, "%s", ptr);
+
+	va_end(ap);
+	free(ptr);
+}
 
 void present(const unsigned int ticks, const char card[], const unsigned int color) {
 
@@ -27,12 +43,15 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 	halfdelay(10);
 
 	unsigned int w, h;
-	getmaxyx(stdscr, w, h);
+	getmaxyx(stdscr, h, w);
 
 	while(1) {
 
 		clear();
-		printf("radeontop %s, running on %s, %u samples/sec\n", VERSION, card, ticks);
+		attron(A_REVERSE);
+		printcenter(0, w, _("radeontop %s, running on %s, %u samples/sec\n"),
+			VERSION, card, 	ticks);
+		attroff(A_REVERSE);
 
 		float ee = 100.0 * (float) results->ee / ticks;
 		float vc = 100.0 * (float) results->vc / ticks;
