@@ -18,15 +18,13 @@
 #include <getopt.h>
 
 const void *area;
-static unsigned int ticks = 60;
-static unsigned char color = 0;
 
-void die(const char *why) {
+void die(const char * const why) {
 	puts(why);
 	exit(1);
 }
 
-static void help(const char * const me) {
+static void help(const char * const me, const unsigned int ticks) {
 	printf("\n\tUsage: %s [-ch] [-t ticks]\n\n"
 		"-c --color		Enable colors\n"
 		"-h --help		Show this help\n"
@@ -46,6 +44,9 @@ unsigned int readgrbm() {
 
 int main(int argc, char **argv) {
 
+	unsigned int ticks = 60;
+	unsigned char color = 0;
+
 	// opts
 	const struct option opts[] = {
 		{"color", 0, 0, 'c'},
@@ -61,7 +62,7 @@ int main(int argc, char **argv) {
 		switch(c) {
 			case 'h':
 			case '?':
-				help(argv[0]);
+				help(argv[0], ticks);
 			break;
 			case 't':
 				ticks = atoi(optarg);
