@@ -29,8 +29,12 @@ static void *collector(void *arg) {
 	struct bits_t *history = calloc(ticks, sizeof(struct bits_t));
 	unsigned int cur = 0;
 
+	const useconds_t sleeptime = 1e6 / ticks;
+
 	while (1) {
 		unsigned int stat = readgrbm();
+
+		usleep(sleeptime);
 	}
 
 	return NULL;
