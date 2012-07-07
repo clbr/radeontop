@@ -46,6 +46,8 @@ unsigned int init_pci() {
 		break;
 	}
 
+	pci_iterator_destroy(iter);
+
 	if (!dev)
 		die("Can't find Radeon cards");
 
