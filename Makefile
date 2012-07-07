@@ -7,6 +7,9 @@ CFLAGS += -Wall -Wextra -pthread
 CFLAGS += -ffunction-sections -fdata-sections
 CFLAGS += $(shell pkg-config --cflags pciaccess)
 
+# Comment this if you don't want translations
+CFLAGS += -DENABLE_NLS=1
+
 ifdef debug
 	CFLAGS += -g
 else

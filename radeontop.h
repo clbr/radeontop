@@ -17,9 +17,10 @@
 #ifndef RADEONTOP_H
 #define RADEONTOP_H
 
-#include "version.h"
-
 #define _GNU_SOURCE
+
+#include "version.h"
+#include "gettext.h"
 
 #include <stdio.h>
 #include <sys/mman.h>
