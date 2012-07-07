@@ -1,3 +1,5 @@
+PREFIX ?= /usr
+
 bin = radeontop
 src = $(wildcard *.c)
 obj = $(src:.c=.o)
@@ -22,7 +24,7 @@ LDFLAGS += $(shell pkg-config --libs pciaccess)
 # On some distros, you might have to change this to ncursesw
 LDFLAGS += -lncurses
 
-.PHONY: all clean
+.PHONY: all clean install
 
 all: $(bin)
 
@@ -40,3 +42,7 @@ version.h: .git
 trans:
 	xgettext -o translations/radeontop.pot -k_ *.c \
 	--package-name radeontop
+
+install: all
+	install -D -m755 $(bin) $(DESTDIR)/$(PREFIX)/sbin
+	make -C translations install
