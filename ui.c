@@ -101,20 +101,23 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 		mvhline(3, 0, ACS_HLINE, w);
 
 		printright(2, hw, _("Graphics pipe %.2f%%\n"), gui);
-		printright(4, hw, _("Event Engine %.2f%%\n"), ee);
-		printright(5, hw, _("Vertex Cache %.2f%%\n"), vc);
-		printright(6, hw, _("Vertex Grouper + Tesselator %.2f%%\n"), vgt);
-		printright(7, hw, _("Texture Addresser %.2f%%\n"), ta);
-		printright(8, hw, _("Texture Cache %.2f%%\n"), tc);
-		printright(9, hw, _("Shader Export %.2f%%\n"), sx);
-		printright(10, hw, _("Sequencer Instruction Cache %.2f%%\n"), sh);
-		printright(11, hw, _("Shader Interpolator %.2f%%\n"), spi);
-		printright(12, hw, _("Shader Memory Exchange %.2f%%\n"), smx);
-		printright(13, hw, _("Scan Converter %.2f%%\n"), sc);
-		printright(14, hw, _("Primitive Assembly %.2f%%\n"), pa);
-		printright(15, hw, _("Depth Block %.2f%%\n"), db);
-		printright(16, hw, _("Clip Rectangle %.2f%%\n"), cr);
-		printright(17, hw, _("Color Block %.2f%%\n"), cb);
+
+		unsigned int start = 4;
+
+		printright(start++, hw, _("Event Engine %.2f%%\n"), ee);
+		printright(start++, hw, _("Vertex Cache %.2f%%\n"), vc);
+		printright(start++, hw, _("Vertex Grouper + Tesselator %.2f%%\n"), vgt);
+		printright(start++, hw, _("Texture Addresser %.2f%%\n"), ta);
+		printright(start++, hw, _("Texture Cache %.2f%%\n"), tc);
+		printright(start++, hw, _("Shader Export %.2f%%\n"), sx);
+		printright(start++, hw, _("Sequencer Instruction Cache %.2f%%\n"), sh);
+		printright(start++, hw, _("Shader Interpolator %.2f%%\n"), spi);
+		printright(start++, hw, _("Shader Memory Exchange %.2f%%\n"), smx);
+		printright(start++, hw, _("Scan Converter %.2f%%\n"), sc);
+		printright(start++, hw, _("Primitive Assembly %.2f%%\n"), pa);
+		printright(start++, hw, _("Depth Block %.2f%%\n"), db);
+		printright(start++, hw, _("Color Block %.2f%%\n"), cb);
+		printright(start++, hw, _("Clip Rectangle %.2f%%\n"), cr);
 
 		refresh();
 
