@@ -56,6 +56,7 @@ static void printright(const unsigned int y, const unsigned int width,
 
 void present(const unsigned int ticks, const char card[], const unsigned int color) {
 
+	// This does not need to be atomic. A delay here is acceptable.
 	while(!results)
 		usleep(16000);
 
@@ -82,6 +83,8 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 		move(2, 0);
 		clrtobot();
 
+		// Again, no need to protect these. Worst that happens is a slightly
+		// wrong number.
 		float ee = 100.0 * (float) results->ee / ticks;
 		float vc = 100.0 * (float) results->vc / ticks;
 		float vgt = 100.0 * (float) results->vgt / ticks;
