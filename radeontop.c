@@ -75,6 +75,7 @@ int main() {
 	printf("grbm_status: %u\n", grbm_status);
 	printf("grbm_status2: %u\n", grbm_status2);
 
+puts("\n\n<stat>");
 	if (grbm_status & S_008010_VC_BUSY) puts("vc busy");
 	if (grbm_status & S_008010_VGT_BUSY) puts("vgt busy");
 	if (grbm_status & S_008010_GUI_ACTIVE) puts("gui busy");
