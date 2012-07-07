@@ -22,9 +22,16 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 	while(!results)
 		usleep(16000);
 
+	initscr();
+	noecho();
+	halfdelay(10);
+
+	unsigned int w, h;
+	getmaxyx(stdscr, w, h);
+
 	while(1) {
 
-		system("clear");
+		clear();
 		printf("radeontop %s, running on %s, %u samples/sec\n", VERSION, card, ticks);
 
 		float ee = 100.0 * (float) results->ee / ticks;
@@ -59,7 +66,11 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 		printf("Clip Rectangle %.2f%%\n", cr);
 		printf("Color Block %.2f%%\n", cb);
 
-		int c = getchar();
+		refresh();
+
+		int c = getch();
 		if (c == 'q') break;
 	}
+
+	endwin();
 }
