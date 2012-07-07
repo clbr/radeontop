@@ -16,7 +16,7 @@
 
 #include "radeontop.h"
 
-void *area;
+const void *area;
 
 void die(const char *why) {
 	puts(why);
@@ -25,9 +25,9 @@ void die(const char *why) {
 
 unsigned int readgrbm() {
 
-	void *ptr = area + 0x10;
+	const void *ptr = area + 0x10;
 
-	unsigned int *inta = ptr;
+	const unsigned int *inta = ptr;
 
 	return *inta;
 }
@@ -61,6 +61,6 @@ int main() {
 	if (grbm_status & bits.cb) puts("Color Block busy");
 
 
-	munmap(area, 4);
+	munmap((void *) area, 4);
 	return 0;
 }

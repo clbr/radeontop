@@ -25,13 +25,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #define GRBM_STATUS 0x8010
 
 // radeontop.c
 void die(const char *why);
 
-extern void *area;
+extern const void *area;
 
 // detect.c
 unsigned int init_pci();
