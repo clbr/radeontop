@@ -81,14 +81,14 @@ puts("\n\n<stat>");
 	if (grbm_status & (S_008010_VGT_BUSY|S_008010_VGT_BUSY_NO_DMA))
 		puts("Vertex Grouper and Tesselator busy");
 	if (grbm_status & S_008010_GUI_ACTIVE) puts("gui? busy");
-	if (grbm_status & S_008010_TA03_BUSY) puts("Texture Addresser 03 busy");
+	if (grbm_status & S_008010_TA03_BUSY) puts("Texture Addresser busy");
 	if (grbm_status & S_008010_TC_BUSY) puts("Texture Cache busy");
 	if (grbm_status & S_008010_SX_BUSY) puts("Shader Export busy");
 	if (grbm_status & S_008010_SH_BUSY) puts("Sequencer Instruction Cache busy");
 	if (grbm_status & S_008010_SPI03_BUSY) puts("Shader Interpolator busy");
 	if (grbm_status & S_008010_SMX_BUSY) puts("Shader Memory Exchange busy");
 	if (grbm_status & S_008010_SC_BUSY) puts("Scan Converter busy");
-	if (grbm_status & S_008010_PA_BUSY) puts("pa busy");
+	if (grbm_status & S_008010_PA_BUSY) puts("Primitive Assembly busy");
 	if (grbm_status & S_008010_DB03_BUSY) puts("Depth Block busy");
 	if (grbm_status & S_008010_CR_BUSY) puts("cr busy");
 	if (grbm_status & S_008010_CB03_BUSY) puts("Color Block busy");
