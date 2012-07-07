@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
 
 	printf("Collecting data, please wait....\n");
 
-	sleep(10);
+	present(ticks, cardname);
 
 	munmap((void *) area, 4);
 	return 0;

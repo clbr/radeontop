@@ -48,6 +48,9 @@ void collect(unsigned int *ticks);
 
 extern struct bits_t *results;
 
+// ui.c
+void present(const unsigned int ticks, const char card[]);
+
 // chips
 enum radeon_family {
 	UNKNOWN_CHIP,
