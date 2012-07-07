@@ -56,7 +56,7 @@ unsigned int init_pci() {
 //	printf("Found area %p, size %lu\n", area, dev->regions[2].size);
 
 	int mem = open("/dev/mem", O_RDONLY);
-	if (mem < 0) die("Can't open /dev/mem");
+	if (mem < 0) die("Can't open /dev/mem, are you root?");
 
 	area = mmap(NULL, 4, PROT_READ, MAP_PRIVATE, mem,
 			dev->regions[2].base_addr + 0x8000);
