@@ -16,25 +16,6 @@
 
 #include "radeontop.h"
 
-#define  S_008010_EE_BUSY                     (1 << 10)
-#define  S_008010_VC_BUSY                     (1 << 11)
-#define  S_008010_VGT_BUSY_NO_DMA             (1 << 16)
-#define  S_008010_VGT_BUSY                    (1 << 17)
-#define  S_008010_TA03_BUSY                   (1 << 14)
-#define  S_008010_TC_BUSY                     (1 << 19)
-#define  S_008010_SX_BUSY                     (1 << 20)
-#define  S_008010_SH_BUSY                     (1 << 21)
-#define  S_008010_SPI03_BUSY                  (1 << 22)
-#define  S_008010_SMX_BUSY                    (1 << 23)
-#define  S_008010_SC_BUSY                     (1 << 24)
-#define  S_008010_PA_BUSY                     (1 << 25)
-#define  S_008010_DB03_BUSY                   (1 << 26)
-#define  S_008010_CR_BUSY                     (1 << 27)
-#define  S_008010_CP_COHERENCY_BUSY           (1 << 28)
-#define  S_008010_CP_BUSY                     (1 << 29)
-#define  S_008010_CB03_BUSY                   (1 << 30)
-#define  S_008010_GUI_ACTIVE		      (1 << 31)
-
 void *area;
 
 void die(const char *why) {
@@ -60,25 +41,24 @@ int main() {
 	const int family = getfamily(pciaddr);
 	const char * const cardname = family_str[family];
 
-	printf("grbm_status: %u\n", grbm_status);
+	initbits(family);
 
-puts("\n\n<stat>");
-	if (grbm_status & S_008010_EE_BUSY) puts("Event Engine busy");
-	if (grbm_status & S_008010_VC_BUSY) puts("Vertex Cache busy");
-	if (grbm_status & (S_008010_VGT_BUSY|S_008010_VGT_BUSY_NO_DMA))
+	if (grbm_status & bits.ee) puts("Event Engine busy");
+	if (grbm_status & bits.vc) puts("Vertex Cache busy");
+	if (grbm_status & bits.vgt)
 		puts("Vertex Grouper and Tesselator busy");
-	if (grbm_status & S_008010_GUI_ACTIVE) puts("Graphics pipe busy");
-	if (grbm_status & S_008010_TA03_BUSY) puts("Texture Addresser busy");
-	if (grbm_status & S_008010_TC_BUSY) puts("Texture Cache busy");
-	if (grbm_status & S_008010_SX_BUSY) puts("Shader Export busy");
-	if (grbm_status & S_008010_SH_BUSY) puts("Sequencer Instruction Cache busy");
-	if (grbm_status & S_008010_SPI03_BUSY) puts("Shader Interpolator busy");
-	if (grbm_status & S_008010_SMX_BUSY) puts("Shader Memory Exchange busy");
-	if (grbm_status & S_008010_SC_BUSY) puts("Scan Converter busy");
-	if (grbm_status & S_008010_PA_BUSY) puts("Primitive Assembly busy");
-	if (grbm_status & S_008010_DB03_BUSY) puts("Depth Block busy");
-	if (grbm_status & S_008010_CR_BUSY) puts("Clip Rectangle busy");
-	if (grbm_status & S_008010_CB03_BUSY) puts("Color Block busy");
+	if (grbm_status & bits.gui) puts("Graphics pipe busy");
+	if (grbm_status & bits.ta) puts("Texture Addresser busy");
+	if (grbm_status & bits.tc) puts("Texture Cache busy");
+	if (grbm_status & bits.sx) puts("Shader Export busy");
+	if (grbm_status & bits.sh) puts("Sequencer Instruction Cache busy");
+	if (grbm_status & bits.spi) puts("Shader Interpolator busy");
+	if (grbm_status & bits.smx) puts("Shader Memory Exchange busy");
+	if (grbm_status & bits.sc) puts("Scan Converter busy");
+	if (grbm_status & bits.pa) puts("Primitive Assembly busy");
+	if (grbm_status & bits.db) puts("Depth Block busy");
+	if (grbm_status & bits.cr) puts("Clip Rectangle busy");
+	if (grbm_status & bits.cb) puts("Color Block busy");
 
 
 	munmap(area, 4);
