@@ -54,8 +54,7 @@ static void printright(const unsigned int y, const unsigned int width,
 	free(ptr);
 }
 
-static void percentage(const unsigned int y, const unsigned int w, const float p,
-			const unsigned char color) {
+static void percentage(const unsigned int y, const unsigned int w, const float p) {
 
 	const unsigned int x = (w/2) + 2;
 	unsigned int len = w - x - 1;
@@ -118,50 +117,51 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 		mvvline(1, (w/2) + 1, ACS_VLINE, h);
 		mvaddch(3, (w/2) + 1, ACS_PLUS);
 
+		percentage(2, w, gui);
 		printright(2, hw, _("Graphics pipe %.2f%%"), gui);
 
 		unsigned int start = 4;
 
-		percentage(start, w, ee, color);
+		percentage(start, w, ee);
 		printright(start++, hw, _("Event Engine %.2f%%"), ee);
 
-		percentage(start, w, vc, color);
+		percentage(start, w, vc);
 		printright(start++, hw, _("Vertex Cache %.2f%%"), vc);
 
-		percentage(start, w, vgt, color);
+		percentage(start, w, vgt);
 		printright(start++, hw, _("Vertex Grouper + Tesselator %.2f%%"), vgt);
 
-		percentage(start, w, ta, color);
+		percentage(start, w, ta);
 		printright(start++, hw, _("Texture Addresser %.2f%%"), ta);
 
-		percentage(start, w, tc, color);
+		percentage(start, w, tc);
 		printright(start++, hw, _("Texture Cache %.2f%%"), tc);
 
-		percentage(start, w, sx, color);
+		percentage(start, w, sx);
 		printright(start++, hw, _("Shader Export %.2f%%"), sx);
 
-		percentage(start, w, sh, color);
+		percentage(start, w, sh);
 		printright(start++, hw, _("Sequencer Instruction Cache %.2f%%"), sh);
 
-		percentage(start, w, spi, color);
+		percentage(start, w, spi);
 		printright(start++, hw, _("Shader Interpolator %.2f%%"), spi);
 
-		percentage(start, w, smx, color);
+		percentage(start, w, smx);
 		printright(start++, hw, _("Shader Memory Exchange %.2f%%"), smx);
 
-		percentage(start, w, sc, color);
+		percentage(start, w, sc);
 		printright(start++, hw, _("Scan Converter %.2f%%"), sc);
 
-		percentage(start, w, pa, color);
+		percentage(start, w, pa);
 		printright(start++, hw, _("Primitive Assembly %.2f%%"), pa);
 
-		percentage(start, w, db, color);
+		percentage(start, w, db);
 		printright(start++, hw, _("Depth Block %.2f%%"), db);
 
-		percentage(start, w, cb, color);
+		percentage(start, w, cb);
 		printright(start++, hw, _("Color Block %.2f%%"), cb);
 
-		percentage(start, w, cr, color);
+		percentage(start, w, cr);
 		printright(start++, hw, _("Clip Rectangle %.2f%%"), cr);
 
 		refresh();
