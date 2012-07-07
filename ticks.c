@@ -35,6 +35,8 @@ static void *collector(void *arg) {
 		unsigned int stat = readgrbm();
 
 		usleep(sleeptime);
+		cur++;
+		cur %= ticks;
 	}
 
 	return NULL;
