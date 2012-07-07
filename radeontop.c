@@ -54,6 +54,8 @@ unsigned int readint() {
 
 int main() {
 
+	unsigned int pciaddr = init_pci();
+
 	int mem = open("/dev/mem", O_RDONLY);
 	if (mem < 0) die("can't open devmem");
 
