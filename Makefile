@@ -45,6 +45,7 @@ trans:
 
 install: all
 	install -D -m755 $(bin) $(DESTDIR)/$(PREFIX)/sbin/$(bin)
+	install -D -m644 radeontop.1 $(DESTDIR)/$(PREFIX)/share/man/man1/radeontop.1
 	make -C translations install PREFIX=$(PREFIX)
 
 man:
