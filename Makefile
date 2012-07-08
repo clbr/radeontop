@@ -1,3 +1,6 @@
+# The make-provided flags like MAKE and CC aren't set, on purpose.
+# This is Linux-specific software, so we can depend on GNU make.
+
 PREFIX ?= /usr
 INSTALL ?= install
 
