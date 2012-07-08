@@ -28,7 +28,7 @@ LDFLAGS += -lncurses
 
 all: $(bin)
 
-$(obj): $(wildcard *.h)
+$(obj): $(wildcard *.h) version.h
 
 $(bin): $(obj)
 	gcc -o $(bin) $(CFLAGS) $(LDFLAGS) $(obj)
