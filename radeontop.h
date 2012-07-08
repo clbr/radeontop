@@ -40,7 +40,7 @@ unsigned int readgrbm();
 extern const void *area;
 
 // detect.c
-unsigned int init_pci();
+unsigned int init_pci(unsigned char bus);
 int getfamily(unsigned int id);
 void initbits(int fam);
 

@@ -19,7 +19,7 @@
 
 struct bits_t bits;
 
-unsigned int init_pci() {
+unsigned int init_pci(unsigned char bus) {
 
 	int ret = pci_system_init();
 	if (ret)
@@ -43,7 +43,8 @@ unsigned int init_pci() {
 		if ((dev->device_class & 0x00ffff00) != 0x00030000 &&
 			(dev->device_class & 0x00ffff00) != 0x00038000)
 			continue;
-		break;
+		if (!bus || bus == dev->bus)
+			break;
 	}
 
 	pci_iterator_destroy(iter);
