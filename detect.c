@@ -81,7 +81,6 @@ void initbits(int fam) {
 	// The majority of these is the same from R600 to Southern Islands.
 
 	bits.ee = (1 << 10);
-	bits.vc = (1 << 11);
 	bits.vgt = (1 << 16) | (1 << 17);
 	bits.ta = (1 << 14);
 	bits.tc = (1 << 19);

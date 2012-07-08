@@ -90,7 +90,6 @@ extern const char * const family_str[];
 // bits
 struct bits_t {
 	unsigned int ee;
-	unsigned int vc;
 	unsigned int vgt;
 	unsigned int gui;
 	unsigned int ta;

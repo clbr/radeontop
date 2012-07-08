@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: radeontop\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-07 22:49+0300\n"
+"POT-Creation-Date: 2012-07-08 13:36+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -36,7 +36,7 @@ msgstr ""
 msgid "mmap failed"
 msgstr ""
 
-#: radeontop.c:28
+#: radeontop.c:32
 #, c-format
 msgid ""
 "\n"
@@ -49,11 +49,11 @@ msgid ""
 "-t --ticks 50\t\tSamples per second (default %u)\n"
 msgstr ""
 
-#: radeontop.c:82
+#: radeontop.c:93
 msgid "Unknown Radeon card. <= R500 won't work, new cards might."
 msgstr ""
 
-#: radeontop.c:91
+#: radeontop.c:102
 #, c-format
 msgid "Collecting data, please wait....\n"
 msgstr ""
@@ -63,77 +63,72 @@ msgstr ""
 msgid "radeontop %s, running on %s, %u samples/sec"
 msgstr ""
 
-#: ui.c:132
+#: ui.c:131
 #, c-format
 msgid "Graphics pipe %.2f%%"
 msgstr ""
 
-#: ui.c:138
+#: ui.c:137
 #, c-format
 msgid "Event Engine %.2f%%"
 msgstr ""
 
-#: ui.c:145
-#, c-format
-msgid "Vertex Cache %.2f%%"
-msgstr ""
-
-#: ui.c:148
+#: ui.c:144
 #, c-format
 msgid "Vertex Grouper + Tesselator %.2f%%"
 msgstr ""
 
-#: ui.c:156
+#: ui.c:152
 #, c-format
 msgid "Texture Addresser %.2f%%"
 msgstr ""
 
-#: ui.c:159
+#: ui.c:155
 #, c-format
 msgid "Texture Cache %.2f%%"
 msgstr ""
 
-#: ui.c:167
+#: ui.c:163
 #, c-format
 msgid "Shader Export %.2f%%"
 msgstr ""
 
-#: ui.c:170
+#: ui.c:166
 #, c-format
 msgid "Sequencer Instruction Cache %.2f%%"
 msgstr ""
 
-#: ui.c:173
+#: ui.c:169
 #, c-format
 msgid "Shader Interpolator %.2f%%"
 msgstr ""
 
-#: ui.c:176
+#: ui.c:172
 #, c-format
 msgid "Shader Memory Exchange %.2f%%"
 msgstr ""
 
-#: ui.c:183
+#: ui.c:179
 #, c-format
 msgid "Scan Converter %.2f%%"
 msgstr ""
 
-#: ui.c:186
+#: ui.c:182
 #, c-format
 msgid "Primitive Assembly %.2f%%"
 msgstr ""
 
-#: ui.c:193
+#: ui.c:189
 #, c-format
 msgid "Depth Block %.2f%%"
 msgstr ""
 
-#: ui.c:196
+#: ui.c:192
 #, c-format
 msgid "Color Block %.2f%%"
 msgstr ""
 
-#: ui.c:199
+#: ui.c:195
 #, c-format
 msgid "Clip Rectangle %.2f%%"
 msgstr ""

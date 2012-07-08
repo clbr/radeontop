@@ -108,7 +108,6 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 		// Again, no need to protect these. Worst that happens is a slightly
 		// wrong number.
 		float ee = 100.0 * (float) results->ee / ticks;
-		float vc = 100.0 * (float) results->vc / ticks;
 		float vgt = 100.0 * (float) results->vgt / ticks;
 		float gui = 100.0 * (float) results->gui / ticks;
 		float ta = 100.0 * (float) results->ta / ticks;
@@ -141,9 +140,6 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 		if (h > bigh) start++;
 
 		if (color) attron(COLOR_PAIR(2));
-		percentage(start, w, vc);
-		printright(start++, hw, _("Vertex Cache %.2f%%"), vc);
-
 		percentage(start, w, vgt);
 		printright(start++, hw, _("Vertex Grouper + Tesselator %.2f%%"), vgt);
 		if (color) attroff(COLOR_PAIR(2));

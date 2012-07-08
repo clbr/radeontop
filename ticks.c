@@ -37,7 +37,6 @@ static void *collector(void *arg) {
 		memset(&history[cur], 0, sizeof(struct bits_t));
 
 		if (stat & bits.ee) history[cur].ee = 1;
-		if (stat & bits.vc) history[cur].vc = 1;
 		if (stat & bits.vgt) history[cur].vgt = 1;
 		if (stat & bits.gui) history[cur].gui = 1;
 		if (stat & bits.ta) history[cur].ta = 1;
@@ -65,7 +64,6 @@ static void *collector(void *arg) {
 
 			for (i = 0; i < ticks; i++) {
 				res[curres].ee += history[i].ee;
-				res[curres].vc += history[i].vc;
 				res[curres].vgt += history[i].vgt;
 				res[curres].gui += history[i].gui;
 				res[curres].ta += history[i].ta;
