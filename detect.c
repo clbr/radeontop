@@ -95,7 +95,12 @@ void initbits(int fam) {
 	bits.cb = (1 << 30);
 	bits.gui = (1 << 31);
 
-	// R600 has a different texture bit
-	if (fam < RV770)
+	// R600 has a different texture bit, and only R600 has the TC, CR, SMX bits
+	if (fam < RV770) {
 		bits.ta = (1 << 18);
+	} else {
+		bits.tc = 0;
+		bits.cr = 0;
+		bits.smx = 0;
+	}
 }

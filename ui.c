@@ -151,8 +151,11 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 		percentage(start, w, ta);
 		printright(start++, hw, _("Texture Addresser %.2f%%"), ta);
 
-		percentage(start, w, tc);
-		printright(start++, hw, _("Texture Cache %.2f%%"), tc);
+		// This is only present on R600
+		if (bits.tc) {
+			percentage(start, w, tc);
+			printright(start++, hw, _("Texture Cache %.2f%%"), tc);
+		}
 		if (color) attroff(COLOR_PAIR(3));
 
 		// Enough height?
@@ -168,8 +171,11 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 		percentage(start, w, spi);
 		printright(start++, hw, _("Shader Interpolator %.2f%%"), spi);
 
-		percentage(start, w, smx);
-		printright(start++, hw, _("Shader Memory Exchange %.2f%%"), smx);
+		// only on R600
+		if (bits.smx) {
+			percentage(start, w, smx);
+			printright(start++, hw, _("Shader Memory Exchange %.2f%%"), smx);
+		}
 		if (color) attroff(COLOR_PAIR(4));
 
 		// Enough height?
@@ -191,8 +197,11 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 		percentage(start, w, cb);
 		printright(start++, hw, _("Color Block %.2f%%"), cb);
 
-		percentage(start, w, cr);
-		printright(start++, hw, _("Clip Rectangle %.2f%%"), cr);
+		// Only present on R600
+		if (bits.cr) {
+			percentage(start, w, cr);
+			printright(start++, hw, _("Clip Rectangle %.2f%%"), cr);
+		}
 		if (color) attroff(COLOR_PAIR(5));
 
 		refresh();
