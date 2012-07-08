@@ -1,4 +1,5 @@
 INSTALL ?= install
+MSGFMT ?= msgfmt
 
 src = $(wildcard *.po)
 obj = $(src:.po=.mo)
@@ -11,7 +12,7 @@ all: $(obj)
 $(obj): $(src)
 
 %.mo: %.po
-	msgfmt -o $@ $<
+	$(MSGFMT) -o $@ $<
 
 %.inst: %.mo
 	$(INSTALL) -D -m 644 $< $(DESTDIR)/$(PREFIX)/share/locale/$*/LC_MESSAGES/$<
