@@ -36,6 +36,8 @@ $(bin): $(obj)
 clean:
 	rm -f *.o $(bin)
 
+.git:
+
 version.h: .git
 	./getver.sh
 
