@@ -20,10 +20,10 @@ else
 endif
 
 LDFLAGS += -Wl,-O1 -Wl,-gc-sections
-LDFLAGS += $(shell pkg-config --libs pciaccess)
+LIBS += $(shell pkg-config --libs pciaccess)
 
 # On some distros, you might have to change this to ncursesw
-LDFLAGS += -lncurses
+LIBS += -lncurses
 
 .PHONY: all clean install man
 
@@ -32,7 +32,7 @@ all: $(bin)
 $(obj): $(wildcard *.h) version.h
 
 $(bin): $(obj)
-	$(CC) -o $(bin) $(obj) $(CFLAGS) $(LDFLAGS)
+	$(CC) -o $(bin) $(obj) $(CFLAGS) $(LDFLAGS) $(LIBS)
 
 clean:
 	rm -f *.o $(bin)
