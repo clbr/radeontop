@@ -2,10 +2,12 @@ PREFIX ?= /usr
 VERSION = $(shell git describe 2>/dev/null || echo "unknown")
 
 # programs
+A2X = a2x
 STRIP = strip
 MAKE = make
 INSTALL = install
 INSTALL_PROGRAM = $(INSTALL) -D -m755
+INSTALL_DATA = $(INSTALL) -D -m644
 XGETTEXT = xgettext
 RM = rm
 
@@ -33,7 +35,7 @@ LIBS += \
 	$(shell pkg-config --libs pciaccess) \
 	$(shell pkg-config --libs ncurses)
 
-.PHONY: all clean install
+.PHONY: all clean install man
 
 all: $(bin)
 
@@ -60,6 +62,10 @@ trans:
 strip:
 	$(STRIP) --strip-unneeded -R .comment -R .GCC.command.line $(bin)
 
-install:
+install: all
 	$(INSTALL_PROGRAM) $(bin) $(DESTDIR)/$(PREFIX)/sbin/$(bin)
+	$(INSTALL_DATA) radeontop.1 $(DESTDIR)/$(PREFIX)/share/man/man1/radeontop.1
 	$(MAKE) -C translations install PREFIX=$(PREFIX)
+
+man:
+	$(A2X) -f manpage radeontop.asc
