@@ -12,6 +12,7 @@ CFLAGS ?= -Os
 CFLAGS += -Wall -Wextra -pthread
 CFLAGS += -ffunction-sections -fdata-sections
 CFLAGS += $(shell pkg-config --cflags pciaccess)
+CFLAGS += $(shell pkg-config --cflags ncurses 2>/dev/null)
 
 # Comment this if you don't want translations
 CFLAGS += -DENABLE_NLS=1
@@ -26,7 +27,7 @@ LDFLAGS += -Wl,-O1 -Wl,-gc-sections
 LIBS += $(shell pkg-config --libs pciaccess)
 
 # On some distros, you might have to change this to ncursesw
-LIBS += -lncurses
+LIBS += $(shell pkg-config --libs ncurses 2>/dev/null || echo "-lncurses")
 
 .PHONY: all clean install man
 
