@@ -32,7 +32,7 @@ all: $(bin)
 $(obj): $(wildcard *.h) version.h
 
 $(bin): $(obj)
-	gcc -o $(bin) $(obj) $(CFLAGS) $(LDFLAGS)
+	$(CC) -o $(bin) $(obj) $(CFLAGS) $(LDFLAGS)
 
 clean:
 	rm -f *.o $(bin)
