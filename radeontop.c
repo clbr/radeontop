@@ -49,7 +49,7 @@ unsigned int readgrbm() {
 
 int main(int argc, char **argv) {
 
-	unsigned int ticks = 60;
+	unsigned int ticks = 120;
 	unsigned char color = 0;
 
 	// Translations
