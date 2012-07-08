@@ -1,4 +1,5 @@
 PREFIX ?= /usr
+INSTALL ?= install
 
 bin = radeontop
 src = $(wildcard *.c)
@@ -46,9 +47,9 @@ trans:
 	--package-name radeontop
 
 install: all
-	install -D -m755 $(bin) $(DESTDIR)/$(PREFIX)/sbin/$(bin)
-	install -D -m644 radeontop.1 $(DESTDIR)/$(PREFIX)/share/man/man1/radeontop.1
-	make -C translations install PREFIX=$(PREFIX)
+	$(INSTALL) -D -m755 $(bin) $(DESTDIR)/$(PREFIX)/sbin/$(bin)
+	$(INSTALL) -D -m644 radeontop.1 $(DESTDIR)/$(PREFIX)/share/man/man1/radeontop.1
+	$(MAKE) -C translations install PREFIX=$(PREFIX)
 
 man:
 	a2x -f manpage radeontop.asc
