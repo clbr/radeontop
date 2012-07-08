@@ -2,12 +2,12 @@
 .\"     Title: radeontop
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.77.1 <http://docbook.sf.net/>
-.\"      Date: 07/08/2012
+.\"      Date: 07/09/2012
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "RADEONTOP" "1" "07/08/2012" "\ \&" "\ \&"
+.TH "RADEONTOP" "1" "07/09/2012" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -31,13 +31,20 @@
 radeontop \- tool to show GPU utilization
 .SH "SYNOPSIS"
 .sp
-\fBradeontop [\-ch] [\-t \fR\fB\fIticks\fR\fR\fB]\fR
+\fBradeontop [\-ch] [\-b \fR\fB\fIbus\fR\fR\fB] [\-t \fR\fB\fIticks\fR\fR\fB]\fR
 .SH "DESCRIPTION"
 .sp
 RadeonTop shows the utilization of your GPU, both in general and by blocks\&.
 .sp
 Supported cards are R600 and up\&.
 .SH "OPTIONS"
+.PP
+\fB\-b, \-\-bus \fR\fB\fIbus\fR\fR
+.RS 4
+If you have multiple cards, use this parameter to select a specific one\&. For lspci output
+\fI01:00\&.0 VGA compatible controller\fR, bus would be
+\fI1\fR\&.
+.RE
 .PP
 \fB\-c, \-\-color\fR
 .RS 4
@@ -46,7 +53,7 @@ Enables colorized output\&.
 .PP
 \fB\-h, \-\-help\fR
 .RS 4
-Displays help
+Displays help\&.
 .RE
 .PP
 \fB\-t, \-\-ticks \fR\fB\fIticks\fR\fR
