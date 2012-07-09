@@ -109,6 +109,6 @@ int main(int argc, char **argv) {
 
 	present(ticks, cardname, color);
 
-	munmap((void *) area, 4);
+	munmap((void *) area, MMAP_SIZE);
 	return 0;
 }

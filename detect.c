@@ -59,7 +59,7 @@ unsigned int init_pci(unsigned char bus) {
 	int mem = open("/dev/mem", O_RDONLY);
 	if (mem < 0) die(_("Can't open /dev/mem, are you root?"));
 
-	area = mmap(NULL, 4, PROT_READ, MAP_PRIVATE, mem,
+	area = mmap(NULL, MMAP_SIZE, PROT_READ, MAP_PRIVATE, mem,
 			dev->regions[2].base_addr + 0x8000);
 	if (area == MAP_FAILED) die(_("mmap failed"));
 
