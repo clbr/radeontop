@@ -68,3 +68,4 @@ dist: clean version.h
 	rm $(name)
 	advdef -z4 /tmp/$(name).tgz
 	git checkout Makefile
+	cd /tmp && sha1sum $(name).tgz > $(name).tgz.sha1
