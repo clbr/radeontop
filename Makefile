@@ -29,7 +29,7 @@ LIBS += $(shell pkg-config --libs pciaccess)
 # On some distros, you might have to change this to ncursesw
 LIBS += $(shell pkg-config --libs ncurses 2>/dev/null || echo "-lncurses")
 
-.PHONY: all clean install man
+.PHONY: all clean install man dist
 
 all: $(bin)
 
@@ -57,3 +57,14 @@ install: all
 
 man:
 	a2x -f manpage radeontop.asc
+
+dist: ver = $(shell git describe)
+dist: name = $(bin)-$(ver)
+dist: clean version.h
+	sed -i '/getver.sh/d' Makefile
+	cd .. && \
+	ln -s $(bin) $(name) && \
+	tar -h --numeric-owner --exclude-vcs -cvf - $(name) | pigz -9 > /tmp/$(name).tgz && \
+	rm $(name)
+	advdef -z4 /tmp/$(name).tgz
+	git checkout Makefile
