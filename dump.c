@@ -18,4 +18,10 @@
 
 void dumpdata(const char file[], const unsigned int limit) {
 
+	printf("Dumping to %s, ", file);
+
+	if (limit)
+		printf("line limit %u.\n", limit);
+	else
+		puts("until termination.");
 }
