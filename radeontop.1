@@ -2,12 +2,12 @@
 .\"     Title: radeontop
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.77.1 <http://docbook.sf.net/>
-.\"      Date: 07/09/2012
+.\"      Date: 07/11/2012
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "RADEONTOP" "1" "07/09/2012" "\ \&" "\ \&"
+.TH "RADEONTOP" "1" "07/11/2012" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -31,7 +31,7 @@
 radeontop \- tool to show GPU utilization
 .SH "SYNOPSIS"
 .sp
-\fBradeontop [\-ch] [\-b \fR\fB\fIbus\fR\fR\fB] [\-t \fR\fB\fIticks\fR\fR\fB]\fR
+\fBradeontop [\-chv] [\-b \fR\fB\fIbus\fR\fR\fB] [\-d \fR\fB\fIfile\fR\fR\fB] [\-l \fR\fB\fIlimit\fR\fR\fB] [\-t \fR\fB\fIticks\fR\fR\fB]\fR
 .SH "DESCRIPTION"
 .sp
 RadeonTop shows the utilization of your GPU, both in general and by blocks\&.
@@ -51,14 +51,44 @@ If you have multiple cards, use this parameter to select a specific one\&. For l
 Enables colorized output\&.
 .RE
 .PP
+\fB\-d, \-\-dump \fR\fB\fIfile\fR\fR
+.RS 4
+Instead of displaying the data, dump it to
+\fIfile\fR\&. Use
+\fI\-\fR
+for stdout\&. The file is appended to, so it\(cqs safe to specify the same filename for consecutive runs\&.
+
+Use
+\fISIGTERM\fR
+or
+\fISIGINT\fR
+for graceful termination\&.
+.RE
+.PP
 \fB\-h, \-\-help\fR
 .RS 4
 Displays help\&.
 .RE
 .PP
+\fB\-l, \-\-limit \fR\fB\fIlimit\fR\fR
+.RS 4
+Quit after dumping
+\fIlimit\fR
+lines\&. Only valid in dump mode\&. Default is to dump until terminated; use
+\fISIGTERM\fR
+or
+\fISIGINT\fR
+for graceful termination\&.
+.RE
+.PP
 \fB\-t, \-\-ticks \fR\fB\fIticks\fR\fR
 .RS 4
 How many times per second to sample the data\&. The default is 120\&. Higher numbers mean more accurate output and more overhead\&.
+.RE
+.PP
+\fB\-v, \-\-version\fR
+.RS 4
+Displays the program version\&.
 .RE
 .SH "RESOURCES"
 .sp
