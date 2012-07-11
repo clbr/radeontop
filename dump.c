@@ -39,4 +39,8 @@ void dumpdata(const char file[], const unsigned int limit) {
 		usleep(16000);
 
 	// Action
+	unsigned int count;
+
+	for (count = limit; !limit || count; count--) {
+	}
 }
