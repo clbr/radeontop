@@ -18,6 +18,9 @@
 
 void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit) {
 
+	// This is a data format, so disable decimal point localization
+	setlocale(LC_NUMERIC, "C");
+
 	printf(_("Dumping to %s, "), file);
 
 	if (limit)
@@ -25,6 +28,7 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 	else
 		puts(_("until termination."));
 
+	// Check the file can be output to
 	FILE *f = NULL;
 	if (file[0] == '-')
 		f = stdout;
@@ -42,5 +46,53 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 	unsigned int count;
 
 	for (count = limit; !limit || count; count--) {
+
+		struct timeval t;
+		gettimeofday(&t, NULL);
+
+		fprintf(f, "%llu.%llu: ", (unsigned long long) t.tv_sec,
+				(unsigned long long) t.tv_usec);
+
+		// Again, no need to protect these. Worst that happens is a slightly
+		// wrong number.
+		float ee = 100.0 * (float) results->ee / ticks;
+		float vgt = 100.0 * (float) results->vgt / ticks;
+		float gui = 100.0 * (float) results->gui / ticks;
+		float ta = 100.0 * (float) results->ta / ticks;
+		float tc = 100.0 * (float) results->tc / ticks;
+		float sx = 100.0 * (float) results->sx / ticks;
+		float sh = 100.0 * (float) results->sh / ticks;
+		float spi = 100.0 * (float) results->spi / ticks;
+		float smx = 100.0 * (float) results->smx / ticks;
+		float sc = 100.0 * (float) results->sc / ticks;
+		float pa = 100.0 * (float) results->pa / ticks;
+		float db = 100.0 * (float) results->db / ticks;
+		float cr = 100.0 * (float) results->cr / ticks;
+		float cb = 100.0 * (float) results->cb / ticks;
+
+		fprintf(f, "gpu %.2f%%, ", gui);
+		fprintf(f, "ee %.2f%%, ", ee);
+		fprintf(f, "vgt %.2f%%, ", vgt);
+		fprintf(f, "ta %.2f%%, ", ta);
+
+		if (bits.tc)
+			fprintf(f, "tc %.2f%%, ", tc);
+
+		fprintf(f, "sx %.2f%%, ", sx);
+		fprintf(f, "sh %.2f%%, ", sh);
+		fprintf(f, "spi %.2f%%, ", spi);
+
+		if (bits.smx)
+			fprintf(f, "smx %.2f%%, ", smx);
+
+		if (bits.cr)
+			fprintf(f, "cr %.2f%%, ", cr);
+
+		fprintf(f, "sc %.2f%%, ", sc);
+		fprintf(f, "pa %.2f%%, ", pa);
+		fprintf(f, "db %.2f%%, ", db);
+		fprintf(f, "cb %.2f%%\n", cb);
+
+		sleep(1);
 	}
 }
