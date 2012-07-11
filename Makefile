@@ -61,7 +61,7 @@ man:
 dist: ver = $(shell git describe)
 dist: name = $(bin)-$(ver)
 dist: clean version.h
-	sed -i '/getver.sh/d' Makefile
+	sed -i '/\t\.\/getver.sh/d' Makefile
 	cd .. && \
 	ln -s $(bin) $(name) && \
 	tar -h --numeric-owner --exclude-vcs -cvf - $(name) | pigz -9 > /tmp/$(name).tgz && \
