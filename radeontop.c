@@ -62,6 +62,8 @@ int main(int argc, char **argv) {
 	unsigned int ticks = 120;
 	unsigned char color = 0;
 	unsigned char bus = 0;
+	unsigned int limit = 0;
+	char *dump = NULL;
 
 	// Translations
 #ifdef ENABLE_NLS
@@ -74,14 +76,16 @@ int main(int argc, char **argv) {
 	const struct option opts[] = {
 		{"bus", 1, 0, 'b'},
 		{"color", 0, 0, 'c'},
+		{"dump", 1, 0, 'd'},
 		{"help", 0, 0, 'h'},
+		{"limit", 1, 0, 'l'},
 		{"ticks", 1, 0, 't'},
 		{"version", 0, 0, 'v'},
 		{0, 0, 0, 0}
 	};
 
 	while (1) {
-		int c = getopt_long(argc, argv, "b:cht:v", opts, NULL);
+		int c = getopt_long(argc, argv, "b:cd:hl:t:v", opts, NULL);
 		if (c == -1) break;
 
 		switch(c) {
@@ -100,6 +104,12 @@ int main(int argc, char **argv) {
 			break;
 			case 'v':
 				version();
+			break;
+			case 'l':
+				limit = atoi(optarg);
+			break;
+			case 'd':
+				dump = optarg;
 			break;
 		}
 	}
@@ -120,7 +130,10 @@ int main(int argc, char **argv) {
 
 	printf(_("Collecting data, please wait....\n"));
 
-	present(ticks, cardname, color);
+	if (dump)
+		dumpdata(dump, limit);
+	else
+		present(ticks, cardname, color);
 
 	munmap((void *) area, MMAP_SIZE);
 	return 0;
