@@ -30,6 +30,7 @@ void die(const char * const why) {
 
 static void version() {
 	printf("RadeonTop %s\n", VERSION);
+	exit(1);
 }
 
 static void help(const char * const me, const unsigned int ticks) {
@@ -75,11 +76,12 @@ int main(int argc, char **argv) {
 		{"color", 0, 0, 'c'},
 		{"help", 0, 0, 'h'},
 		{"ticks", 1, 0, 't'},
+		{"version", 0, 0, 'v'},
 		{0, 0, 0, 0}
 	};
 
 	while (1) {
-		int c = getopt_long(argc, argv, "b:cht:", opts, NULL);
+		int c = getopt_long(argc, argv, "b:cht:v", opts, NULL);
 		if (c == -1) break;
 
 		switch(c) {
@@ -95,6 +97,9 @@ int main(int argc, char **argv) {
 			break;
 			case 'b':
 				bus = atoi(optarg);
+			break;
+			case 'v':
+				version();
 			break;
 		}
 	}
