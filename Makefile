@@ -10,6 +10,7 @@ obj = $(src:.c=.o)
 
 CFLAGS ?= -Os
 CFLAGS += -Wall -Wextra -pthread
+CFLAGS += -Iinclude
 CFLAGS += -ffunction-sections -fdata-sections
 CFLAGS += $(shell pkg-config --cflags pciaccess)
 CFLAGS += $(shell pkg-config --cflags ncurses 2>/dev/null)
@@ -33,7 +34,7 @@ LIBS += $(shell pkg-config --libs ncurses 2>/dev/null || echo "-lncurses")
 
 all: $(bin)
 
-$(obj): $(wildcard *.h) version.h
+$(obj): $(wildcard include/*.h) include/version.h
 
 $(bin): $(obj)
 	$(CC) -o $(bin) $(obj) $(CFLAGS) $(LDFLAGS) $(LIBS)
@@ -43,7 +44,7 @@ clean:
 
 .git:
 
-version.h: .git
+include/version.h: .git
 	./getver.sh
 
 trans:
