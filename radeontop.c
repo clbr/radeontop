@@ -28,13 +28,21 @@ void die(const char * const why) {
 	exit(1);
 }
 
+static void version() {
+	printf("RadeonTop %s\n", VERSION);
+}
+
 static void help(const char * const me, const unsigned int ticks) {
 	printf(_("\n\tRadeonTop for R600 and above.\n\n"
-		"\tUsage: %s [-ch] [-b bus] [-t ticks]\n\n"
+		"\tUsage: %s [-ch] [-b bus] [-d file] [-l limit] [-t ticks]\n\n"
 		"-b --bus 3		Pick card from this PCI bus\n"
 		"-c --color		Enable colors\n"
+		"-d --dump file		Dump data to this file, - for stdout\n"
+		"-l --limit 3		Quit after dumping N lines, default forever\n"
+		"-t --ticks 50		Samples per second (default %u)\n"
+		"\n"
 		"-h --help		Show this help\n"
-		"-t --ticks 50		Samples per second (default %u)\n"),
+		"-v --version		Show the version\n"),
 		me, ticks);
 	die("");
 }
