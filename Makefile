@@ -7,6 +7,7 @@ INSTALL ?= install
 bin = radeontop
 src = $(wildcard *.c)
 obj = $(src:.c=.o)
+verh = include/version.h
 
 CFLAGS ?= -Os
 CFLAGS += -Wall -Wextra -pthread
@@ -34,7 +35,7 @@ LIBS += $(shell pkg-config --libs ncurses 2>/dev/null || echo "-lncurses")
 
 all: $(bin)
 
-$(obj): $(wildcard include/*.h) include/version.h
+$(obj): $(wildcard include/*.h) $(verh)
 
 $(bin): $(obj)
 	$(CC) -o $(bin) $(obj) $(CFLAGS) $(LDFLAGS) $(LIBS)
@@ -44,7 +45,7 @@ clean:
 
 .git:
 
-include/version.h: .git
+$(verh): .git
 	./getver.sh
 
 trans:
@@ -61,7 +62,7 @@ man:
 
 dist: ver = $(shell git describe)
 dist: name = $(bin)-$(ver)
-dist: clean version.h
+dist: clean $(verh)
 	sed -i '/\t\.\/getver.sh/d' Makefile
 	cd .. && \
 	ln -s $(bin) $(name) && \
