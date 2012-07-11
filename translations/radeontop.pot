@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: radeontop\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-09 00:49+0300\n"
+"POT-Creation-Date: 2012-07-11 15:00+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -36,100 +36,122 @@ msgstr ""
 msgid "mmap failed"
 msgstr ""
 
-#: radeontop.c:32
+#: dump.c:44
+#, c-format
+msgid "Dumping to %s, "
+msgstr ""
+
+#: dump.c:47
+#, c-format
+msgid "line limit %u.\n"
+msgstr ""
+
+#: dump.c:49
+msgid "until termination."
+msgstr ""
+
+#: dump.c:59
+msgid "Can't open file for writing."
+msgstr ""
+
+#: radeontop.c:37
 #, c-format
 msgid ""
 "\n"
 "\tRadeonTop for R600 and above.\n"
 "\n"
-"\tUsage: %s [-ch] [-b bus] [-t ticks]\n"
+"\tUsage: %s [-ch] [-b bus] [-d file] [-l limit] [-t ticks]\n"
 "\n"
 "-b --bus 3\t\tPick card from this PCI bus\n"
 "-c --color\t\tEnable colors\n"
-"-h --help\t\tShow this help\n"
+"-d --dump file\t\tDump data to this file, - for stdout\n"
+"-l --limit 3\t\tQuit after dumping N lines, default forever\n"
 "-t --ticks 50\t\tSamples per second (default %u)\n"
+"\n"
+"-h --help\t\tShow this help\n"
+"-v --version\t\tShow the version\n"
 msgstr ""
 
-#: radeontop.c:99
+#: radeontop.c:122
 msgid "Unknown Radeon card. <= R500 won't work, new cards might."
 msgstr ""
 
-#: radeontop.c:108
+#: ui.c:71
 #, c-format
 msgid "Collecting data, please wait....\n"
 msgstr ""
 
-#: ui.c:99
+#: ui.c:101
 #, c-format
 msgid "radeontop %s, running on %s, %u samples/sec"
 msgstr ""
 
-#: ui.c:131
+#: ui.c:133
 #, c-format
-msgid "Graphics pipe %.2f%%"
+msgid "Graphics pipe %6.2f%%"
 msgstr ""
 
-#: ui.c:137
+#: ui.c:139
 #, c-format
-msgid "Event Engine %.2f%%"
+msgid "Event Engine %6.2f%%"
 msgstr ""
 
-#: ui.c:144
+#: ui.c:146
 #, c-format
-msgid "Vertex Grouper + Tesselator %.2f%%"
+msgid "Vertex Grouper + Tesselator %6.2f%%"
 msgstr ""
 
-#: ui.c:152
+#: ui.c:154
 #, c-format
-msgid "Texture Addresser %.2f%%"
+msgid "Texture Addresser %6.2f%%"
 msgstr ""
 
-#: ui.c:157
+#: ui.c:159
 #, c-format
-msgid "Texture Cache %.2f%%"
+msgid "Texture Cache %6.2f%%"
 msgstr ""
 
-#: ui.c:166
+#: ui.c:168
 #, c-format
-msgid "Shader Export %.2f%%"
+msgid "Shader Export %6.2f%%"
 msgstr ""
 
-#: ui.c:169
+#: ui.c:171
 #, c-format
-msgid "Sequencer Instruction Cache %.2f%%"
+msgid "Sequencer Instruction Cache %6.2f%%"
 msgstr ""
 
-#: ui.c:172
+#: ui.c:174
 #, c-format
-msgid "Shader Interpolator %.2f%%"
+msgid "Shader Interpolator %6.2f%%"
 msgstr ""
 
-#: ui.c:177
+#: ui.c:179
 #, c-format
-msgid "Shader Memory Exchange %.2f%%"
+msgid "Shader Memory Exchange %6.2f%%"
 msgstr ""
 
-#: ui.c:185
+#: ui.c:187
 #, c-format
-msgid "Scan Converter %.2f%%"
+msgid "Scan Converter %6.2f%%"
 msgstr ""
 
-#: ui.c:188
+#: ui.c:190
 #, c-format
-msgid "Primitive Assembly %.2f%%"
+msgid "Primitive Assembly %6.2f%%"
 msgstr ""
 
-#: ui.c:195
+#: ui.c:197
 #, c-format
-msgid "Depth Block %.2f%%"
+msgid "Depth Block %6.2f%%"
 msgstr ""
 
-#: ui.c:198
+#: ui.c:200
 #, c-format
-msgid "Color Block %.2f%%"
+msgid "Color Block %6.2f%%"
 msgstr ""
 
-#: ui.c:203
+#: ui.c:205
 #, c-format
-msgid "Clip Rectangle %.2f%%"
+msgid "Clip Rectangle %6.2f%%"
 msgstr ""
