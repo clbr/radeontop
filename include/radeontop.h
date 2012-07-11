@@ -31,8 +31,10 @@
 #include <unistd.h>
 #include <string.h>
 
-#define GRBM_STATUS 0x8010
-#define MMAP_SIZE 0x14
+enum {
+	GRBM_STATUS = 0x8010,
+	MMAP_SIZE = 0x14
+};
 
 // radeontop.c
 void die(const char *why);
