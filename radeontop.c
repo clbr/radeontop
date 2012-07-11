@@ -128,8 +128,6 @@ int main(int argc, char **argv) {
 	// runtime
 	collect(&ticks);
 
-	printf(_("Collecting data, please wait....\n"));
-
 	if (dump)
 		dumpdata(dump, limit);
 	else

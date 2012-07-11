@@ -68,6 +68,8 @@ static void percentage(const unsigned int y, const unsigned int w, const float p
 
 void present(const unsigned int ticks, const char card[], const unsigned int color) {
 
+	printf(_("Collecting data, please wait....\n"));
+
 	// This does not need to be atomic. A delay here is acceptable.
 	while(!results)
 		usleep(16000);
