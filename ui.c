@@ -128,20 +128,20 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 
 		if (color) attron(COLOR_PAIR(1));
 		percentage(2, w, gui);
-		printright(2, hw, _("Graphics pipe %.2f%%"), gui);
+		printright(2, hw, _("Graphics pipe %5.2f%%"), gui);
 		if (color) attroff(COLOR_PAIR(1));
 
 		unsigned int start = 4;
 
 		percentage(start, w, ee);
-		printright(start++, hw, _("Event Engine %.2f%%"), ee);
+		printright(start++, hw, _("Event Engine %5.2f%%"), ee);
 
 		// Enough height?
 		if (h > bigh) start++;
 
 		if (color) attron(COLOR_PAIR(2));
 		percentage(start, w, vgt);
-		printright(start++, hw, _("Vertex Grouper + Tesselator %.2f%%"), vgt);
+		printright(start++, hw, _("Vertex Grouper + Tesselator %5.2f%%"), vgt);
 		if (color) attroff(COLOR_PAIR(2));
 
 		// Enough height?
@@ -149,12 +149,12 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 
 		if (color) attron(COLOR_PAIR(3));
 		percentage(start, w, ta);
-		printright(start++, hw, _("Texture Addresser %.2f%%"), ta);
+		printright(start++, hw, _("Texture Addresser %5.2f%%"), ta);
 
 		// This is only present on R600
 		if (bits.tc) {
 			percentage(start, w, tc);
-			printright(start++, hw, _("Texture Cache %.2f%%"), tc);
+			printright(start++, hw, _("Texture Cache %5.2f%%"), tc);
 		}
 		if (color) attroff(COLOR_PAIR(3));
 
@@ -163,18 +163,18 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 
 		if (color) attron(COLOR_PAIR(4));
 		percentage(start, w, sx);
-		printright(start++, hw, _("Shader Export %.2f%%"), sx);
+		printright(start++, hw, _("Shader Export %5.2f%%"), sx);
 
 		percentage(start, w, sh);
-		printright(start++, hw, _("Sequencer Instruction Cache %.2f%%"), sh);
+		printright(start++, hw, _("Sequencer Instruction Cache %5.2f%%"), sh);
 
 		percentage(start, w, spi);
-		printright(start++, hw, _("Shader Interpolator %.2f%%"), spi);
+		printright(start++, hw, _("Shader Interpolator %5.2f%%"), spi);
 
 		// only on R600
 		if (bits.smx) {
 			percentage(start, w, smx);
-			printright(start++, hw, _("Shader Memory Exchange %.2f%%"), smx);
+			printright(start++, hw, _("Shader Memory Exchange %5.2f%%"), smx);
 		}
 		if (color) attroff(COLOR_PAIR(4));
 
@@ -182,25 +182,25 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 		if (h > bigh) start++;
 
 		percentage(start, w, sc);
-		printright(start++, hw, _("Scan Converter %.2f%%"), sc);
+		printright(start++, hw, _("Scan Converter %5.2f%%"), sc);
 
 		percentage(start, w, pa);
-		printright(start++, hw, _("Primitive Assembly %.2f%%"), pa);
+		printright(start++, hw, _("Primitive Assembly %5.2f%%"), pa);
 
 		// Enough height?
 		if (h > bigh) start++;
 
 		if (color) attron(COLOR_PAIR(5));
 		percentage(start, w, db);
-		printright(start++, hw, _("Depth Block %.2f%%"), db);
+		printright(start++, hw, _("Depth Block %5.2f%%"), db);
 
 		percentage(start, w, cb);
-		printright(start++, hw, _("Color Block %.2f%%"), cb);
+		printright(start++, hw, _("Color Block %5.2f%%"), cb);
 
 		// Only present on R600
 		if (bits.cr) {
 			percentage(start, w, cr);
-			printright(start++, hw, _("Clip Rectangle %.2f%%"), cr);
+			printright(start++, hw, _("Clip Rectangle %5.2f%%"), cr);
 		}
 		if (color) attroff(COLOR_PAIR(5));
 
