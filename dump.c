@@ -16,6 +16,8 @@
 
 #include "radeontop.h"
 
+static unsigned char quit = 0;
+
 void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit) {
 
 	// This is a data format, so disable decimal point localization
@@ -93,6 +95,17 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		fprintf(f, "db %.2f%%, ", db);
 		fprintf(f, "cb %.2f%%\n", cb);
 
+		// Did we get a termination signal?
+		if (quit)
+			break;
+
 		sleep(1);
+	}
+
+	fflush(f);
+
+	if (f != stdout) {
+		fsync(fileno(f));
+		fclose(f);
 	}
 }
