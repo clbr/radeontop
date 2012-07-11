@@ -18,10 +18,25 @@
 
 void dumpdata(const char file[], const unsigned int limit) {
 
-	printf("Dumping to %s, ", file);
+	printf(_("Dumping to %s, "), file);
 
 	if (limit)
-		printf("line limit %u.\n", limit);
+		printf(_("line limit %u.\n"), limit);
 	else
-		puts("until termination.");
+		puts(_("until termination."));
+
+	FILE *f = NULL;
+	if (file[0] == '-')
+		f = stdout;
+	else
+		f = fopen(file, "a");
+
+	if (!f)
+		die(_("Can't open file for writing."));
+
+	// This does not need to be atomic. A delay here is acceptable.
+	while(!results)
+		usleep(16000);
+
+	// Action
 }
