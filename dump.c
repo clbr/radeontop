@@ -18,10 +18,28 @@
 
 static unsigned char quit = 0;
 
+static void sighandler(int sig) {
+
+	switch (sig) {
+		case SIGTERM:
+		case SIGINT:
+			quit = 1;
+		break;
+	}
+}
+
 void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit) {
 
 	// This is a data format, so disable decimal point localization
 	setlocale(LC_NUMERIC, "C");
+
+	// Set up signals to exit gracefully when terminated
+	struct sigaction sig;
+
+	sig.sa_handler = sighandler;
+
+	sigaction(SIGTERM, &sig, NULL);
+	sigaction(SIGINT, &sig, NULL);
 
 	printf(_("Dumping to %s, "), file);
 

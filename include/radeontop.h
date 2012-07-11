@@ -31,6 +31,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+#include <signal.h>
 
 enum {
 	GRBM_STATUS = 0x8010,
