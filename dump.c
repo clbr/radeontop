@@ -16,7 +16,7 @@
 
 #include "radeontop.h"
 
-void dumpdata(const char file[], const unsigned int limit) {
+void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit) {
 
 	printf(_("Dumping to %s, "), file);
 

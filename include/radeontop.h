@@ -56,7 +56,7 @@ extern struct bits_t *results;
 void present(const unsigned int ticks, const char card[], const unsigned int color);
 
 // dump.c
-void dumpdata(const char file[], const unsigned int limit);
+void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit);
 
 // chips
 enum radeon_family {

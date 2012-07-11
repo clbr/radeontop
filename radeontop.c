@@ -129,7 +129,7 @@ int main(int argc, char **argv) {
 	collect(&ticks);
 
 	if (dump)
-		dumpdata(dump, limit);
+		dumpdata(ticks, dump, limit);
 	else
 		present(ticks, cardname, color);
 
