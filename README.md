@@ -9,3 +9,10 @@ Supported cards
 ---------------
 
 R600 and up, even Southern Islands should work fine. Requires the open radeon drivers.
+
+Translations
+------------
+
+If you'd like to translate RadeonTop to your own language, please go here:
+
+https://translations.launchpad.net/radeontop
