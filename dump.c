@@ -30,8 +30,10 @@ static void sighandler(int sig) {
 
 void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit) {
 
+#ifdef ENABLE_NLS
 	// This is a data format, so disable decimal point localization
 	setlocale(LC_NUMERIC, "C");
+#endif
 
 	// Set up signals to exit gracefully when terminated
 	struct sigaction sig;

@@ -17,10 +17,6 @@
 #include "radeontop.h"
 #include <getopt.h>
 
-#ifdef ENABLE_NLS
-#include <locale.h>
-#endif
-
 const void *area;
 
 void die(const char * const why) {
