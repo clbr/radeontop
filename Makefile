@@ -1,8 +1,14 @@
 # The make-provided flags like MAKE and CC aren't set, on purpose.
 # This is Linux-specific software, so we can depend on GNU make.
 
+# Options:
+#	nls	enable translations, default on
+#	debug	enable debug symbols, default off
+
 PREFIX ?= /usr
 INSTALL ?= install
+
+nls ?= 1
 
 bin = radeontop
 src = $(wildcard *.c)
@@ -17,7 +23,9 @@ CFLAGS += $(shell pkg-config --cflags pciaccess)
 CFLAGS += $(shell pkg-config --cflags ncurses 2>/dev/null)
 
 # Comment this if you don't want translations
-CFLAGS += -DENABLE_NLS=1
+ifeq ($(nls), 1)
+	CFLAGS += -DENABLE_NLS=1
+endif
 
 ifdef debug
 	CFLAGS += -g
