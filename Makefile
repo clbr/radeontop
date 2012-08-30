@@ -15,10 +15,13 @@ src = $(wildcard *.c)
 obj = $(src:.c=.o)
 verh = include/version.h
 
+CFLAGS_SECTIONED = -ffunction-sections -fdata-sections
+LDFLAGS_SECTIONED = -Wl,-gc-sections
+
 CFLAGS ?= -Os
 CFLAGS += -Wall -Wextra -pthread
 CFLAGS += -Iinclude
-CFLAGS += -ffunction-sections -fdata-sections
+CFLAGS += $(CFLAGS_SECTIONED)
 CFLAGS += $(shell pkg-config --cflags pciaccess)
 CFLAGS += $(shell pkg-config --cflags ncurses 2>/dev/null)
 
@@ -33,7 +36,8 @@ else
 	CFLAGS += -s
 endif
 
-LDFLAGS += -Wl,-O1 -Wl,-gc-sections
+LDFLAGS ?= -Wl,-O1
+LDFLAGS += $(LDFLAGS_SECTIONED)
 LIBS += $(shell pkg-config --libs pciaccess)
 
 # On some distros, you might have to change this to ncursesw
