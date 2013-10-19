@@ -1,0 +1,173 @@
+# Russian translation for radeontop
+# Copyright (c) 2012 Rosetta Contributors and Canonical Ltd 2012
+# This file is distributed under the same license as the radeontop package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: radeontop\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2012-07-11 15:00+0300\n"
+"PO-Revision-Date: 2012-10-08 06:43+0000\n"
+"Last-Translator: Lev Lamberov <l.lamberov@gmail.com>\n"
+"Language-Team: Russian <ru@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2013-10-19 08:36+0000\n"
+"X-Generator: Launchpad (build 16807)\n"
+
+#: detect.c:26
+msgid "Failed to init pciaccess"
+msgstr "Не удалось инициализировать pciaccess"
+
+#: detect.c:53
+msgid "Can't find Radeon cards"
+msgstr "Не удалось найти карты Radeon"
+
+#: detect.c:55
+msgid "Can't get the register area size"
+msgstr "Не удалось получить размер register area"
+
+#: detect.c:60
+msgid "Can't open /dev/mem, are you root?"
+msgstr "Не удалось открыть /dev/mem, имеете ли вы привилегии root?"
+
+#: detect.c:64
+msgid "mmap failed"
+msgstr "mmap не удался"
+
+#: dump.c:44
+#, c-format
+msgid "Dumping to %s, "
+msgstr "Сбрасываем в %s, "
+
+#: dump.c:47
+#, c-format
+msgid "line limit %u.\n"
+msgstr "лимит строки %u.\n"
+
+#: dump.c:49
+msgid "until termination."
+msgstr "до завершения."
+
+#: dump.c:59
+msgid "Can't open file for writing."
+msgstr "Не удалось открыть файл для записи."
+
+#: radeontop.c:37
+#, c-format
+msgid ""
+"\n"
+"\tRadeonTop for R600 and above.\n"
+"\n"
+"\tUsage: %s [-ch] [-b bus] [-d file] [-l limit] [-t ticks]\n"
+"\n"
+"-b --bus 3\t\tPick card from this PCI bus\n"
+"-c --color\t\tEnable colors\n"
+"-d --dump file\t\tDump data to this file, - for stdout\n"
+"-l --limit 3\t\tQuit after dumping N lines, default forever\n"
+"-t --ticks 50\t\tSamples per second (default %u)\n"
+"\n"
+"-h --help\t\tShow this help\n"
+"-v --version\t\tShow the version\n"
+msgstr ""
+"\n"
+"\tRadeonTop для r600 и выше.\n"
+"\n"
+"\tИспользование: %s [-ch] [-b шина] [-d файл] [-l лимит] [-t тики]\n"
+"\n"
+"-b --bus 3\t\tВыбрать видеокарту на этой PCI шине\n"
+"-c --color\t\tВключить цвета\n"
+"-d --dump file\t\tСбросить данные в файл, - для стандартного вывода\n"
+"-l --limit 3\t\tВыйти после сброса N строк, по-умолчанию бесконечно\n"
+"-t --ticks 50\t\tСэмплов в секунду (по-умолчанию %u)\n"
+"\n"
+"-h --help\t\tПоказать помощь\n"
+"-v --version\t\tПоказать версию\n"
+
+#: radeontop.c:122
+msgid "Unknown Radeon card. <= R500 won't work, new cards might."
+msgstr ""
+"Неизвестная видеокарта Radeon. <= R500 не работают, новые видеокарты могут "
+"работать."
+
+#: ui.c:71
+#, c-format
+msgid "Collecting data, please wait....\n"
+msgstr "Сбор данных, пожалуйста, ждите....\n"
+
+#: ui.c:101
+#, c-format
+msgid "radeontop %s, running on %s, %u samples/sec"
+msgstr "radeontop %s запущен на %s, %u сэмплов/сек"
+
+#: ui.c:133
+#, c-format
+msgid "Graphics pipe %6.2f%%"
+msgstr "Графический канал %6.2f%%"
+
+#: ui.c:139
+#, c-format
+msgid "Event Engine %6.2f%%"
+msgstr "Обработка событий %6.2f%%"
+
+#: ui.c:146
+#, c-format
+msgid "Vertex Grouper + Tesselator %6.2f%%"
+msgstr "Вертексный группировщик + Тесселятор %6.2f%%"
+
+#: ui.c:154
+#, c-format
+msgid "Texture Addresser %6.2f%%"
+msgstr "Адрессовщик текстур %6.2f%%"
+
+#: ui.c:159
+#, c-format
+msgid "Texture Cache %6.2f%%"
+msgstr "Кэш текстур %6.2f%%"
+
+#: ui.c:168
+#, c-format
+msgid "Shader Export %6.2f%%"
+msgstr "Экспорт шейдеров %6.2f%%"
+
+#: ui.c:171
+#, c-format
+msgid "Sequencer Instruction Cache %6.2f%%"
+msgstr "Кэш секвенсора инструкций %6.2f%%"
+
+#: ui.c:174
+#, c-format
+msgid "Shader Interpolator %6.2f%%"
+msgstr "Интерполятор шейдеров %6.2ff%%"
+
+#: ui.c:179
+#, c-format
+msgid "Shader Memory Exchange %6.2f%%"
+msgstr "Обмен шейдерной памяти %6.2f%%"
+
+#: ui.c:187
+#, c-format
+msgid "Scan Converter %6.2f%%"
+msgstr "Конвертер сканирования %6.2f%%"
+
+#: ui.c:190
+#, c-format
+msgid "Primitive Assembly %6.2f%%"
+msgstr "Сборщик примитивов %6.2f%%"
+
+#: ui.c:197
+#, c-format
+msgid "Depth Block %6.2f%%"
+msgstr "Блок глубины %6.2f%%"
+
+#: ui.c:200
+#, c-format
+msgid "Color Block %6.2f%%"
+msgstr "Блок цвета %6.2f%%"
+
+#: ui.c:205
+#, c-format
+msgid "Clip Rectangle %6.2f%%"
+msgstr "Обрезка прямоугольников %6.2f%%"
