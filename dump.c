@@ -115,6 +115,8 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		fprintf(f, "db %.2f%%, ", db);
 		fprintf(f, "cb %.2f%%\n", cb);
 
+		fflush(f);
+
 		// Did we get a termination signal?
 		if (quit)
 			break;
