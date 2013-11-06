@@ -48,4 +48,9 @@ const char * const family_str[] = {
 	str(TAHITI),
 	str(PITCAIRN),
 	str(VERDE),
+	str(OLAND),
+	str(HAINAN),
+	str(BONAIRE),
+	str(KABINI),
+	str(KAVERI),
 };

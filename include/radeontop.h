@@ -92,6 +92,11 @@ enum radeon_family {
 	TAHITI,
 	PITCAIRN,
 	VERDE,
+	OLAND,
+	HAINAN,
+	BONAIRE,
+	KABINI,
+	KAVERI,
 };
 
 extern const char * const family_str[];
