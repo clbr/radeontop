@@ -11,6 +11,9 @@ Supported cards
 R600 and up, even Southern Islands should work fine.
 Works with both the open drivers and AMD Catalyst.
 
+The total GPU utilization is also valid for OpenCL loads; the other blocks
+are only useful in GL loads.
+
 Translations
 ------------
 
