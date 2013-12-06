@@ -25,7 +25,12 @@ static void printcenter(const unsigned int y, const unsigned int width,
 	va_list ap;
 	va_start(ap, fmt);
 
+#ifdef ENABLE_NLS
+	vasprintf(&ptr, fmt, ap);
+	const unsigned int len = mbstowcs(NULL, ptr, 0);
+#else
 	const unsigned int len = vasprintf(&ptr, fmt, ap);
+#endif
 
 	unsigned x = (width - len)/2;
 	if (len > width) x = 0;
@@ -43,7 +48,12 @@ static void printright(const unsigned int y, const unsigned int width,
 	va_list ap;
 	va_start(ap, fmt);
 
+#ifdef ENABLE_NLS
+	vasprintf(&ptr, fmt, ap);
+	const unsigned int len = mbstowcs(NULL, ptr, 0);
+#else
 	const unsigned int len = vasprintf(&ptr, fmt, ap);
+#endif
 
 	unsigned x = (width - len);
 	if (len > width) x = 0;
