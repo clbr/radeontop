@@ -41,7 +41,11 @@ LDFLAGS += $(LDFLAGS_SECTIONED)
 LIBS += $(shell pkg-config --libs pciaccess)
 
 # On some distros, you might have to change this to ncursesw
-LIBS += $(shell pkg-config --libs ncurses 2>/dev/null || echo "-lncurses")
+ifeq ($(nls), 1)
+	LIBS += $(shell pkg-config --libs ncursesw 2>/dev/null || echo "-lncursesw")
+else
+	LIBS += $(shell pkg-config --libs ncurses 2>/dev/null || echo "-lncurses")
+endif
 
 .PHONY: all clean install man dist
 
