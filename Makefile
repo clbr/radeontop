@@ -32,8 +32,6 @@ endif
 
 ifdef debug
 	CFLAGS += -g
-else
-	CFLAGS += -s
 endif
 
 LDFLAGS ?= -Wl,-O1
