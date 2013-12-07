@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: radeontop\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2012-07-11 15:00+0300\n"
-"PO-Revision-Date: 2012-10-08 06:43+0000\n"
-"Last-Translator: Lev Lamberov <l.lamberov@gmail.com>\n"
+"PO-Revision-Date: 2013-12-07 13:32+0000\n"
+"Last-Translator: Nikoli <Unknown>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2013-10-19 08:36+0000\n"
-"X-Generator: Launchpad (build 16807)\n"
+"X-Launchpad-Export-Date: 2013-12-07 14:24+0000\n"
+"X-Generator: Launchpad (build 16869)\n"
 
 #: detect.c:26
 msgid "Failed to init pciaccess"
@@ -31,7 +31,7 @@ msgstr "Не удалось получить размер register area"
 
 #: detect.c:60
 msgid "Can't open /dev/mem, are you root?"
-msgstr "Не удалось открыть /dev/mem, имеете ли вы привилегии root?"
+msgstr "Не удалось открыть /dev/mem, имеете ли вы права root?"
 
 #: detect.c:64
 msgid "mmap failed"
@@ -45,7 +45,7 @@ msgstr "Сбрасываем в %s, "
 #: dump.c:47
 #, c-format
 msgid "line limit %u.\n"
-msgstr "лимит строки %u.\n"
+msgstr "ограничение строк %u.\n"
 
 #: dump.c:49
 msgid "until termination."
@@ -89,8 +89,7 @@ msgstr ""
 #: radeontop.c:122
 msgid "Unknown Radeon card. <= R500 won't work, new cards might."
 msgstr ""
-"Неизвестная видеокарта Radeon. <= R500 не работают, новые видеокарты могут "
-"работать."
+"Неизвестная видеокарта Radeon. <= R500 не будут работать, новые могут."
 
 #: ui.c:71
 #, c-format
@@ -140,7 +139,7 @@ msgstr "Кэш секвенсора инструкций %6.2f%%"
 #: ui.c:174
 #, c-format
 msgid "Shader Interpolator %6.2f%%"
-msgstr "Интерполятор шейдеров %6.2ff%%"
+msgstr "Интерполятор шейдеров %6.2f%%"
 
 #: ui.c:179
 #, c-format
