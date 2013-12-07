@@ -4,6 +4,7 @@
 # Options:
 #	nls	enable translations, default on
 #	debug	enable debug symbols, default off
+#	plain	apply neither -g nor -s.
 
 PREFIX ?= /usr
 INSTALL ?= install
@@ -32,6 +33,8 @@ endif
 
 ifdef debug
 	CFLAGS += -g
+else ifdef plain
+#
 else
 	CFLAGS += -s
 endif
