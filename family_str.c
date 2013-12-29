@@ -53,4 +53,5 @@ const char * const family_str[] = {
 	str(BONAIRE),
 	str(KABINI),
 	str(KAVERI),
+	str(HAWAII),
 };
