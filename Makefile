@@ -4,6 +4,7 @@
 # Options:
 #	nls	enable translations, default on
 #	debug	enable debug symbols, default off
+#	nostrip	disable stripping, default off
 #	plain	apply neither -g nor -s.
 
 PREFIX ?= /usr
@@ -31,12 +32,13 @@ ifeq ($(nls), 1)
 	CFLAGS += -DENABLE_NLS=1
 endif
 
+ifndef plain
 ifdef debug
 	CFLAGS += -g
-else ifdef plain
-#
-else
+endif
+ifndef nostrip
 	CFLAGS += -s
+endif
 endif
 
 LDFLAGS ?= -Wl,-O1
