@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: radeontop\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-11 15:00+0300\n"
+"POT-Creation-Date: 2014-04-23 15:04+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,45 +16,65 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: detect.c:26
+#: detect.c:85
 msgid "Failed to init pciaccess"
 msgstr ""
 
-#: detect.c:53
+#: detect.c:112
 msgid "Can't find Radeon cards"
 msgstr ""
 
-#: detect.c:55
+#: detect.c:114
 msgid "Can't get the register area size"
 msgstr ""
 
-#: detect.c:60
+#: detect.c:119
 msgid "Can't open /dev/mem, are you root?"
 msgstr ""
 
-#: detect.c:64
+#: detect.c:123
 msgid "mmap failed"
 msgstr ""
 
-#: dump.c:44
+#: detect.c:133
+#, c-format
+msgid "Failed to open DRM node, no VRAM support.\n"
+msgstr ""
+
+#: detect.c:145
+#, c-format
+msgid "Kernel too old for VRAM reporting.\n"
+msgstr ""
+
+#: detect.c:156
+#, c-format
+msgid "Failed to get VRAM size, error %d\n"
+msgstr ""
+
+#: detect.c:164
+#, c-format
+msgid "Failed to get VRAM usage, kernel likely too old\n"
+msgstr ""
+
+#: dump.c:46
 #, c-format
 msgid "Dumping to %s, "
 msgstr ""
 
-#: dump.c:47
+#: dump.c:49
 #, c-format
 msgid "line limit %u.\n"
 msgstr ""
 
-#: dump.c:49
+#: dump.c:51
 msgid "until termination."
 msgstr ""
 
-#: dump.c:59
+#: dump.c:61
 msgid "Can't open file for writing."
 msgstr ""
 
-#: radeontop.c:37
+#: radeontop.c:33
 #, c-format
 msgid ""
 "\n"
@@ -72,86 +92,96 @@ msgid ""
 "-v --version\t\tShow the version\n"
 msgstr ""
 
-#: radeontop.c:122
+#: radeontop.c:118
 msgid "Unknown Radeon card. <= R500 won't work, new cards might."
 msgstr ""
 
-#: ui.c:71
+#: ui.c:81
 #, c-format
 msgid "Collecting data, please wait....\n"
 msgstr ""
 
-#: ui.c:101
+#: ui.c:111
 #, c-format
 msgid "radeontop %s, running on %s, %u samples/sec"
 msgstr ""
 
-#: ui.c:133
+#: ui.c:145
 #, c-format
 msgid "Graphics pipe %6.2f%%"
 msgstr ""
 
-#: ui.c:139
+#: ui.c:151
 #, c-format
 msgid "Event Engine %6.2f%%"
 msgstr ""
 
-#: ui.c:146
+#: ui.c:158
 #, c-format
 msgid "Vertex Grouper + Tesselator %6.2f%%"
 msgstr ""
 
-#: ui.c:154
+#: ui.c:166
 #, c-format
 msgid "Texture Addresser %6.2f%%"
 msgstr ""
 
-#: ui.c:159
+#: ui.c:171
 #, c-format
 msgid "Texture Cache %6.2f%%"
 msgstr ""
 
-#: ui.c:168
+#: ui.c:180
 #, c-format
 msgid "Shader Export %6.2f%%"
 msgstr ""
 
-#: ui.c:171
+#: ui.c:183
 #, c-format
 msgid "Sequencer Instruction Cache %6.2f%%"
 msgstr ""
 
-#: ui.c:174
+#: ui.c:186
 #, c-format
 msgid "Shader Interpolator %6.2f%%"
 msgstr ""
 
-#: ui.c:179
+#: ui.c:191
 #, c-format
 msgid "Shader Memory Exchange %6.2f%%"
 msgstr ""
 
-#: ui.c:187
+#: ui.c:199
 #, c-format
 msgid "Scan Converter %6.2f%%"
 msgstr ""
 
-#: ui.c:190
+#: ui.c:202
 #, c-format
 msgid "Primitive Assembly %6.2f%%"
 msgstr ""
 
-#: ui.c:197
+#: ui.c:209
 #, c-format
 msgid "Depth Block %6.2f%%"
 msgstr ""
 
-#: ui.c:200
+#: ui.c:212
 #, c-format
 msgid "Color Block %6.2f%%"
 msgstr ""
 
-#: ui.c:205
+#: ui.c:217
 #, c-format
 msgid "Clip Rectangle %6.2f%%"
+msgstr ""
+
+#: ui.c:227
+#, c-format
+msgid "VRAM %6.2f%%"
+msgstr ""
+
+#: ui.c:228
+#, c-format
+msgid "VRAM %6.0fM"
 msgstr ""
