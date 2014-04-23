@@ -79,6 +79,8 @@ static void *collector(void *arg) {
 				res[curres].cr += history[i].cr;
 			}
 
+			res[curres].vram = getvram();
+
 			// Atomically write it to the pointer
 			__sync_bool_compare_and_swap(&results, results, &res[curres]);
 

@@ -16,8 +16,67 @@
 
 #include "radeontop.h"
 #include <pciaccess.h>
+#include <dirent.h>
 
 struct bits_t bits;
+unsigned long long vramsize;
+int drm_fd = -1;
+
+static int drmfilter(const struct dirent *ent) {
+
+	if (ent->d_name[0] == '.')
+		return 0;
+	if (strncmp(ent->d_name, "card", 4))
+		return 0;
+
+	return 1;
+}
+
+static void finddrm(const unsigned char bus) {
+
+	int fd, i;
+	struct dirent **namelist;
+	const int entries = scandir("/dev/dri", &namelist, drmfilter, alphasort);
+	char tmp[160];
+
+	for (i = 0; i < entries; i++) {
+		snprintf(tmp, 160, "/dev/dri/%s", namelist[i]->d_name);
+
+		fd = open(tmp, O_RDWR);
+		if (fd < 0) continue;
+
+		const char *busid = drmGetBusid(fd);
+
+		if (strncmp(busid, "pci:", 4))
+			goto fail;
+
+		busid = strchr(busid, ':');
+		if (!busid) goto fail;
+		busid++;
+
+		busid = strchr(busid, ':');
+		if (!busid) goto fail;
+		busid++;
+
+		unsigned parsed;
+		if (sscanf(busid, "%x", &parsed) != 1)
+			goto fail;
+
+		if (parsed == bus) {
+			drm_fd = fd;
+			break;
+		}
+
+		fail:
+		close(fd);
+	}
+
+	for (i = 0; i < entries; i++) {
+		free(namelist[i]);
+	}
+
+	free(namelist);
+}
 
 unsigned int init_pci(unsigned char bus) {
 
@@ -63,7 +122,70 @@ unsigned int init_pci(unsigned char bus) {
 			dev->regions[2].base_addr + 0x8000);
 	if (area == MAP_FAILED) die(_("mmap failed"));
 
+	// DRM support for VRAM
+	if (bus)
+		finddrm(bus);
+	else
+		drm_fd = open("/dev/dri/card0", O_RDWR);
+
+	bits.vram = 0;
+	if (drm_fd < 0) {
+		printf(_("Failed to open DRM node, no VRAM support.\n"));
+	} else {
+		const drmVersion * const ver = drmGetVersion(drm_fd);
+
+/*		printf("Version %u.%u.%u, name %s\n",
+			ver->version_major,
+			ver->version_minor,
+			ver->version_patchlevel,
+			ver->name);*/
+
+		if (ver->version_major < 2 ||
+			ver->version_minor < 36) {
+			printf(_("Kernel too old for VRAM reporting.\n"));
+			goto out;
+		}
+
+		// No version indicator, so we need to test once
+		int ret;
+		struct drm_radeon_gem_info gem;
+
+		ret = drmCommandWriteRead(drm_fd, DRM_RADEON_GEM_INFO,
+						&gem, sizeof(gem));
+		if (ret) {
+			printf(_("Failed to get VRAM size, error %d\n"),
+				ret);
+			goto out;
+		}
+		vramsize = gem.vram_size;
+
+		ret = getvram();
+		if (ret == 0) {
+			printf(_("Failed to get VRAM usage, kernel likely too old\n"));
+			goto out;
+		}
+
+		bits.vram = 1;
+	}
+
+	out:
 	return dev->device_id;
+}
+
+unsigned long long getvram() {
+
+	int ret;
+	unsigned long long val = 0;
+
+	struct drm_radeon_info info;
+	memset(&info, 0, sizeof(info));
+	info.value = (unsigned long) &val;
+	info.request = RADEON_INFO_VRAM_USAGE;
+
+	ret = drmCommandWriteRead(drm_fd, DRM_RADEON_INFO, &info, sizeof(info));
+	if (ret) return 0;
+
+	return val;
 }
 
 int getfamily(unsigned int id) {

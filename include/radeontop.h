@@ -33,11 +33,17 @@
 #include <string.h>
 #include <signal.h>
 #include <locale.h>
+#include <xf86drm.h>
+#include <radeon_drm.h>
 
 enum {
 	GRBM_STATUS = 0x8010,
 	MMAP_SIZE = 0x14
 };
+
+#ifndef RADEON_INFO_VRAM_USAGE
+#define RADEON_INFO_VRAM_USAGE 0x1e
+#endif
 
 // radeontop.c
 void die(const char *why);
@@ -49,6 +55,7 @@ extern const void *area;
 unsigned int init_pci(unsigned char bus);
 int getfamily(unsigned int id);
 void initbits(int fam);
+unsigned long long getvram();
 
 // ticks.c
 void collect(unsigned int *ticks);
@@ -118,8 +125,11 @@ struct bits_t {
 	unsigned int db;
 	unsigned int cb;
 	unsigned int cr;
+	unsigned long long vram;
 };
 
 extern struct bits_t bits;
+extern unsigned long long vramsize;
+extern int drm_fd;
 
 #endif
