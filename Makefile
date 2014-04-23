@@ -25,6 +25,7 @@ CFLAGS += -Wall -Wextra -pthread
 CFLAGS += -Iinclude
 CFLAGS += $(CFLAGS_SECTIONED)
 CFLAGS += $(shell pkg-config --cflags pciaccess)
+CFLAGS += $(shell pkg-config --cflags libdrm)
 CFLAGS += $(shell pkg-config --cflags ncurses 2>/dev/null)
 
 # Comment this if you don't want translations
@@ -44,6 +45,7 @@ endif
 LDFLAGS ?= -Wl,-O1
 LDFLAGS += $(LDFLAGS_SECTIONED)
 LIBS += $(shell pkg-config --libs pciaccess)
+LIBS += $(shell pkg-config --libs libdrm)
 
 # On some distros, you might have to change this to ncursesw
 LIBS += $(shell pkg-config --libs ncursesw 2>/dev/null || \
