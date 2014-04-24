@@ -111,15 +111,19 @@ unsigned int init_pci(unsigned char bus) {
 	if (!dev)
 		die(_("Can't find Radeon cards"));
 
-	if (!dev->regions[2].size) die(_("Can't get the register area size"));
+	int reg = 2;
+	if (getfamily(dev->device_id) >= BONAIRE)
+		reg = 5;
 
-//	printf("Found area %p, size %lu\n", area, dev->regions[2].size);
+	if (!dev->regions[reg].size) die(_("Can't get the register area size"));
+
+//	printf("Found area %p, size %lu\n", area, dev->regions[reg].size);
 
 	int mem = open("/dev/mem", O_RDONLY);
 	if (mem < 0) die(_("Can't open /dev/mem, are you root?"));
 
 	area = mmap(NULL, MMAP_SIZE, PROT_READ, MAP_PRIVATE, mem,
-			dev->regions[2].base_addr + 0x8000);
+			dev->regions[reg].base_addr + 0x8000);
 	if (area == MAP_FAILED) die(_("mmap failed"));
 
 	// DRM support for VRAM
