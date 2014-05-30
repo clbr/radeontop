@@ -136,6 +136,7 @@ unsigned int init_pci(unsigned char bus) {
 	if (drm_fd < 0) {
 		printf(_("Failed to open DRM node, no VRAM support.\n"));
 	} else {
+		drmDropMaster(drm_fd);
 		const drmVersion * const ver = drmGetVersion(drm_fd);
 
 /*		printf("Version %u.%u.%u, name %s\n",
