@@ -36,8 +36,7 @@ endif
 ifndef plain
 ifdef debug
 	CFLAGS += -g
-endif
-ifndef nostrip
+else ifndef nostrip
 	CFLAGS += -s
 endif
 endif
