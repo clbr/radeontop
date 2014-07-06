@@ -39,6 +39,11 @@ static void finddrm(const unsigned char bus) {
 	const int entries = scandir("/dev/dri", &namelist, drmfilter, alphasort);
 	char tmp[160];
 
+	if (entries < 0) {
+		perror("scandir");
+		return;
+	}
+
 	for (i = 0; i < entries; i++) {
 		snprintf(tmp, 160, "/dev/dri/%s", namelist[i]->d_name);
 
