@@ -103,6 +103,7 @@ enum radeon_family {
 	HAINAN,
 	BONAIRE,
 	KABINI,
+	MULLINS,
 	KAVERI,
 	HAWAII,
 };
