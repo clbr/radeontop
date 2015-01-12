@@ -135,6 +135,7 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 		float cb = 100.0 * (float) results->cb / ticks;
 		float vram = 100.0 * (float) results->vram / vramsize;
 		float vrammb = results->vram / 1024.0f / 1024.0f;
+		float vramsizemb = vramsize / 1024.0f / 1024.0f;
 
 		mvhline(3, 0, ACS_HLINE, w);
 		mvvline(1, (w/2) + 1, ACS_VLINE, h);
@@ -224,8 +225,8 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 		if (bits.vram) {
 			if (color) attron(COLOR_PAIR(2));
 			percentage(start, w, vram);
-			printright(start++, hw, _("VRAM %6.2f%%"), vram);
-			printright(start++, hw, _("VRAM %6.0fM"), vrammb);
+			printright(start++, hw, _("%.0fM / %.0fM VRAM %6.2f%%"),
+					vrammb, vramsizemb, vram);
 			if (color) attroff(COLOR_PAIR(2));
 		}
 

@@ -178,10 +178,5 @@ msgstr ""
 
 #: ui.c:227
 #, c-format
-msgid "VRAM %6.2f%%"
-msgstr ""
-
-#: ui.c:228
-#, c-format
-msgid "VRAM %6.0fM"
+msgid "%.0fM / %.0fM VRAM %6.2f%%"
 msgstr ""
