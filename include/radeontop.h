@@ -106,6 +106,7 @@ enum radeon_family {
 	MULLINS,
 	KAVERI,
 	HAWAII,
+	TONGA,
 };
 
 extern const char * const family_str[];
