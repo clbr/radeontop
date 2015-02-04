@@ -134,9 +134,9 @@ unsigned int init_pci(unsigned char bus) {
 	// DRM support for VRAM
 	if (bus)
 		finddrm(bus);
-	else if (access("/dev/dri/card0", F_OK))
+	else if (access("/dev/dri/card0", F_OK) == 0)
 		drm_fd = open("/dev/dri/card0", O_RDWR);
-	else if (access("/dev/ati/card0", F_OK))
+	else if (access("/dev/ati/card0", F_OK) == 0) // fglrx
 		drm_fd = open("/dev/ati/card0", O_RDWR);
 
 	bits.vram = 0;
