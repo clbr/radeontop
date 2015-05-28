@@ -124,13 +124,6 @@ unsigned int init_pci(unsigned char bus) {
 
 //	printf("Found area %p, size %lu\n", area, dev->regions[reg].size);
 
-	int mem = open("/dev/mem", O_RDONLY);
-	if (mem < 0) die(_("Can't open /dev/mem, are you root?"));
-
-	area = mmap(NULL, MMAP_SIZE, PROT_READ, MAP_PRIVATE, mem,
-			dev->regions[reg].base_addr + 0x8000);
-	if (area == MAP_FAILED) die(_("mmap failed"));
-
 	// DRM support for VRAM
 	if (bus)
 		finddrm(bus);
@@ -138,6 +131,21 @@ unsigned int init_pci(unsigned char bus) {
 		drm_fd = open("/dev/dri/card0", O_RDWR);
 	else if (access("/dev/ati/card0", F_OK) == 0) // fglrx path
 		drm_fd = open("/dev/ati/card0", O_RDWR);
+
+	use_ioctl = 0;
+	if (drm_fd >= 0) {
+		uint32_t rreg = 0x8010;
+		use_ioctl = get_drm_value(drm_fd, RADEON_INFO_READ_REG, &rreg);
+	}
+
+	if (!use_ioctl) {
+		int mem = open("/dev/mem", O_RDONLY);
+		if (mem < 0) die(_("Cannot access GPU registers, are you root?"));
+
+		area = mmap(NULL, MMAP_SIZE, PROT_READ, MAP_PRIVATE, mem,
+				dev->regions[reg].base_addr + 0x8000);
+		if (area == MAP_FAILED) die(_("mmap failed"));
+	}
 
 	bits.vram = 0;
 	if (drm_fd < 0) {
