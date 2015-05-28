@@ -44,12 +44,17 @@ enum {
 #ifndef RADEON_INFO_VRAM_USAGE
 #define RADEON_INFO_VRAM_USAGE 0x1e
 #endif
+#ifndef RADEON_INFO_READ_REG
+#define RADEON_INFO_READ_REG 0x24
+#endif
 
 // radeontop.c
 void die(const char *why);
+int get_drm_value(int fd, unsigned request, uint32_t *out);
 unsigned int readgrbm();
 
 extern const void *area;
+extern int use_ioctl;
 
 // detect.c
 unsigned int init_pci(unsigned char bus);
