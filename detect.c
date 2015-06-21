@@ -152,7 +152,7 @@ unsigned int init_pci(unsigned char bus) {
 		printf(_("Failed to open DRM node, no VRAM support.\n"));
 	} else {
 		drmDropMaster(drm_fd);
-		const drmVersion * const ver = drmGetVersion(drm_fd);
+		drmVersion * const ver = drmGetVersion(drm_fd);
 
 /*		printf("Version %u.%u.%u, name %s\n",
 			ver->version_major,
@@ -160,8 +160,12 @@ unsigned int init_pci(unsigned char bus) {
 			ver->version_patchlevel,
 			ver->name);*/
 
-		if (ver->version_major < 2 ||
-			ver->version_minor < 36) {
+		const int outdatedKernel = ver->version_major <= 2 && ver->version_minor <= 36;
+
+		// Free the allocated storage
+		drmFreeVersion(ver);
+
+		if (outdatedKernel) {
 			printf(_("Kernel too old for VRAM reporting.\n"));
 			goto out;
 		}
@@ -246,4 +250,10 @@ void initbits(int fam) {
 		bits.cr = 0;
 		bits.smx = 0;
 	}
+}
+
+void shutdown_pci(void) {
+
+	// Not much to do here
+	pci_system_cleanup();
 }

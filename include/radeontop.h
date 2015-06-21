@@ -61,6 +61,7 @@ unsigned int init_pci(unsigned char bus);
 int getfamily(unsigned int id);
 void initbits(int fam);
 unsigned long long getvram();
+void shutdown_pci(void);
 
 // ticks.c
 void collect(unsigned int *ticks);

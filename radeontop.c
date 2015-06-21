@@ -147,6 +147,10 @@ int main(int argc, char **argv) {
 	else
 		present(ticks, cardname, color);
 
+	// shutdown
 	munmap((void *) area, MMAP_SIZE);
+
+	shutdown_pci();
+
 	return 0;
 }
