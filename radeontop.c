@@ -65,7 +65,7 @@ unsigned int readgrbm() {
 		get_drm_value(drm_fd, RADEON_INFO_READ_REG, &reg);
 		return reg;
 	} else {
-		const void *ptr = area + 0x10;
+		const void *ptr = (const char*)area + 0x10;
 		const unsigned int *inta = ptr;
 		return *inta;
 	}
