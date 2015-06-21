@@ -76,7 +76,7 @@ static void percentage(const unsigned int y, const unsigned int w, const float p
 	attroff(A_REVERSE);
 }
 
-void present(const unsigned int ticks, const char card[], const unsigned int color) {
+void present(const unsigned int ticks, const char card[], unsigned int color) {
 
 	printf(_("Collecting data, please wait....\n"));
 
@@ -89,15 +89,13 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 	halfdelay(10);
 	curs_set(0);
 	clear();
-	if(color) {
-		start_color();
 
-		init_pair(1, COLOR_GREEN, COLOR_BLACK);
-		init_pair(2, COLOR_RED, COLOR_BLACK);
-		init_pair(3, COLOR_CYAN, COLOR_BLACK);
-		init_pair(4, COLOR_MAGENTA, COLOR_BLACK);
-		init_pair(5, COLOR_YELLOW, COLOR_BLACK);
-	}
+	start_color();
+	init_pair(1, COLOR_GREEN, COLOR_BLACK);
+	init_pair(2, COLOR_RED, COLOR_BLACK);
+	init_pair(3, COLOR_CYAN, COLOR_BLACK);
+	init_pair(4, COLOR_MAGENTA, COLOR_BLACK);
+	init_pair(5, COLOR_YELLOW, COLOR_BLACK);
 
 	const unsigned int bigh = 23;
 
@@ -233,7 +231,8 @@ void present(const unsigned int ticks, const char card[], const unsigned int col
 		refresh();
 
 		int c = getch();
-		if (c == 'q') break;
+		if (c == 'q' || c == 'Q') break;
+		if (c == 'c' || c == 'C') color = !color;
 	}
 
 	endwin();
