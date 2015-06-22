@@ -189,6 +189,9 @@ unsigned int init_pci(unsigned char bus) {
 	}
 
 	out:
+
+	pci_system_cleanup();
+
 	return dev->device_id;
 }
 
