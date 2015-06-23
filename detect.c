@@ -160,7 +160,7 @@ unsigned int init_pci(unsigned char bus) {
 			ver->version_patchlevel,
 			ver->name);*/
 
-		if (ver->version_major < 2 ||
+		if (ver->version_major != 2 ||
 			ver->version_minor < 36) {
 			printf(_("Kernel too old for VRAM reporting.\n"));
 			goto out;
