@@ -57,7 +57,7 @@ extern const void *area;
 extern int use_ioctl;
 
 // detect.c
-unsigned int init_pci(unsigned char bus);
+unsigned int init_pci(unsigned char bus, const unsigned char forcemem);
 int getfamily(unsigned int id);
 void initbits(int fam);
 unsigned long long getvram();

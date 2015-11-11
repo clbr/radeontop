@@ -37,6 +37,7 @@ static void help(const char * const me, const unsigned int ticks) {
 		"-c --color		Enable colors\n"
 		"-d --dump file		Dump data to this file, - for stdout\n"
 		"-l --limit 3		Quit after dumping N lines, default forever\n"
+		"-m --mem		Force the /dev/mem path, for the proprietary driver\n"
 		"-t --ticks 50		Samples per second (default %u)\n"
 		"\n"
 		"-h --help		Show this help\n"
@@ -75,7 +76,7 @@ int main(int argc, char **argv) {
 
 	unsigned int ticks = 120;
 	unsigned char color = 0;
-	unsigned char bus = 0;
+	unsigned char bus = 0, forcemem = 0;
 	unsigned int limit = 0;
 	char *dump = NULL;
 
@@ -93,13 +94,14 @@ int main(int argc, char **argv) {
 		{"dump", 1, 0, 'd'},
 		{"help", 0, 0, 'h'},
 		{"limit", 1, 0, 'l'},
+		{"mem", 0, 0, 'm'},
 		{"ticks", 1, 0, 't'},
 		{"version", 0, 0, 'v'},
 		{0, 0, 0, 0}
 	};
 
 	while (1) {
-		int c = getopt_long(argc, argv, "b:cd:hl:t:v", opts, NULL);
+		int c = getopt_long(argc, argv, "b:cd:hl:mt:v", opts, NULL);
 		if (c == -1) break;
 
 		switch(c) {
@@ -112,6 +114,9 @@ int main(int argc, char **argv) {
 			break;
 			case 'c':
 				color = 1;
+			break;
+			case 'm':
+				forcemem = 1;
 			break;
 			case 'b':
 				bus = atoi(optarg);
@@ -129,7 +134,7 @@ int main(int argc, char **argv) {
 	}
 
 	// init
-	const unsigned int pciaddr = init_pci(bus);
+	const unsigned int pciaddr = init_pci(bus, forcemem);
 
 	const int family = getfamily(pciaddr);
 	if (!family)

@@ -83,7 +83,7 @@ static void finddrm(const unsigned char bus) {
 	free(namelist);
 }
 
-unsigned int init_pci(unsigned char bus) {
+unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 
 	int ret = pci_system_init();
 	if (ret)
@@ -136,6 +136,11 @@ unsigned int init_pci(unsigned char bus) {
 	if (drm_fd >= 0) {
 		uint32_t rreg = 0x8010;
 		use_ioctl = get_drm_value(drm_fd, RADEON_INFO_READ_REG, &rreg);
+	}
+
+	if (forcemem) {
+		printf(_("Forcing the /dev/mem path.\n"));
+		use_ioctl = 0;
 	}
 
 	if (!use_ioctl) {
