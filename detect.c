@@ -116,8 +116,9 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 	if (!dev)
 		die(_("Can't find Radeon cards"));
 
+	unsigned int device_id = dev->device_id;
 	int reg = 2;
-	if (getfamily(dev->device_id) >= BONAIRE)
+	if (getfamily(device_id) >= BONAIRE)
 		reg = 5;
 
 	if (!dev->regions[reg].size) die(_("Can't get the register area size"));
@@ -197,7 +198,7 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 
 	pci_system_cleanup();
 
-	return dev->device_id;
+	return device_id;
 }
 
 unsigned long long getvram() {
