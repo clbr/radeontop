@@ -158,7 +158,7 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 		printf(_("Failed to open DRM node, no VRAM support.\n"));
 	} else {
 		drmDropMaster(drm_fd);
-		const drmVersion * const ver = drmGetVersion(drm_fd);
+		drmVersionPtr ver = drmGetVersion(drm_fd);
 
 /*		printf("Version %u.%u.%u, name %s\n",
 			ver->version_major,
@@ -169,8 +169,10 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 		if (ver->version_major != 2 ||
 			ver->version_minor < 36) {
 			printf(_("Kernel too old for VRAM reporting.\n"));
+			drmFreeVersion(ver);
 			goto out;
 		}
+		drmFreeVersion(ver);
 
 		// No version indicator, so we need to test once
 
