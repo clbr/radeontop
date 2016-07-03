@@ -116,7 +116,7 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 	if (!dev)
 		die(_("Can't find Radeon cards"));
 
-	unsigned int device_id = dev->device_id;
+	const unsigned int device_id = dev->device_id;
 	int reg = 2;
 	if (getfamily(device_id) >= BONAIRE)
 		reg = 5;
