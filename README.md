@@ -3,7 +3,7 @@ RadeonTop
 
 View your GPU utilization, both for the total activity percent and individual blocks.
 
-Requires root rights or other permissions to /dev/mem.
+Requires access to /dev/dri/cardN files or /dev/mem (root privileges).
 
 Supported cards
 ---------------

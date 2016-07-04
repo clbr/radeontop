@@ -135,6 +135,7 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 
 	use_ioctl = 0;
 	if (drm_fd >= 0) {
+		authenticate_drm(drm_fd);
 		uint32_t rreg = 0x8010;
 		use_ioctl = get_drm_value(drm_fd, RADEON_INFO_READ_REG, &rreg);
 	}
