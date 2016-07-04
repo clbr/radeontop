@@ -48,6 +48,9 @@ enum {
 #define RADEON_INFO_READ_REG 0x24
 #endif
 
+// auth.c
+void authenticate_drm(int fd);
+
 // radeontop.c
 void die(const char *why);
 int get_drm_value(int fd, unsigned request, uint32_t *out);
