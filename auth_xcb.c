@@ -15,42 +15,29 @@
 */
 
 #include "radeontop.h"
-#ifdef ENABLE_XCB
-#include <dlfcn.h>
-#endif
+#include <xcb/xcb.h>
+#include <xcb/dri2.h>
 
-#ifdef ENABLE_XCB
-typedef void (*auth_magic_func)(drm_magic_t magic);
-
-static void call_authenticate_drm_xcb(drm_magic_t magic) {
-	void *handle = dlopen("libradeontop_xcb.so", RTLD_NOW);
-	if (!handle) {
+/* Try to authenticate the DRM client with help from the X server. */
+void authenticate_drm_xcb(drm_magic_t magic) {
+	xcb_connection_t *conn = xcb_connect(NULL, NULL);
+	if (!conn) {
+		return;
+	}
+	if (xcb_connection_has_error(conn)) {
+		xcb_disconnect(conn);
 		return;
 	}
 
-	auth_magic_func func = (auth_magic_func) dlsym(handle,
-			"authenticate_drm_xcb");
-	if (func) {
-		func(magic);
-	}
-	dlclose(handle);
-}
-#endif
+	xcb_screen_t *screen = xcb_setup_roots_iterator(xcb_get_setup(conn)).data;
+	xcb_window_t window = screen->root;
 
-void authenticate_drm(int fd) {
-	drm_magic_t magic;
+	/* Authenticate our client via the X server using the magic. */
+	xcb_dri2_authenticate_cookie_t auth_cookie =
+		xcb_dri2_authenticate(conn, window, magic);
+	xcb_dri2_authenticate_reply_t *auth_reply =
+		xcb_dri2_authenticate_reply(conn, auth_cookie, NULL);
+	free(auth_reply);
 
-	/* Obtain magic for our DRM client. */
-	if (drmGetMagic(fd, &magic) < 0) {
-		return;
-	}
-
-	/* Try self-authenticate (if we are somehow the master). */
-	if (drmAuthMagic(fd, magic) == 0) {
-		return;
-	}
-
-#ifdef ENABLE_XCB
-	call_authenticate_drm_xcb(magic);
-#endif
+	xcb_disconnect(conn);
 }
