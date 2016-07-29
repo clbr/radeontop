@@ -22,67 +22,6 @@ struct bits_t bits;
 unsigned long long vramsize;
 int drm_fd = -1;
 
-static int drmfilter(const struct dirent *ent) {
-
-	if (ent->d_name[0] == '.')
-		return 0;
-	if (strncmp(ent->d_name, "card", 4))
-		return 0;
-
-	return 1;
-}
-
-static void finddrm(const unsigned char bus) {
-
-	int fd, i;
-	struct dirent **namelist;
-	const int entries = scandir("/dev/dri", &namelist, drmfilter, alphasort);
-	char tmp[160];
-
-	if (entries < 0) {
-		perror("scandir");
-		return;
-	}
-
-	for (i = 0; i < entries; i++) {
-		snprintf(tmp, 160, "/dev/dri/%s", namelist[i]->d_name);
-
-		fd = open(tmp, O_RDWR);
-		if (fd < 0) continue;
-
-		const char *busid = drmGetBusid(fd);
-
-		if (strncmp(busid, "pci:", 4))
-			goto fail;
-
-		busid = strchr(busid, ':');
-		if (!busid) goto fail;
-		busid++;
-
-		busid = strchr(busid, ':');
-		if (!busid) goto fail;
-		busid++;
-
-		unsigned parsed;
-		if (sscanf(busid, "%x", &parsed) != 1)
-			goto fail;
-
-		if (parsed == bus) {
-			drm_fd = fd;
-			break;
-		}
-
-		fail:
-		close(fd);
-	}
-
-	for (i = 0; i < entries; i++) {
-		free(namelist[i]);
-	}
-
-	free(namelist);
-}
-
 unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 
 	int ret = pci_system_init();
@@ -101,12 +40,15 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 
 	struct pci_device_iterator *iter = pci_id_match_iterator_create(&match);
 	struct pci_device *dev = NULL;
+	char busid[32];
 
 	while ((dev = pci_device_next(iter))) {
 		pci_device_probe(dev);
 		if ((dev->device_class & 0x00ffff00) != 0x00030000 &&
 			(dev->device_class & 0x00ffff00) != 0x00038000)
 			continue;
+		snprintf(busid, sizeof(busid), "pci:%04x:%02x:%02x.%u",
+				dev->domain, dev->bus, dev->dev, dev->func);
 		if (!bus || bus == dev->bus)
 			break;
 	}
@@ -126,11 +68,17 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 //	printf("Found area %p, size %lu\n", area, dev->regions[reg].size);
 
 	// DRM support for VRAM
-	if (bus)
-		finddrm(bus);
-	else if (access("/dev/dri/card0", F_OK) == 0)
-		drm_fd = open("/dev/dri/card0", O_RDWR);
-	else if (access("/dev/ati/card0", F_OK) == 0) // fglrx path
+	drm_fd = drmOpen(NULL, busid);
+	if (drm_fd >= 0) {
+		drmVersionPtr ver = drmGetVersion(drm_fd);
+
+		if (strcmp(ver->name, "radeon") != 0) {
+			close(drm_fd);
+			drm_fd = -1;
+		}
+		drmFreeVersion(ver);
+	}
+	if (drm_fd < 0 && access("/dev/ati/card0", F_OK) == 0) // fglrx path
 		drm_fd = open("/dev/ati/card0", O_RDWR);
 
 	use_ioctl = 0;
