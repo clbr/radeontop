@@ -10,6 +10,7 @@
 
 PREFIX ?= /usr
 INSTALL ?= install
+LIBDIR ?= lib
 
 nls ?= 1
 xcb ?= 1
@@ -93,7 +94,7 @@ trans:
 install: all
 	$(INSTALL) -D -m755 $(bin) $(DESTDIR)/$(PREFIX)/sbin/$(bin)
 ifeq ($(xcb), 1)
-	$(INSTALL) -D -m755 $(xcblib) $(DESTDIR)/$(PREFIX)/lib/$(xcblib)
+	$(INSTALL) -D -m755 $(xcblib) $(DESTDIR)/$(PREFIX)/$(LIBDIR)/$(xcblib)
 endif
 	$(INSTALL) -D -m644 radeontop.1 $(DESTDIR)/$(PREFIX)/share/man/man1/radeontop.1
 ifeq ($(nls), 1)
