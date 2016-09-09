@@ -60,4 +60,6 @@ const char * const family_str[] = {
 	str(FIJI),
 	str(CARRIZO),
 	str(STONEY),
+	str(POLARIS11),
+	str(POLARIS10),
 };

@@ -119,6 +119,8 @@ enum radeon_family {
 	FIJI,
 	CARRIZO,
 	STONEY,
+	POLARIS11,
+	POLARIS10,
 };
 
 extern const char * const family_str[];
