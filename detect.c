@@ -21,6 +21,7 @@
 struct bits_t bits;
 unsigned long long vramsize;
 int drm_fd = -1;
+char drm_name[10] = ""; // should be radeon or amdgpu
 
 unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 
@@ -71,11 +72,11 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 	drm_fd = drmOpen(NULL, busid);
 	if (drm_fd >= 0) {
 		drmVersionPtr ver = drmGetVersion(drm_fd);
-
-		if (strcmp(ver->name, "radeon") != 0) {
+		if (strcmp(ver->name, "radeon") != 0 && strcmp(ver->name, "amdgpu") != 0) {
 			close(drm_fd);
 			drm_fd = -1;
 		}
+		strcpy(drm_name, ver->name);
 		drmFreeVersion(ver);
 	}
 	if (drm_fd < 0 && access("/dev/ati/card0", F_OK) == 0) // fglrx path
@@ -115,8 +116,8 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 			ver->version_patchlevel,
 			ver->name);*/
 
-		if (ver->version_major != 2 ||
-			ver->version_minor < 36) {
+		if (ver->version_major < 2 ||
+			(ver->version_major == 2 && ver->version_minor < 36)) {
 			printf(_("Kernel too old for VRAM reporting.\n"));
 			drmFreeVersion(ver);
 			goto out;
@@ -124,17 +125,36 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 		drmFreeVersion(ver);
 
 		// No version indicator, so we need to test once
+		// We use different codepaths for radeon and amdgpu
+		// We store vram_size and check below if the ret value is sane
+		if (strcmp(drm_name, "radeon") == 0) {
+			struct drm_radeon_gem_info gem;
 
-		struct drm_radeon_gem_info gem;
+			ret = drmCommandWriteRead(drm_fd, DRM_RADEON_GEM_INFO,
+							&gem, sizeof(gem));
+			vramsize = gem.vram_size;
+		} else if (strcmp(drm_name, "amdgpu") == 0) {
+#ifdef ENABLE_AMDGPU
+			struct drm_amdgpu_info_vram_gtt vram_gtt = {};
 
-		ret = drmCommandWriteRead(drm_fd, DRM_RADEON_GEM_INFO,
-						&gem, sizeof(gem));
+			struct drm_amdgpu_info request;
+			memset(&request, 0, sizeof(request));
+			request.return_pointer = (unsigned long) &vram_gtt;
+			request.return_size = sizeof(vram_gtt);
+			request.query = AMDGPU_INFO_VRAM_GTT;
+
+			ret = drmCommandWrite(drm_fd, DRM_AMDGPU_INFO,
+						&request, sizeof(request));
+			vramsize = vram_gtt.vram_size;
+#else
+			printf(_("amdgpu DRM driver is used, but amdgpu VRAM size reporting is not enabled\n"));
+#endif
+		}
 		if (ret) {
 			printf(_("Failed to get VRAM size, error %d\n"),
 				ret);
 			goto out;
 		}
-		vramsize = gem.vram_size;
 
 		ret = getvram();
 		if (ret == 0) {
@@ -154,15 +174,29 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 
 unsigned long long getvram() {
 
-	int ret;
+	int ret = -1;
 	unsigned long long val = 0;
 
-	struct drm_radeon_info info;
-	memset(&info, 0, sizeof(info));
-	info.value = (unsigned long) &val;
-	info.request = RADEON_INFO_VRAM_USAGE;
+	if (strcmp(drm_name, "radeon") == 0) {
+		struct drm_radeon_info info;
+		memset(&info, 0, sizeof(info));
+		info.value = (unsigned long) &val;
+		info.request = RADEON_INFO_VRAM_USAGE;
 
-	ret = drmCommandWriteRead(drm_fd, DRM_RADEON_INFO, &info, sizeof(info));
+		ret = drmCommandWriteRead(drm_fd, DRM_RADEON_INFO, &info, sizeof(info));
+	} else if (strcmp(drm_name, "amdgpu") == 0) {
+#ifdef ENABLE_AMDGPU
+		struct drm_amdgpu_info request;
+		memset(&request, 0, sizeof(request));
+		request.return_pointer = (unsigned long) &val;
+		request.return_size = sizeof(val);
+		request.query = AMDGPU_INFO_VRAM_USAGE;
+
+		ret = drmCommandWrite(drm_fd, DRM_AMDGPU_INFO, &request, sizeof(request));
+#else
+		printf(_("amdgpu DRM driver is used, but amdgpu VRAM usage reporting is not enabled\n"));
+#endif
+	}
 	if (ret) return 0;
 
 	return val;

@@ -7,6 +7,8 @@
 #	nostrip	disable stripping, default off
 #	plain	apply neither -g nor -s.
 #	xcb	enable libxcb to run unprivileged in Xorg, default on
+#	amdgpu	enable amdgpu VRAM size and usage reporting, default off
+#		because amdgpu requires libdrm >= 2.4.63
 
 PREFIX ?= /usr
 INSTALL ?= install
@@ -14,6 +16,7 @@ LIBDIR ?= lib
 
 nls ?= 1
 xcb ?= 1
+amdgpu ?= 0
 
 bin = radeontop
 xcblib = libradeontop_xcb.so
@@ -39,6 +42,10 @@ CFLAGS += $(shell pkg-config --cflags ncurses 2>/dev/null)
 # Comment this if you don't want translations
 ifeq ($(nls), 1)
 	CFLAGS += -DENABLE_NLS=1
+endif
+
+ifeq ($(amdgpu), 1)
+	CFLAGS += -DENABLE_AMDGPU=1
 endif
 
 ifndef plain
