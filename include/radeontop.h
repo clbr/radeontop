@@ -35,6 +35,9 @@
 #include <locale.h>
 #include <xf86drm.h>
 #include <radeon_drm.h>
+#ifdef ENABLE_AMDGPU
+#include <amdgpu_drm.h>
+#endif
 
 enum {
 	GRBM_STATUS = 0x8010,
