@@ -158,6 +158,11 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 
 		ret = getvram();
 		if (ret == 0) {
+			if (strcmp(drm_name, "amdgpu") == 0) {
+#ifndef ENABLE_AMDGPU
+				printf(_("amdgpu DRM driver is used, but amdgpu VRAM usage reporting is not enabled\n"));
+#endif
+			}
 			printf(_("Failed to get VRAM usage, kernel likely too old\n"));
 			goto out;
 		}
@@ -193,8 +198,6 @@ unsigned long long getvram() {
 		request.query = AMDGPU_INFO_VRAM_USAGE;
 
 		ret = drmCommandWrite(drm_fd, DRM_AMDGPU_INFO, &request, sizeof(request));
-#else
-		printf(_("amdgpu DRM driver is used, but amdgpu VRAM usage reporting is not enabled\n"));
 #endif
 	}
 	if (ret) return 0;
