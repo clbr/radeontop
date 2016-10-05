@@ -229,6 +229,9 @@ void present(const unsigned int ticks, const char card[], unsigned int color) {
 			if (color) attroff(COLOR_PAIR(2));
 		}
 
+		//move the cursor away to fix some resizing artifacts on some terminals
+		move(0,0);
+
 		refresh();
 
 		int c = getch();
