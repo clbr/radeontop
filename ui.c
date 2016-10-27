@@ -99,12 +99,17 @@ void present(const unsigned int ticks, const char card[], unsigned int color) {
 
 	const unsigned int bigh = 23;
 
-	unsigned int w, h;
-	getmaxyx(stdscr, h, w);
-
-	unsigned int hw = w/2;
+	// Screen dimensions. (Re)calculated only when resize is non-zero.
+	unsigned int h, w, hw;
+	int resize = 1;
 
 	while(1) {
+		if (resize) {
+			resize = 0;
+			getmaxyx(stdscr, h, w);
+			hw = w/2;
+		}
+
 		//draw the header
 		move(0,0);
 		attron(A_REVERSE);
@@ -237,11 +242,7 @@ void present(const unsigned int ticks, const char card[], unsigned int color) {
 		int c = getch();
 		if (c == 'q' || c == 'Q') break;
 		if (c == 'c' || c == 'C') color = !color;
-		if (c == KEY_RESIZE){
-			getmaxyx(stdscr, h, w);
-			hw = w/2;
-			refresh();
-		}
+		if (c == KEY_RESIZE) resize = 1;
 	}
 
 	endwin();
