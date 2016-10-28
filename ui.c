@@ -100,7 +100,7 @@ void present(const unsigned int ticks, const char card[], unsigned int color) {
 	const unsigned int bigh = 23;
 
 	// Screen dimensions. (Re)calculated only when resize is non-zero.
-	unsigned int h, w, hw;
+	unsigned int h = 1, w = 1, hw = 1;
 	int resize = 1;
 
 	while(1) {
