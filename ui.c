@@ -137,6 +137,8 @@ void present(const unsigned int ticks, const char card[], unsigned int color) {
 		float db = 100.0 * (float) results->db / ticks;
 		float cr = 100.0 * (float) results->cr / ticks;
 		float cb = 100.0 * (float) results->cb / ticks;
+		float uvd = 100.0 * (float) results->uvd / ticks;
+		float vce0 = 100.0 * (float) results->vce0 / ticks;
 		float vram = 100.0 * (float) results->vram / vramsize;
 		float vrammb = results->vram / 1024.0f / 1024.0f;
 		float vramsizemb = vramsize / 1024.0f / 1024.0f;
@@ -225,6 +227,13 @@ void present(const unsigned int ticks, const char card[], unsigned int color) {
 
 		// Enough height?
 		if (h > bigh) start++;
+
+		percentage(start, w, uvd);
+		printright(start++, hw, _("UVD %6.2f%%"), uvd);
+		percentage(start, w, vce0);
+		printright(start++, hw, _("VCE %6.2f%%"), vce0);
+
+		if(h > bigh) start++;
 
 		if (bits.vram) {
 			if (color) attron(COLOR_PAIR(2));

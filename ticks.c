@@ -33,6 +33,8 @@ static void *collector(void *arg) {
 
 	while (1) {
 		unsigned int stat = readgrbm();
+		unsigned int uvd = readsrbm();
+		unsigned int vce = readsrbm2();
 
 		memset(&history[cur], 0, sizeof(struct bits_t));
 
@@ -51,6 +53,8 @@ static void *collector(void *arg) {
 		if (stat & bits.cr) history[cur].cr = 1;
 		if (stat & bits.cb) history[cur].cb = 1;
 
+		if (uvd & bits.uvd) history[cur].uvd = 1;
+		if (vce & bits.vce0) history[cur].vce0 = 1;
 
 		usleep(sleeptime);
 		cur++;
@@ -77,6 +81,8 @@ static void *collector(void *arg) {
 				res[curres].db += history[i].db;
 				res[curres].cb += history[i].cb;
 				res[curres].cr += history[i].cr;
+				res[curres].uvd += history[i].uvd;
+				res[curres].vce0 += history[i].vce0;
 			}
 
 			res[curres].vram = getvram();

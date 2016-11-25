@@ -91,6 +91,8 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		float db = 100.0 * (float) results->db / ticks;
 		float cr = 100.0 * (float) results->cr / ticks;
 		float cb = 100.0 * (float) results->cb / ticks;
+		float uvd = 100.0 * (float) results->uvd / ticks;
+		float vce0 = 100.0 * (float) results->vce0 /ticks;
 		float vram = 100.0 * (float) results->vram / vramsize;
 		float vrammb = results->vram / 1024.0f / 1024.0f;
 
@@ -116,6 +118,8 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		fprintf(f, "pa %.2f%%, ", pa);
 		fprintf(f, "db %.2f%%, ", db);
 		fprintf(f, "cb %.2f%%", cb);
+		fprintf(f, "uvd %.2f%%", uvd);
+		fprintf(f, "vce0 %.2f%%", vce0);
 
 		if (bits.vram)
 			fprintf(f, ", vram %.2f%% %.2fmb\n", vram, vrammb);

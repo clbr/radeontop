@@ -17,7 +17,8 @@
 #include "radeontop.h"
 #include <getopt.h>
 
-const void *area;
+const void *grbm_area;
+const void *srbm_area;
 int use_ioctl;
 
 void die(const char * const why) {
@@ -46,27 +47,95 @@ static void help(const char * const me, const unsigned int ticks) {
 	die("");
 }
 
-int get_drm_value(int fd, unsigned request, uint32_t *out) {
-    struct drm_radeon_info info;
-    int retval;
+int get_drm_value(int fd, unsigned reg_offset, unsigned request, uint32_t *out){
 
-    memset(&info, 0, sizeof(info));
+	int retval = -1;
 
-    info.value = (unsigned long)out;
-    info.request = request;
+	if (strcmp(drm_name, "radeon") == 0) {
+		struct drm_radeon_info info;
+		memset(&info, 0, sizeof(info));
 
-    retval = drmCommandWriteRead(fd, DRM_RADEON_INFO, &info, sizeof(info));
-    return !retval;
+		info.value = (unsigned long)out;
+		info.request = request;
+
+		retval = drmCommandWriteRead(fd, DRM_RADEON_INFO, &info, sizeof(info));
+	} else if (strcmp(drm_name, "amdgpu") == 0) {
+#ifdef ENABLE_AMDGPU
+		struct drm_amdgpu_info info;
+		memset(&info, 0, sizeof(info));
+
+		info.return_pointer = (unsigned long)out;
+		info.return_size = sizeof(uint32_t);
+		info.query = request;
+		info.read_mmr_reg.dword_offset = reg_offset;
+		info.read_mmr_reg.count = 1;
+		info.read_mmr_reg.instance = 0xffffffff;
+		info.read_mmr_reg.flags = 0;
+
+		retval = drmCommandWriteRead(fd, DRM_AMDGPU_INFO, &info, sizeof(info));
+#endif
+	}
+	return !retval;
 }
 
 unsigned int readgrbm() {
 
 	if (use_ioctl) {
-		uint32_t reg = 0x8010;
-		get_drm_value(drm_fd, RADEON_INFO_READ_REG, &reg);
+		uint32_t reg = GRBM_STATUS;
+		if (strcmp(drm_name, "radeon") == 0) {
+			get_drm_value(drm_fd, reg, RADEON_INFO_READ_REG, &reg);
+		} else if (strcmp(drm_name, "amdgpu") == 0) {
+#ifdef ENABLE_AMDGPU
+			get_drm_value(drm_fd, reg, AMDGPU_INFO_READ_MMR_REG, &reg);
+#else
+			printf(_("amdgpu DRM driver is used, but amdgpu ioctl query is not enabled\n"));
+#endif
+		}
 		return reg;
 	} else {
-		const void *ptr = (const char *) area + 0x10;
+		const void *ptr = (const char *) grbm_area + 0x10;
+		const unsigned int *inta = ptr;
+		return *inta;
+	}
+}
+
+unsigned int readsrbm() {
+
+	if (use_ioctl) {
+		uint32_t reg = SRBM_STATUS;
+		if (strcmp(drm_name, "radeon") == 0) {
+			get_drm_value(drm_fd, reg, RADEON_INFO_READ_REG, &reg);
+		} else if (strcmp(drm_name, "amdgpu") == 0) {
+#ifdef ENABLE_AMDGPU
+			get_drm_value(drm_fd,reg, AMDGPU_INFO_READ_MMR_REG, &reg);
+#else
+			printf(_("amdgpu DRM driver is used, but amdgpu ioctl query is not enabled\n"));
+#endif
+		}
+		return reg;
+	} else {
+		const void *ptr = (const char *) srbm_area + 0xe50;
+		const unsigned int *inta = ptr;
+		return *inta;
+	}
+}
+
+unsigned int readsrbm2() {
+
+	if (use_ioctl) {
+		uint32_t reg = SRBM_STATUS2;
+		if (strcmp(drm_name, "radeon") == 0) {
+			get_drm_value(drm_fd, reg, RADEON_INFO_READ_REG, &reg);
+		} else if (strcmp(drm_name, "amdgpu") == 0) {
+#ifdef ENABLE_AMDGPU
+			get_drm_value(drm_fd,reg, AMDGPU_INFO_READ_MMR_REG, &reg);
+#else
+			printf(_("amdgpu DRM driver is used, but amdgpu ioctl query is not enabled\n"));
+#endif
+		}
+		return reg;
+	} else {
+		const void *ptr = (const char *) srbm_area + 0xe4c;
 		const unsigned int *inta = ptr;
 		return *inta;
 	}
@@ -152,6 +221,7 @@ int main(int argc, char **argv) {
 	else
 		present(ticks, cardname, color);
 
-	munmap((void *) area, MMAP_SIZE);
+	munmap((void *) grbm_area, GRBM_MMAP_SIZE);
+	munmap((void *) srbm_area, SRBM_MMAP_SIZE);
 	return 0;
 }

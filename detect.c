@@ -85,8 +85,16 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 	use_ioctl = 0;
 	if (drm_fd >= 0) {
 		authenticate_drm(drm_fd);
-		uint32_t rreg = 0x8010;
-		use_ioctl = get_drm_value(drm_fd, RADEON_INFO_READ_REG, &rreg);
+		uint32_t rreg = GRBM_STATUS;
+		if (strcmp(drm_name, "radeon") == 0) {
+			use_ioctl = get_drm_value(drm_fd, rreg, RADEON_INFO_READ_REG, &rreg);
+		} else if (strcmp(drm_name, "amdgpu") == 0) {
+#ifdef ENABLE_AMDGPU
+			use_ioctl = get_drm_value(drm_fd, rreg, AMDGPU_INFO_READ_MMR_REG, &rreg);
+#else
+			printf(_("amdgpu DRM driver is used, but amdgpu ioctl query is not enabled\n"));
+#endif
+		}
 	}
 
 	if (forcemem) {
@@ -98,9 +106,13 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 		int mem = open("/dev/mem", O_RDONLY);
 		if (mem < 0) die(_("Cannot access GPU registers, are you root?"));
 
-		area = mmap(NULL, MMAP_SIZE, PROT_READ, MAP_PRIVATE, mem,
+		grbm_area = mmap(NULL, GRBM_MMAP_SIZE, PROT_READ, MAP_PRIVATE, mem,
 				dev->regions[reg].base_addr + 0x8000);
-		if (area == MAP_FAILED) die(_("mmap failed"));
+		if (grbm_area == MAP_FAILED) die(_("mmap failed"));
+
+		srbm_area = mmap(NULL, SRBM_MMAP_SIZE, PROT_READ, MAP_PRIVATE, mem,
+				dev->regions[reg].base_addr);
+		if (srbm_area == MAP_FAILED) die(_("mmap failed"));
 	}
 
 	bits.vram = 0;
@@ -234,6 +246,8 @@ void initbits(int fam) {
 	bits.cr = (1U << 27);
 	bits.cb = (1U << 30);
 	bits.gui = (1U << 31);
+	bits.uvd = (1U << 19);
+	bits.vce0 = (1U << 7);
 
 	// R600 has a different texture bit, and only R600 has the TC, CR, SMX bits
 	if (fam < RV770) {

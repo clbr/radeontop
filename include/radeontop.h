@@ -37,12 +37,22 @@
 #include <radeon_drm.h>
 #ifdef ENABLE_AMDGPU
 #include <amdgpu_drm.h>
-#endif
-
+enum {
+	GRBM_STATUS = 0x2004,
+	SRBM_STATUS = 0x394,
+	SRBM_STATUS2 = 0x393,
+	GRBM_MMAP_SIZE = 0x14,
+	SRBM_MMAP_SIZE = 0xe54
+};
+#else
 enum {
 	GRBM_STATUS = 0x8010,
-	MMAP_SIZE = 0x14
+	SRBM_STATUS = 0xe50,
+	SRBM_STATUS2 = 0xe4c,
+	GRBM_MMAP_SIZE = 0x14,
+	SRBM_MMAP_SIZE = 0xe54
 };
+#endif
 
 #ifndef RADEON_INFO_VRAM_USAGE
 #define RADEON_INFO_VRAM_USAGE 0x1e
@@ -56,11 +66,15 @@ void authenticate_drm(int fd);
 
 // radeontop.c
 void die(const char *why);
-int get_drm_value(int fd, unsigned request, uint32_t *out);
+int get_drm_value(int fd, unsigned regoffset, unsigned request, uint32_t *out);
 unsigned int readgrbm();
+unsigned int readsrbm();
+unsigned int readsrbm2();
 
-extern const void *area;
+extern const void *grbm_area;
+extern const void *srbm_area;
 extern int use_ioctl;
+extern char drm_name[10];
 
 // detect.c
 unsigned int init_pci(unsigned char bus, const unsigned char forcemem);
@@ -146,6 +160,8 @@ struct bits_t {
 	unsigned int db;
 	unsigned int cb;
 	unsigned int cr;
+	unsigned int uvd;
+	unsigned int vce0;
 	unsigned long long vram;
 };
 
