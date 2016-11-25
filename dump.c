@@ -93,6 +93,8 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		float cb = 100.0 * (float) results->cb / ticks;
 		float vram = 100.0 * (float) results->vram / vramsize;
 		float vrammb = results->vram / 1024.0f / 1024.0f;
+		float gtt = 100.0 * (float) results->gtt / gttsize;
+		float gttmb = results->gtt / 1024.0f / 1024.0f;
 
 		fprintf(f, "gpu %.2f%%, ", gui);
 		fprintf(f, "ee %.2f%%, ", ee);
@@ -119,6 +121,11 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 
 		if (bits.vram)
 			fprintf(f, ", vram %.2f%% %.2fmb\n", vram, vrammb);
+		else
+			fprintf(f, "\n");
+
+		if(bits.gtt)
+			fprintf(f, ", gtt %.2f%% %.2fmb\n", gtt, gttmb);
 		else
 			fprintf(f, "\n");
 

@@ -80,6 +80,7 @@ static void *collector(void *arg) {
 			}
 
 			res[curres].vram = getvram();
+			res[curres].gtt = getgtt();
 
 			// Atomically write it to the pointer
 			__sync_bool_compare_and_swap(&results, results, &res[curres]);
