@@ -20,6 +20,7 @@
 
 struct bits_t bits;
 unsigned long long vramsize;
+unsigned long long gttsize;
 int drm_fd = -1;
 char drm_name[10] = ""; // should be radeon or amdgpu
 
@@ -116,6 +117,7 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 	}
 
 	bits.vram = 0;
+	bits.gtt = 0;
 	if (drm_fd < 0) {
 		printf(_("Failed to open DRM node, no VRAM support.\n"));
 	} else {
@@ -145,6 +147,7 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 			ret = drmCommandWriteRead(drm_fd, DRM_RADEON_GEM_INFO,
 							&gem, sizeof(gem));
 			vramsize = gem.vram_size;
+			gttsize = gem.gart_size;
 		} else if (strcmp(drm_name, "amdgpu") == 0) {
 #ifdef ENABLE_AMDGPU
 			struct drm_amdgpu_info_vram_gtt vram_gtt = {};
@@ -158,6 +161,7 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 			ret = drmCommandWrite(drm_fd, DRM_AMDGPU_INFO,
 						&request, sizeof(request));
 			vramsize = vram_gtt.vram_size;
+			gttsize = vram_gtt.gtt_size;
 #else
 			printf(_("amdgpu DRM driver is used, but amdgpu VRAM size reporting is not enabled\n"));
 #endif
@@ -180,6 +184,19 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 		}
 
 		bits.vram = 1;
+
+		ret = getgtt();
+		if (ret == 0) {
+			if (strcmp(drm_name, "amdgpu") == 0) {
+#ifndef ENABLE_AMDGPU
+				printf(_("amdgpu DRM driver is used, but amdgpu GTT usage reporting is not enabled\n"));
+#endif
+			}
+			printf(_("Failed to get GTT usage, kernel likely too old\n"));
+			goto out;
+		}
+
+		bits.gtt = 1;
 	}
 
 	out:
@@ -210,6 +227,34 @@ unsigned long long getvram() {
 		request.query = AMDGPU_INFO_VRAM_USAGE;
 
 		ret = drmCommandWrite(drm_fd, DRM_AMDGPU_INFO, &request, sizeof(request));
+#endif
+	}
+	if (ret) return 0;
+
+	return val;
+}
+
+unsigned long long getgtt() {
+	int ret = -1;
+	unsigned long long val = 0;
+
+	if (strcmp(drm_name, "radeon") == 0) {
+		struct drm_radeon_info info;
+		memset(&info, 0, sizeof(info));
+		info.value = (unsigned long) &val;
+		info.request = RADEON_INFO_GTT_USAGE;
+
+		ret = drmCommandWriteRead(drm_fd, DRM_RADEON_INFO, &info, sizeof(info));
+	} else if (strcmp(drm_name, "amdgpu") == 0) {
+#ifdef ENABLE_AMDGPU
+		struct drm_amdgpu_info info;
+
+		memset(&info, 0, sizeof(struct drm_amdgpu_info));
+		info.query = AMDGPU_INFO_GTT_USAGE;
+		info.return_pointer = (unsigned long)&val;
+		info.return_size = sizeof(val);
+
+		ret = drmCommandWriteRead(drm_fd, DRM_AMDGPU_INFO, &info, sizeof(info));
 #endif
 	}
 	if (ret) return 0;
