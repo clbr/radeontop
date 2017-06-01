@@ -47,16 +47,16 @@ static void help(const char * const me, const unsigned int ticks) {
 }
 
 int get_drm_value(int fd, unsigned request, uint32_t *out) {
-    struct drm_radeon_info info;
-    int retval;
+	struct drm_radeon_info info;
+	int retval;
 
-    memset(&info, 0, sizeof(info));
+	memset(&info, 0, sizeof(info));
 
-    info.value = (unsigned long)out;
-    info.request = request;
+	info.value = (unsigned long)out;
+	info.request = request;
 
-    retval = drmCommandWriteRead(fd, DRM_RADEON_INFO, &info, sizeof(info));
-    return !retval;
+	retval = drmCommandWriteRead(fd, DRM_RADEON_INFO, &info, sizeof(info));
+	return !retval;
 }
 
 unsigned int readgrbm() {
