@@ -124,7 +124,7 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		else
 			fprintf(f, "\n");
 
-		if(bits.gtt)
+		if (bits.gtt)
 			fprintf(f, ", gtt %.2f%% %.2fmb\n", gtt, gttmb);
 		else
 			fprintf(f, "\n");
