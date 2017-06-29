@@ -48,6 +48,11 @@ ifeq ($(amdgpu), 1)
 	CFLAGS += -DENABLE_AMDGPU=1
 endif
 
+# add transparent background
+ifeq ($(transparent), 1)
+	CFLAGS += -DENABLE_TRANSPARENT=1
+endif
+
 ifndef plain
 ifdef debug
 	CFLAGS += -g
