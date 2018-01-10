@@ -73,6 +73,8 @@ unsigned int readgrbm() {
 }
 
 int main(int argc, char **argv) {
+	// Temporarily drop privileges to do option parsing, etc.
+	seteuid(getuid());
 
 	unsigned int ticks = 120;
 	unsigned char color = 0;
@@ -133,8 +135,10 @@ int main(int argc, char **argv) {
 		}
 	}
 
-	// init
+	// init (regain privileges for bus initialization and ultimately drop them afterwards)
+	seteuid(0);
 	const unsigned int pciaddr = init_pci(bus, forcemem);
+	setuid(getuid());
 
 	const int family = getfamily(pciaddr);
 	if (!family)
