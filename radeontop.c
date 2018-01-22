@@ -34,6 +34,7 @@ static void help(const char * const me, const unsigned int ticks) {
 	printf(_("\n\tRadeonTop for R600 and above.\n\n"
 		"\tUsage: %s [-ch] [-b bus] [-d file] [-l limit] [-t ticks]\n\n"
 		"-b --bus 3		Pick card from this PCI bus\n"
+		"-r --card 1		Pick card from this PCI bus\n"
 		"-c --color		Enable colors\n"
 		"-d --dump file		Dump data to this file, - for stdout\n"
 		"-l --limit 3		Quit after dumping N lines, default forever\n"
@@ -79,6 +80,7 @@ int main(int argc, char **argv) {
 	unsigned int ticks = 120;
 	unsigned char color = 0;
 	unsigned char bus = 0, forcemem = 0;
+	unsigned char card = 0;
 	unsigned int limit = 0;
 	char *dump = NULL;
 
@@ -92,6 +94,7 @@ int main(int argc, char **argv) {
 	// opts
 	const struct option opts[] = {
 		{"bus", 1, 0, 'b'},
+		{"card", 1, 0, 'r'},
 		{"color", 0, 0, 'c'},
 		{"dump", 1, 0, 'd'},
 		{"help", 0, 0, 'h'},
@@ -103,7 +106,7 @@ int main(int argc, char **argv) {
 	};
 
 	while (1) {
-		int c = getopt_long(argc, argv, "b:cd:hl:mt:v", opts, NULL);
+		int c = getopt_long(argc, argv, "br:cd:hl:mt:v", opts, NULL);
 		if (c == -1) break;
 
 		switch(c) {
@@ -123,6 +126,9 @@ int main(int argc, char **argv) {
 			case 'b':
 				bus = atoi(optarg);
 			break;
+			case 'r':
+				card = atoi(optarg);
+			break;
 			case 'v':
 				version();
 			break;
@@ -137,7 +143,7 @@ int main(int argc, char **argv) {
 
 	// init (regain privileges for bus initialization and ultimately drop them afterwards)
 	seteuid(0);
-	const unsigned int pciaddr = init_pci(bus, forcemem);
+	const unsigned int pciaddr = init_pci(bus, card, forcemem);
 	setuid(getuid());
 
 	const int family = getfamily(pciaddr);
