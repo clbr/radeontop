@@ -24,3 +24,9 @@ Translations
 If you'd like to translate RadeonTop to your own language, please go here:
 
 https://translations.launchpad.net/radeontop
+
+Need to install:
+sudo apt-get install libpciaccess-dev
+sudo apt-get install libncurses5-dev
+sudo apt-get install libdrm-dev
+sudo apt-get install libxcb-dri2-0-dev
