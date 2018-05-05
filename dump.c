@@ -120,9 +120,7 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		fprintf(f, "cb %.2f%%", cb);
 
 		if (bits.vram)
-			fprintf(f, ", vram %.2f%% %.2fmb\n", vram, vrammb);
-		else
-			fprintf(f, "\n");
+			fprintf(f, ", vram %.2f%% %.2fmb", vram, vrammb);
 
 		if (bits.gtt)
 			fprintf(f, ", gtt %.2f%% %.2fmb\n", gtt, gttmb);
