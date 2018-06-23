@@ -133,7 +133,9 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		if (quit)
 			break;
 
-		sleep(1);
+		// No sleeping on the last line.
+		if (!limit || count > 1)
+			sleep(1);
 	}
 
 	fflush(f);
