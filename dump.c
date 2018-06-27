@@ -28,7 +28,8 @@ static void sighandler(int sig) {
 	}
 }
 
-void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit, unsigned char bus) {
+void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit,
+		const unsigned char bus) {
 
 #ifdef ENABLE_NLS
 	// This is a data format, so disable decimal point localization

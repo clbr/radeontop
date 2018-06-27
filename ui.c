@@ -76,7 +76,8 @@ static void percentage(const unsigned int y, const unsigned int w, const float p
 	attroff(A_REVERSE);
 }
 
-void present(const unsigned int ticks, const char card[], unsigned int color, unsigned char bus) {
+void present(const unsigned int ticks, const char card[], unsigned int color,
+		const unsigned char bus) {
 
 	printf(_("Collecting data, please wait....\n"));
 
