@@ -76,7 +76,7 @@ static void percentage(const unsigned int y, const unsigned int w, const float p
 	attroff(A_REVERSE);
 }
 
-void present(const unsigned int ticks, const char card[], unsigned int color) {
+void present(const unsigned int ticks, const char card[], unsigned int color, unsigned char bus) {
 
 	printf(_("Collecting data, please wait....\n"));
 
@@ -114,8 +114,8 @@ void present(const unsigned int ticks, const char card[], unsigned int color) {
 		move(0,0);
 		attron(A_REVERSE);
 		mvhline(0, 0, ' ', w);
-		printcenter(0, w, _("radeontop %s, running on %s, %u samples/sec"),
-			    VERSION, card, 	ticks);
+		printcenter(0, w, _("radeontop %s, running on %s bus %02x, %u samples/sec"),
+			    VERSION, card, bus, ticks);
 		attroff(A_REVERSE);
 
 		move(1,0);

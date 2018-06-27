@@ -28,7 +28,7 @@ static void sighandler(int sig) {
 	}
 }
 
-void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit) {
+void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit, unsigned char bus) {
 
 #ifdef ENABLE_NLS
 	// This is a data format, so disable decimal point localization
@@ -74,6 +74,8 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 
 		fprintf(f, "%llu.%llu: ", (unsigned long long) t.tv_sec,
 				(unsigned long long) t.tv_usec);
+
+		fprintf(f, "bus %02x, ", bus);
 
 		// Again, no need to protect these. Worst that happens is a slightly
 		// wrong number.

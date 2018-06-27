@@ -138,6 +138,8 @@ int main(int argc, char **argv) {
 	// init (regain privileges for bus initialization and ultimately drop them afterwards)
 	seteuid(0);
 	const unsigned int pciaddr = init_pci(bus, forcemem);
+	// after init_pci we can assume that bus exists (otherwise it would die())
+
 	setuid(getuid());
 
 	const int family = getfamily(pciaddr);
@@ -152,9 +154,9 @@ int main(int argc, char **argv) {
 	collect(&ticks);
 
 	if (dump)
-		dumpdata(ticks, dump, limit);
+		dumpdata(ticks, dump, limit, bus);
 	else
-		present(ticks, cardname, color);
+		present(ticks, cardname, color, bus);
 
 	munmap((void *) area, MMAP_SIZE);
 	return 0;
