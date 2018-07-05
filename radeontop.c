@@ -33,7 +33,7 @@ static void version() {
 static void help(const char * const me, const unsigned int ticks) {
 	printf(_("\n\tRadeonTop for R600 and above.\n\n"
 		"\tUsage: %s [-ch] [-b bus] [-d file] [-l limit] [-t ticks]\n\n"
-		"-b --bus 3		Pick card from this PCI bus\n"
+		"-b --bus 3		Pick card from this PCI bus (hexadecimal)\n"
 		"-c --color		Enable colors\n"
 		"-d --dump file		Dump data to this file, - for stdout\n"
 		"-l --limit 3		Quit after dumping N lines, default forever\n"
@@ -121,7 +121,7 @@ int main(int argc, char **argv) {
 				forcemem = 1;
 			break;
 			case 'b':
-				bus = atoi(optarg);
+				bus = strtoul(optarg, NULL, 16);
 			break;
 			case 'v':
 				version();
