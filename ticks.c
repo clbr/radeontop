@@ -25,7 +25,7 @@ struct collector_args_t {
 };
 
 static void *collector(void *arg) {
-	struct collector_args_t *args = (struct collector_args_t*)arg;
+	struct collector_args_t *args = (struct collector_args_t *) arg;
 
 	const unsigned int ticks = args->ticks;
 	const unsigned int dumpinterval = args->dumpinterval;
@@ -33,7 +33,7 @@ static void *collector(void *arg) {
 	struct bits_t res[2];
 
 	// Save one second's worth of history
-	struct bits_t *history = calloc(ticks*dumpinterval, sizeof(struct bits_t));
+	struct bits_t *history = calloc(ticks * dumpinterval, sizeof(struct bits_t));
 	unsigned int cur = 0, curres = 0;
 
 	const useconds_t sleeptime = 1e6 / ticks;
@@ -61,7 +61,7 @@ static void *collector(void *arg) {
 
 		usleep(sleeptime);
 		cur++;
-		cur %= ticks*dumpinterval;
+		cur %= ticks * dumpinterval;
 
 		// One second has passed, we have one sec's worth of data
 		if (cur == 0) {
@@ -69,7 +69,7 @@ static void *collector(void *arg) {
 
 			memset(&res[curres], 0, sizeof(struct bits_t));
 
-			for (i = 0; i < ticks*dumpinterval; i++) {
+			for (i = 0; i < ticks * dumpinterval; i++) {
 				res[curres].ee += history[i].ee;
 				res[curres].vgt += history[i].vgt;
 				res[curres].gui += history[i].gui;

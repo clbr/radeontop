@@ -141,7 +141,7 @@ int main(int argc, char **argv) {
 			break;
 			case 'i':
 				dumpinterval = atoi(optarg);
-				if(dumpinterval < 1)
+				if (dumpinterval < 1)
 					dumpinterval = 1;
 			break;
 		}
