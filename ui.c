@@ -77,7 +77,7 @@ static void percentage(const unsigned int y, const unsigned int w, const float p
 }
 
 void present(const unsigned int ticks, const char card[], unsigned int color,
-		const unsigned char bus) {
+		const unsigned char bus, const unsigned int dumpinterval) {
 
 	printf(_("Collecting data, please wait....\n"));
 
@@ -124,24 +124,25 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 
 		// Again, no need to protect these. Worst that happens is a slightly
 		// wrong number.
-		float ee = 100.0 * (float) results->ee / ticks;
-		float vgt = 100.0 * (float) results->vgt / ticks;
-		float gui = 100.0 * (float) results->gui / ticks;
-		float ta = 100.0 * (float) results->ta / ticks;
-		float tc = 100.0 * (float) results->tc / ticks;
-		float sx = 100.0 * (float) results->sx / ticks;
-		float sh = 100.0 * (float) results->sh / ticks;
-		float spi = 100.0 * (float) results->spi / ticks;
-		float smx = 100.0 * (float) results->smx / ticks;
-		float sc = 100.0 * (float) results->sc / ticks;
-		float pa = 100.0 * (float) results->pa / ticks;
-		float db = 100.0 * (float) results->db / ticks;
-		float cr = 100.0 * (float) results->cr / ticks;
-		float cb = 100.0 * (float) results->cb / ticks;
-		float vram = 100.0 * (float) results->vram / vramsize;
+		float k = 1.0f / ticks / dumpinterval;
+		float ee = 100 * results->ee * k;
+		float vgt = 100 * results->vgt * k;
+		float gui = 100 * results->gui * k;
+		float ta = 100 * results->ta * k;
+		float tc = 100 * results->tc * k;
+		float sx = 100 * results->sx * k;
+		float sh = 100 * results->sh * k;
+		float spi = 100 * results->spi * k;
+		float smx = 100 * results->smx * k;
+		float sc = 100 * results->sc * k;
+		float pa = 100 * results->pa * k;
+		float db = 100 * results->db * k;
+		float cr = 100 * results->cr * k;
+		float cb = 100 * results->cb * k;
+		float vram = 100.0f * results->vram / vramsize;
 		float vrammb = results->vram / 1024.0f / 1024.0f;
 		float vramsizemb = vramsize / 1024.0f / 1024.0f;
-		float gtt = 100.0 * (float) results->gtt / gttsize;
+		float gtt = 100.0f * results->gtt / gttsize;
 		float gttmb = results->gtt / 1024.0f / 1024.0f;
 		float gttsizemb = gttsize / 1024.0f / 1024.0f;
 

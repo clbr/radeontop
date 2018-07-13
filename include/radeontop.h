@@ -73,15 +73,15 @@ unsigned long long getvram();
 unsigned long long getgtt();
 
 // ticks.c
-void collect(unsigned int *ticks);
+void collect(unsigned int ticks, unsigned int dumpinterval);
 
 extern struct bits_t *results;
 
 // ui.c
-void present(const unsigned int ticks, const char card[], unsigned int color, const unsigned char bus);
+void present(const unsigned int ticks, const char card[], unsigned int color, const unsigned char bus, const unsigned int dumpinterval);
 
 // dump.c
-void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit, const unsigned char bus);
+void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit, const unsigned char bus, const unsigned int dumpinterval);
 
 // chips
 enum radeon_family {
