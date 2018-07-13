@@ -19,14 +19,21 @@
 
 struct bits_t *results = NULL;
 
-static void *collector(void *arg) {
+struct collector_args_t {
+	unsigned int ticks;
+	unsigned int dumpinterval;
+};
 
-	const unsigned int ticks = * ((unsigned int *) arg);
+static void *collector(void *arg) {
+	struct collector_args_t *args = (struct collector_args_t*)arg;
+
+	const unsigned int ticks = args->ticks;
+	const unsigned int dumpinterval = args->dumpinterval;
 
 	struct bits_t res[2];
 
 	// Save one second's worth of history
-	struct bits_t *history = calloc(ticks, sizeof(struct bits_t));
+	struct bits_t *history = calloc(ticks*dumpinterval, sizeof(struct bits_t));
 	unsigned int cur = 0, curres = 0;
 
 	const useconds_t sleeptime = 1e6 / ticks;
@@ -54,7 +61,7 @@ static void *collector(void *arg) {
 
 		usleep(sleeptime);
 		cur++;
-		cur %= ticks;
+		cur %= ticks*dumpinterval;
 
 		// One second has passed, we have one sec's worth of data
 		if (cur == 0) {
@@ -62,7 +69,7 @@ static void *collector(void *arg) {
 
 			memset(&res[curres], 0, sizeof(struct bits_t));
 
-			for (i = 0; i < ticks; i++) {
+			for (i = 0; i < ticks*dumpinterval; i++) {
 				res[curres].ee += history[i].ee;
 				res[curres].vgt += history[i].vgt;
 				res[curres].gui += history[i].gui;
@@ -93,7 +100,7 @@ static void *collector(void *arg) {
 	return NULL;
 }
 
-void collect(unsigned int *ticks) {
+void collect(unsigned int ticks, unsigned int dumpinterval) {
 
 	// Start a thread collecting data
 	pthread_t tid;
@@ -103,5 +110,9 @@ void collect(unsigned int *ticks) {
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
-	pthread_create(&tid, &attr, collector, ticks);
+	struct collector_args_t *args = malloc(sizeof(*args));
+	args->ticks = ticks;
+	args->dumpinterval = dumpinterval;
+
+	pthread_create(&tid, &attr, collector, args);
 }

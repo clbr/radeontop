@@ -31,19 +31,20 @@ static void version() {
 	exit(1);
 }
 
-static void help(const char * const me, const unsigned int ticks) {
+static void help(const char * const me, const unsigned int ticks, const unsigned int dumpinterval) {
 	printf(_("\n\tRadeonTop for R600 and above.\n\n"
-		"\tUsage: %s [-ch] [-b bus] [-d file] [-l limit] [-t ticks]\n\n"
+		"\tUsage: %s [-ch] [-b bus] [-d file] [-i seconds] [-l limit] [-t ticks]\n\n"
 		"-b --bus 3		Pick card from this PCI bus (hexadecimal)\n"
 		"-c --color		Enable colors\n"
 		"-d --dump file		Dump data to this file, - for stdout\n"
+		"-i --dump-interval 1	Number of seconds between dumps (default %u)\n"
 		"-l --limit 3		Quit after dumping N lines, default forever\n"
 		"-m --mem		Force the /dev/mem path, for the proprietary driver\n"
 		"-t --ticks 50		Samples per second (default %u)\n"
 		"\n"
 		"-h --help		Show this help\n"
 		"-v --version		Show the version\n"),
-		me, ticks);
+		me, dumpinterval, ticks);
 	die("");
 }
 
@@ -77,11 +78,15 @@ int main(int argc, char **argv) {
 	// Temporarily drop privileges to do option parsing, etc.
 	seteuid(getuid());
 
-	unsigned int ticks = 120;
+	const unsigned int default_ticks = 120;
+	const unsigned int default_dumpinterval = 1;
+
+	unsigned int ticks = default_ticks;
 	unsigned char color = 0;
 	unsigned char bus = 0, forcemem = 0;
 	unsigned int limit = 0;
 	char *dump = NULL;
+	unsigned int dumpinterval = default_dumpinterval;
 
 	// Translations
 #ifdef ENABLE_NLS
@@ -95,6 +100,7 @@ int main(int argc, char **argv) {
 		{"bus", 1, 0, 'b'},
 		{"color", 0, 0, 'c'},
 		{"dump", 1, 0, 'd'},
+		{"dump-interval", 1, 0, 'i'},
 		{"help", 0, 0, 'h'},
 		{"limit", 1, 0, 'l'},
 		{"mem", 0, 0, 'm'},
@@ -104,13 +110,13 @@ int main(int argc, char **argv) {
 	};
 
 	while (1) {
-		int c = getopt_long(argc, argv, "b:cd:hl:mt:v", opts, NULL);
+		int c = getopt_long(argc, argv, "b:cd:hi:l:mt:v", opts, NULL);
 		if (c == -1) break;
 
 		switch(c) {
 			case 'h':
 			case '?':
-				help(argv[0], ticks);
+				help(argv[0], default_ticks, default_dumpinterval);
 			break;
 			case 't':
 				ticks = atoi(optarg);
@@ -133,6 +139,11 @@ int main(int argc, char **argv) {
 			case 'd':
 				dump = optarg;
 			break;
+			case 'i':
+				dumpinterval = atoi(optarg);
+				if(dumpinterval < 1)
+					dumpinterval = 1;
+			break;
 		}
 	}
 
@@ -152,12 +163,12 @@ int main(int argc, char **argv) {
 	initbits(family);
 
 	// runtime
-	collect(&ticks);
+	collect(ticks, dumpinterval);
 
 	if (dump)
-		dumpdata(ticks, dump, limit, bus);
+		dumpdata(ticks, dump, limit, bus, dumpinterval);
 	else
-		present(ticks, cardname, color, bus);
+		present(ticks, cardname, color, bus, dumpinterval);
 
 	munmap((void *) area, MMAP_SIZE);
 	return 0;
