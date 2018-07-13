@@ -2,12 +2,12 @@
 .\"     Title: radeontop
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
-.\"      Date: 11/11/2015
+.\"      Date: 07/13/2018
 .\"    Manual: \ \&
 .\"    Source: \ \&
 .\"  Language: English
 .\"
-.TH "RADEONTOP" "1" "11/11/2015" "\ \&" "\ \&"
+.TH "RADEONTOP" "1" "07/13/2018" "\ \&" "\ \&"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -31,7 +31,7 @@
 radeontop \- tool to show GPU utilization
 .SH "SYNOPSIS"
 .sp
-\fBradeontop [\-chv] [\-b \fR\fB\fIbus\fR\fR\fB] [\-d \fR\fB\fIfile\fR\fR\fB] [\-l \fR\fB\fIlimit\fR\fR\fB] [\-t \fR\fB\fIticks\fR\fR\fB]\fR
+\fBradeontop [\-chv] [\-b \fR\fB\fIbus\fR\fR\fB] [\-d \fR\fB\fIfile\fR\fR\fB] [\-l \fR\fB\fIlimit\fR\fR\fB] [\-i \fR\fB\fIsecs\fR\fR\fB] [\-t \fR\fB\fIticks\fR\fR\fB]\fR
 .SH "DESCRIPTION"
 .sp
 RadeonTop shows the utilization of your GPU, both in general and by blocks\&.
@@ -68,6 +68,11 @@ for graceful termination\&.
 \fB\-h, \-\-help\fR
 .RS 4
 Displays help\&.
+.RE
+.PP
+\fB\-i, \-\-dump\-interval \fR\fB\fIseconds\fR\fR
+.RS 4
+Wait for N seconds between data output\&.
 .RE
 .PP
 \fB\-l, \-\-limit \fR\fB\fIlimit\fR\fR
