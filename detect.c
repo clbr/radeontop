@@ -56,24 +56,24 @@ struct pci_device * findGPUDevice(const unsigned char bus) {
 	return dev;
 }
 
-unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
-
+struct pci_device init_pci(unsigned char bus, const unsigned char forcemem) {
 	int ret = pci_system_init();
 	if (ret)
 		die(_("Failed to init pciaccess"));
 
-	struct pci_device * const dev = findGPUDevice(bus);
+	// we need to copy the pci device as pci_system_cleanup() will destroy it before returning
+	const struct pci_device gpu_device = *findGPUDevice(bus);
 
 	char busid[32];
 	snprintf(busid, sizeof(busid), "pci:%04x:%02x:%02x.%u",
-			 dev->domain, dev->bus, dev->dev, dev->func);
+			 gpu_device.domain, gpu_device.bus, gpu_device.dev, gpu_device.func);
 
-	const unsigned int device_id = dev->device_id;
+
 	int reg = 2;
-	if (getfamily(device_id) >= BONAIRE)
+	if (getfamily(gpu_device.device_id) >= BONAIRE)
 		reg = 5;
 
-	if (!dev->regions[reg].size) die(_("Can't get the register area size"));
+	if (!gpu_device.regions[reg].size) die(_("Can't get the register area size"));
 
 //	printf("Found area %p, size %lu\n", area, dev->regions[reg].size);
 
@@ -108,7 +108,7 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 		if (mem < 0) die(_("Cannot access GPU registers, are you root?"));
 
 		area = mmap(NULL, MMAP_SIZE, PROT_READ, MAP_PRIVATE, mem,
-				dev->regions[reg].base_addr + 0x8000);
+				gpu_device.regions[reg].base_addr + 0x8000);
 		if (area == MAP_FAILED) die(_("mmap failed"));
 	}
 
@@ -199,7 +199,7 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 
 	pci_system_cleanup();
 
-	return device_id;
+	return gpu_device;
 }
 
 unsigned long long getvram() {

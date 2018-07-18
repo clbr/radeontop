@@ -17,6 +17,7 @@
 
 #include "radeontop.h"
 #include <getopt.h>
+#include <pciaccess.h>
 
 const void *area;
 int use_ioctl;
@@ -149,12 +150,16 @@ int main(int argc, char **argv) {
 
 	// init (regain privileges for bus initialization and ultimately drop them afterwards)
 	seteuid(0);
-	const unsigned int pciaddr = init_pci(bus, forcemem);
-	// after init_pci we can assume that bus exists (otherwise it would die())
+	const struct pci_device gpu_device = init_pci(bus, forcemem);
+	// after init_pci we can assume that pci device exists (otherwise it would die())
+
+	// need to re-read the bus ID: in case no bus parameter has been specified a random GPU is being used
+	if(!bus)
+		bus = gpu_device.bus;
 
 	setuid(getuid());
 
-	const int family = getfamily(pciaddr);
+	const int family = getfamily(gpu_device.device_id);
 	if (!family)
 		puts(_("Unknown Radeon card. <= R500 won't work, new cards might."));
 
