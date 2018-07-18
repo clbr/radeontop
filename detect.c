@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2012 Lauri Kasanen
+    Copyright (C) 2018 Genesis Cloud Ltd.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,12 +33,8 @@ unsigned long long sclk_max = 0; // kilohertz
 int drm_fd = -1;
 char drm_name[10] = ""; // should be radeon or amdgpu
 
-unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
-
-	int ret = pci_system_init();
-	if (ret)
-		die(_("Failed to init pciaccess"));
-
+struct pci_device * findGPUDevice(const unsigned char bus) {
+	struct pci_device *dev;
 	struct pci_id_match match;
 
 	match.vendor_id = 0x1002;
@@ -49,16 +46,12 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 	match.match_data = 0;
 
 	struct pci_device_iterator *iter = pci_id_match_iterator_create(&match);
-	struct pci_device *dev = NULL;
-	char busid[32];
 
 	while ((dev = pci_device_next(iter))) {
 		pci_device_probe(dev);
 		if ((dev->device_class & 0x00ffff00) != 0x00030000 &&
 			(dev->device_class & 0x00ffff00) != 0x00038000)
 			continue;
-		snprintf(busid, sizeof(busid), "pci:%04x:%02x:%02x.%u",
-				dev->domain, dev->bus, dev->dev, dev->func);
 		if (!bus || bus == dev->bus)
 			break;
 	}
@@ -68,12 +61,27 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 	if (!dev)
 		die(_("Can't find Radeon cards"));
 
-	const unsigned int device_id = dev->device_id;
+	return dev;
+}
+
+unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
+
+	int ret = pci_system_init();
+	if (ret)
+		die(_("Failed to init pciaccess"));
+
+	const struct pci_device * const gpu_device = findGPUDevice(bus);
+
+	char busid[32];
+	snprintf(busid, sizeof(busid), "pci:%04x:%02x:%02x.%u",
+			 gpu_device->domain, gpu_device->bus, gpu_device->dev, gpu_device->func);
+
+	const unsigned int device_id = gpu_device->device_id;
 	int reg = 2;
 	if (getfamily(device_id) >= BONAIRE)
 		reg = 5;
 
-	if (!dev->regions[reg].size) die(_("Can't get the register area size"));
+	if (!gpu_device->regions[reg].size) die(_("Can't get the register area size"));
 
 //	printf("Found area %p, size %lu\n", area, dev->regions[reg].size);
 
@@ -108,7 +116,7 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 		if (mem < 0) die(_("Cannot access GPU registers, are you root?"));
 
 		area = mmap(NULL, MMAP_SIZE, PROT_READ, MAP_PRIVATE, mem,
-				dev->regions[reg].base_addr + 0x8000);
+				gpu_device->regions[reg].base_addr + 0x8000);
 		if (area == MAP_FAILED) die(_("mmap failed"));
 	}
 
