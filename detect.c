@@ -64,21 +64,19 @@ struct pci_device * findGPUDevice(const unsigned char bus) {
 	return dev;
 }
 
-unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
-
+void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char forcemem) {
 	int ret = pci_system_init();
 	if (ret)
 		die(_("Failed to init pciaccess"));
 
-	const struct pci_device * const gpu_device = findGPUDevice(bus);
+	const struct pci_device * const gpu_device = findGPUDevice(*bus);
 
 	char busid[32];
 	snprintf(busid, sizeof(busid), "pci:%04x:%02x:%02x.%u",
 			 gpu_device->domain, gpu_device->bus, gpu_device->dev, gpu_device->func);
 
-	const unsigned int device_id = gpu_device->device_id;
 	int reg = 2;
-	if (getfamily(device_id) >= BONAIRE)
+	if (getfamily(gpu_device->device_id) >= BONAIRE)
 		reg = 5;
 
 	if (!gpu_device->regions[reg].size) die(_("Can't get the register area size"));
@@ -224,9 +222,9 @@ unsigned int init_pci(unsigned char bus, const unsigned char forcemem) {
 
 	out:
 
+	*bus = gpu_device->bus;
+	*device_id = gpu_device->device_id;
 	pci_system_cleanup();
-
-	return device_id;
 }
 
 unsigned long long getvram() {

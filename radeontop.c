@@ -84,6 +84,7 @@ int main(int argc, char **argv) {
 	unsigned int ticks = default_ticks;
 	unsigned char color = 0;
 	unsigned char bus = 0, forcemem = 0;
+	unsigned int device_id = 0;
 	unsigned int limit = 0;
 	char *dump = NULL;
 	unsigned int dumpinterval = default_dumpinterval;
@@ -149,12 +150,12 @@ int main(int argc, char **argv) {
 
 	// init (regain privileges for bus initialization and ultimately drop them afterwards)
 	seteuid(0);
-	const unsigned int pciaddr = init_pci(bus, forcemem);
-	// after init_pci we can assume that bus exists (otherwise it would die())
+	init_pci(&bus, &device_id, forcemem);
+	// after init_pci we can assume that bus/device_id exists (otherwise it would die())
 
 	setuid(getuid());
 
-	const int family = getfamily(pciaddr);
+	const int family = getfamily(device_id);
 	if (!family)
 		puts(_("Unknown Radeon card. <= R500 won't work, new cards might."));
 
