@@ -98,7 +98,7 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 	init_pair(4, COLOR_MAGENTA, COLOR_BLACK);
 	init_pair(5, COLOR_YELLOW, COLOR_BLACK);
 
-	const unsigned int bigh = 25;
+	const unsigned int bigh = 23;
 
 	// Screen dimensions. (Re)calculated only when resize is non-zero.
 	unsigned int h = 1, w = 1, hw = 1;
@@ -254,9 +254,6 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 		}
 
 		if (mclk_max != 0 && mclk > 0) {
-			// Enough height?
-			if (h > bigh) start++;
-
 			if (color) attron(COLOR_PAIR(3));
 			percentage(start, w, mclk);
 			printright(start++, hw, _("%.2fG / %.2fG Memory Clock %6.2f%%"),
