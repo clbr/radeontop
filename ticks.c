@@ -57,7 +57,8 @@ static void *collector(void *arg) {
 		if (stat & bits.db) history[cur].db = 1;
 		if (stat & bits.cr) history[cur].cr = 1;
 		if (stat & bits.cb) history[cur].cb = 1;
-
+		history[cur].mclk = getmclk();
+		history[cur].sclk = getsclk();
 
 		usleep(sleeptime);
 		cur++;
@@ -84,6 +85,8 @@ static void *collector(void *arg) {
 				res[curres].db += history[i].db;
 				res[curres].cb += history[i].cb;
 				res[curres].cr += history[i].cr;
+				res[curres].mclk += history[i].mclk;
+				res[curres].sclk += history[i].sclk;
 			}
 
 			res[curres].vram = getvram();

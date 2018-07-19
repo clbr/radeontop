@@ -71,6 +71,8 @@ int getfamily(unsigned int id);
 void initbits(int fam);
 unsigned long long getvram();
 unsigned long long getgtt();
+unsigned long long getmclk();
+unsigned long long getsclk();
 
 // ticks.c
 void collect(unsigned int ticks, unsigned int dumpinterval);
@@ -153,11 +155,15 @@ struct bits_t {
 	unsigned int cr;
 	unsigned long long vram;
 	unsigned long long gtt;
+	unsigned long long mclk;
+	unsigned long long sclk;
 };
 
 extern struct bits_t bits;
 extern unsigned long long vramsize;
 extern unsigned long long gttsize;
+extern unsigned long long mclk_max;
+extern unsigned long long sclk_max;
 extern int drm_fd;
 
 #endif
