@@ -8,7 +8,7 @@
 #	plain	apply neither -g nor -s.
 #	xcb	enable libxcb to run unprivileged in Xorg, default on
 #	amdgpu	enable amdgpu VRAM size and usage reporting, default off
-#		because amdgpu requires libdrm >= 2.4.63
+#		because amdgpu requires libdrm >= 2.4.77
 
 PREFIX ?= /usr
 INSTALL ?= install
