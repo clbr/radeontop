@@ -100,6 +100,10 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		float vrammb = results->vram / 1024.0f / 1024.0f;
 		float gtt = 100.0f * results->gtt / gttsize;
 		float gttmb = results->gtt / 1024.0f / 1024.0f;
+		float mclk = 100.0f * (results->mclk * k) / (mclk_max / 1e3f);
+		float sclk = 100.0f * (results->sclk * k) / (sclk_max / 1e3f);
+		float mclk_ghz = results->mclk * k / 1000.0f;
+		float sclk_ghz = results->sclk * k / 1000.0f;
 
 		fprintf(f, "gpu %.2f%%, ", gui);
 		fprintf(f, "ee %.2f%%, ", ee);
@@ -128,10 +132,13 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 			fprintf(f, ", vram %.2f%% %.2fmb", vram, vrammb);
 
 		if (bits.gtt)
-			fprintf(f, ", gtt %.2f%% %.2fmb\n", gtt, gttmb);
-		else
-			fprintf(f, "\n");
+			fprintf(f, ", gtt %.2f%% %.2fmb", gtt, gttmb);
 
+		if (mclk_max != 0 && mclk > 0)
+			fprintf(f, ", mclk %.2f%% %.3fghz, sclk %.2f%% %.3fghz",
+					mclk, mclk_ghz, sclk, sclk_ghz);
+
+		fprintf(f, "\n");
 		fflush(f);
 
 		// Did we get a termination signal?
