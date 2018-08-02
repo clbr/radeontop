@@ -26,6 +26,7 @@ static void printcenter(const unsigned int y, const unsigned int width,
 	va_start(ap, fmt);
 
 #ifdef ENABLE_NLS
+	setlocale(LC_ALL, "");
 	vasprintf(&ptr, fmt, ap);
 	const unsigned int len = mbstowcs(NULL, ptr, 0);
 #else

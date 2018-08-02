@@ -68,7 +68,7 @@ endif
 # On some distros, you might have to change this to ncursesw
 LIBS += $(shell pkg-config --libs ncursesw 2>/dev/null || \
 		shell pkg-config --libs ncurses 2>/dev/null || \
-		echo "-lncurses")
+		echo "-lncursesw")
 
 .PHONY: all clean install man dist
 
