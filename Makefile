@@ -78,7 +78,7 @@ ifeq ($(xcb), 1)
 all: $(xcblib)
 
 $(xcblib): auth_xcb.c $(wildcard include/*.h) $(verh)
-	$(CC) -shared -fPIC -o $@ $< $(CFLAGS) $(LDFLAGS) $(xcb_LIBS)
+	$(CC) -shared -fPIC -Wl,-soname,$@ -o $@ $< $(CFLAGS) $(LDFLAGS) $(xcb_LIBS)
 endif
 
 $(obj): $(wildcard include/*.h) $(verh)
