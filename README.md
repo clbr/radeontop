@@ -24,3 +24,65 @@ Translations
 If you'd like to translate RadeonTop to your own language, please go here:
 
 https://translations.launchpad.net/radeontop
+
+Running
+-------
+
+#### Prerequisites
+
+* libdrm
+* libncurses
+* libpciaccess
+* libxcb
+
+
+Simply start radeontop and it auto-selects the first supported GPU:
+
+    ./radeontop
+
+
+Running radeontop on a bus 0f:
+
+    ./radeontop -b 0f
+
+
+Writing values to stdout instead of showing a GUI:
+
+    ./radeontop -d -
+
+
+Getting all options:
+
+    ./radeontop --help
+
+
+Building
+--------
+
+#### Prerequisites
+* all run time prerequisites with dev files
+* gcc / clang
+* pkgconf
+
+### Building
+If all prerequisites are fullfilled, it can be build by simply running:
+
+    make
+
+#### Build options
+
+Build options can be specified to having the following variables being set to "1"
+
+    nls     enable translations, default on
+    debug   enable debug symbols, default off
+    nostrip disable stripping, default off
+    plain   apply neither gcc's -g nor -s.
+    xcb     enable libxcb to run unprivileged in Xorg, default on
+    amdgpu  enable amdgpu VRAM size and usage reporting, default off (requires libdrm >= 2.4.77)
+
+
+Example:
+
+    make amdgpu=1 xcb=1
+
+This will build radeontop with amdgpu VRAM reporting and xcb support.
