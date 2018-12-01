@@ -13,6 +13,7 @@
 PREFIX ?= /usr
 INSTALL ?= install
 LIBDIR ?= lib
+MANDIR ?= share/man
 
 nls ?= 1
 xcb ?= 1
@@ -103,7 +104,7 @@ install: all
 ifeq ($(xcb), 1)
 	$(INSTALL) -D -m755 $(xcblib) $(DESTDIR)/$(PREFIX)/$(LIBDIR)/$(xcblib)
 endif
-	$(INSTALL) -D -m644 radeontop.1 $(DESTDIR)/$(PREFIX)/share/man/man1/radeontop.1
+	$(INSTALL) -D -m644 radeontop.1 $(DESTDIR)/$(PREFIX)/$(MANDIR)/man1/radeontop.1
 ifeq ($(nls), 1)
 	$(MAKE) -C translations install PREFIX=$(PREFIX)
 endif
