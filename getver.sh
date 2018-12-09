@@ -2,7 +2,9 @@
 
 ver=unknown
 
-[ -n "`which git`" ] && ver=`git describe`
+if [ -n "`which git`" ] && git rev-parse HEAD 2>/dev/null; then
+  ver=`git describe`
+fi
 
 cat > include/version.h << EOF
 #ifndef VER_H
