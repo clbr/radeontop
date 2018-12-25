@@ -131,6 +131,7 @@ enum radeon_family {
 	POLARIS11,
 	POLARIS10,
 	POLARIS12,
+	POLARIS22,
 	VEGA10,
 	RAVEN,
 };
