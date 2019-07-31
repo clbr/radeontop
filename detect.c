@@ -33,7 +33,7 @@ unsigned long long sclk_max = 0; // kilohertz
 int drm_fd = -1;
 char drm_name[10] = ""; // should be radeon or amdgpu
 const void *area;
-int use_ioctl;
+int (*getgrbm_device)(uint32_t *out);	// pointer to the right backend
 
 struct pci_device * findGPUDevice(const unsigned char bus) {
 	struct pci_device *dev;
@@ -66,20 +66,25 @@ struct pci_device * findGPUDevice(const unsigned char bus) {
 	return dev;
 }
 
-int get_drm_value(int fd, unsigned request, uint32_t *out) {
+int getgrbm_device_radeon(uint32_t *out) {
 	struct drm_radeon_info info;
-	int retval;
 
 	memset(&info, 0, sizeof(info));
+	*out = GRBM_STATUS;
 
 	info.value = (unsigned long)out;
-	info.request = request;
+	info.request = RADEON_INFO_READ_REG;
 
-	retval = drmCommandWriteRead(fd, DRM_RADEON_INFO, &info, sizeof(info));
-	return !retval;
+	return drmCommandWriteRead(drm_fd, DRM_RADEON_INFO, &info, sizeof(info));
+}
+
+int getgrbm_device_mem(uint32_t *out) {
+	*out = *(uint32_t *)((const char *) area + 0x10);
+	return 0;
 }
 
 void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char forcemem) {
+	int use_ioctl = 0;
 	int ret = pci_system_init();
 	if (ret)
 		die(_("Failed to init pciaccess"));
@@ -112,11 +117,11 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 	if (drm_fd < 0 && access("/dev/ati/card0", F_OK) == 0) // fglrx path
 		drm_fd = open("/dev/ati/card0", O_RDWR);
 
-	use_ioctl = 0;
 	if (drm_fd >= 0) {
 		authenticate_drm(drm_fd);
-		uint32_t rreg = 0x8010;
-		use_ioctl = get_drm_value(drm_fd, RADEON_INFO_READ_REG, &rreg);
+		getgrbm_device = getgrbm_device_radeon;
+		uint32_t rreg;
+		use_ioctl = !getgrbm_device(&rreg);
 	}
 
 	if (forcemem) {
@@ -131,6 +136,8 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 		area = mmap(NULL, MMAP_SIZE, PROT_READ, MAP_PRIVATE, mem,
 				gpu_device->regions[reg].base_addr + 0x8000);
 		if (area == MAP_FAILED) die(_("mmap failed"));
+
+		getgrbm_device = getgrbm_device_mem;
 	}
 
 	bits.vram = 0;
@@ -247,16 +254,9 @@ void cleanup() {
 }
 
 unsigned int readgrbm() {
-
-	if (use_ioctl) {
-		uint32_t reg = 0x8010;
-		get_drm_value(drm_fd, RADEON_INFO_READ_REG, &reg);
-		return reg;
-	} else {
-		const void *ptr = (const char *) area + 0x10;
-		const unsigned int *inta = ptr;
-		return *inta;
-	}
+	uint32_t reg;
+	getgrbm_device(&reg);
+	return reg;
 }
 
 unsigned long long getvram() {
