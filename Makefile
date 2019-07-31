@@ -7,8 +7,8 @@
 #	nostrip	disable stripping, default off
 #	plain	apply neither -g nor -s.
 #	xcb	enable libxcb to run unprivileged in Xorg, default on
-#	amdgpu	enable amdgpu VRAM size and usage reporting, default off
-#		because amdgpu requires libdrm >= 2.4.77
+#	amdgpu	enable amdgpu VRAM size and usage reporting, default auto
+#		it requires libdrm >= 2.4.77
 
 PREFIX ?= /usr
 INSTALL ?= install
@@ -17,7 +17,6 @@ MANDIR ?= share/man
 
 nls ?= 1
 xcb ?= 1
-amdgpu ?= 0
 
 bin = radeontop
 xcblib = libradeontop_xcb.so
@@ -45,9 +44,20 @@ ifeq ($(nls), 1)
 	CFLAGS += -DENABLE_NLS=1
 endif
 
+# autodetect libdrm_amdgpu features
+ifeq ($(shell pkg-config --atleast-version=2 libdrm_amdgpu && echo ok), ok)
+	amdgpu ?= 1
+else
+	amdgpu ?= 0
+endif
+
 ifeq ($(amdgpu), 1)
 	CFLAGS += -DENABLE_AMDGPU=1
 	LIBS += $(shell pkg-config --libs libdrm_amdgpu)
+
+	ifeq ($(shell pkg-config --atleast-version=2.4.79 libdrm_amdgpu && echo ok), ok)
+		CFLAGS += -DHAS_AMDGPU_QUERY_SENSOR_INFO=1
+	endif
 endif
 
 ifndef plain

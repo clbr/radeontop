@@ -19,12 +19,6 @@
 #include <pciaccess.h>
 #include <dirent.h>
 
-#ifdef ENABLE_AMDGPU
-#ifndef AMDGPU_INFO_SENSOR
-#error libdrm version is too old
-#endif
-#endif
-
 struct bits_t bits;
 unsigned long long vramsize;
 unsigned long long gttsize;
@@ -36,6 +30,7 @@ const void *area;
 int (*getgrbm_device)(uint32_t *out);	// pointer to the right backend
 
 #ifdef ENABLE_AMDGPU
+#include <libdrm/amdgpu_drm.h>
 #include <libdrm/amdgpu.h>
 amdgpu_device_handle amdgpu_dev;
 #endif
@@ -190,18 +185,13 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 		drmFreeVersion(ver);
 
 		if (strcmp(drm_name, "amdgpu") == 0) {
-#ifdef ENABLE_AMDGPU
-			struct drm_amdgpu_info_device device = {};
-
-			struct drm_amdgpu_info request = {};
-			request.query = AMDGPU_INFO_DEV_INFO;
-			request.return_pointer = (unsigned long)&device;
-			request.return_size = sizeof(device);
-			ret = drmCommandWrite(drm_fd, DRM_AMDGPU_INFO, &request, sizeof(request));
+#ifdef HAS_AMDGPU_QUERY_SENSOR_INFO
+			struct amdgpu_gpu_info gpu = {};
+			ret = amdgpu_query_gpu_info(amdgpu_dev, &gpu);
 
 			if (ret == 0) {
-				mclk_max = device.max_memory_clock;
-				sclk_max = device.max_engine_clock;
+				mclk_max = gpu.max_memory_clk;
+				sclk_max = gpu.max_engine_clk;
 			}
 #else
 			printf(_("amdgpu DRM driver is used, but clock reporting is not enabled\n"));
@@ -221,15 +211,9 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 		} else if (strcmp(drm_name, "amdgpu") == 0) {
 #ifdef ENABLE_AMDGPU
 			struct drm_amdgpu_info_vram_gtt vram_gtt = {};
-
-			struct drm_amdgpu_info request;
-			memset(&request, 0, sizeof(request));
-			request.return_pointer = (unsigned long) &vram_gtt;
-			request.return_size = sizeof(vram_gtt);
-			request.query = AMDGPU_INFO_VRAM_GTT;
-
-			ret = drmCommandWrite(drm_fd, DRM_AMDGPU_INFO,
-						&request, sizeof(request));
+			ret = amdgpu_query_info(amdgpu_dev,
+						AMDGPU_INFO_VRAM_GTT,
+						sizeof(vram_gtt), &vram_gtt);
 			vramsize = vram_gtt.vram_size;
 			gttsize = vram_gtt.gtt_size;
 #else
@@ -304,13 +288,8 @@ unsigned long long getvram() {
 		ret = drmCommandWriteRead(drm_fd, DRM_RADEON_INFO, &info, sizeof(info));
 	} else if (strcmp(drm_name, "amdgpu") == 0) {
 #ifdef ENABLE_AMDGPU
-		struct drm_amdgpu_info request;
-		memset(&request, 0, sizeof(request));
-		request.return_pointer = (unsigned long) &val;
-		request.return_size = sizeof(val);
-		request.query = AMDGPU_INFO_VRAM_USAGE;
-
-		ret = drmCommandWrite(drm_fd, DRM_AMDGPU_INFO, &request, sizeof(request));
+		ret = amdgpu_query_info(amdgpu_dev, AMDGPU_INFO_VRAM_USAGE,
+					sizeof(val), &val);
 #endif
 	}
 	if (ret) return 0;
@@ -331,14 +310,8 @@ unsigned long long getgtt() {
 		ret = drmCommandWriteRead(drm_fd, DRM_RADEON_INFO, &info, sizeof(info));
 	} else if (strcmp(drm_name, "amdgpu") == 0) {
 #ifdef ENABLE_AMDGPU
-		struct drm_amdgpu_info info;
-
-		memset(&info, 0, sizeof(struct drm_amdgpu_info));
-		info.query = AMDGPU_INFO_GTT_USAGE;
-		info.return_pointer = (unsigned long)&val;
-		info.return_size = sizeof(val);
-
-		ret = drmCommandWriteRead(drm_fd, DRM_AMDGPU_INFO, &info, sizeof(info));
+		ret = amdgpu_query_info(amdgpu_dev, AMDGPU_INFO_GTT_USAGE,
+					sizeof(val), &val);
 #endif
 	}
 	if (ret) return 0;
@@ -346,17 +319,13 @@ unsigned long long getgtt() {
 	return val;
 }
 
-#ifdef ENABLE_AMDGPU
+#ifdef HAS_AMDGPU_QUERY_SENSOR_INFO
 static unsigned long long amdgpu_read_sensor(uint32_t sensor_id) {
 	int ret;
 	unsigned long long val = 0;
 
-	struct drm_amdgpu_info info = {};
-	info.query = AMDGPU_INFO_SENSOR;
-	info.sensor_info.type = sensor_id;
-	info.return_pointer = (unsigned long)&val;
-	info.return_size = sizeof(val);
-	ret = drmCommandWrite(drm_fd, DRM_AMDGPU_INFO, &info, sizeof(info));
+	ret = amdgpu_query_sensor_info(amdgpu_dev, sensor_id,
+				sizeof(val), &val);
 
 	if (ret) return 0;
 
@@ -365,27 +334,17 @@ static unsigned long long amdgpu_read_sensor(uint32_t sensor_id) {
 #endif
 
 unsigned long long getmclk() {
-	unsigned long long val = 0;
-
-	if (strcmp(drm_name, "amdgpu") == 0) {
-#ifdef ENABLE_AMDGPU
-		val = amdgpu_read_sensor(AMDGPU_INFO_SENSOR_GFX_MCLK);
+#ifdef HAS_AMDGPU_QUERY_SENSOR_INFO
+	return amdgpu_read_sensor(AMDGPU_INFO_SENSOR_GFX_MCLK);
 #endif
-	}
-
-	return val;
+	return 0;
 }
 
 unsigned long long getsclk() {
-	unsigned long long val = 0;
-
-	if (strcmp(drm_name, "amdgpu") == 0) {
-#ifdef ENABLE_AMDGPU
-		val = amdgpu_read_sensor(AMDGPU_INFO_SENSOR_GFX_SCLK);
+#ifdef HAS_AMDGPU_QUERY_SENSOR_INFO
+	return amdgpu_read_sensor(AMDGPU_INFO_SENSOR_GFX_SCLK);
 #endif
-	}
-
-	return val;
+	return 0;
 }
 
 int getfamily(unsigned int id) {
