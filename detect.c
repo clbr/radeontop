@@ -35,6 +35,11 @@ char drm_name[10] = ""; // should be radeon or amdgpu
 const void *area;
 int (*getgrbm_device)(uint32_t *out);	// pointer to the right backend
 
+#ifdef ENABLE_AMDGPU
+#include <libdrm/amdgpu.h>
+amdgpu_device_handle amdgpu_dev;
+#endif
+
 struct pci_device * findGPUDevice(const unsigned char bus) {
 	struct pci_device *dev;
 	struct pci_id_match match;
@@ -78,6 +83,13 @@ int getgrbm_device_radeon(uint32_t *out) {
 	return drmCommandWriteRead(drm_fd, DRM_RADEON_INFO, &info, sizeof(info));
 }
 
+#ifdef ENABLE_AMDGPU
+int getgrbm_device_amdgpu(uint32_t *out) {
+	return amdgpu_read_mm_registers(amdgpu_dev, GRBM_STATUS / 4, 1,
+					0xffffffff, 0, out);
+}
+#endif
+
 int getgrbm_device_mem(uint32_t *out) {
 	*out = *(uint32_t *)((const char *) area + 0x10);
 	return 0;
@@ -120,6 +132,21 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 	if (drm_fd >= 0) {
 		authenticate_drm(drm_fd);
 		getgrbm_device = getgrbm_device_radeon;
+
+		if (strcmp(drm_name, "amdgpu") == 0) {
+#ifdef ENABLE_AMDGPU
+			uint32_t maj, min;
+
+			if (amdgpu_device_initialize(drm_fd, &maj, &min,
+						&amdgpu_dev))
+				die(_("Can't initialize amdgpu driver"));
+
+			getgrbm_device = getgrbm_device_amdgpu;
+#else
+			printf(_("amdgpu DRM driver is used, but support is not compiled in\n"));
+#endif
+		}
+
 		uint32_t rreg;
 		use_ioctl = !getgrbm_device(&rreg);
 	}
@@ -251,6 +278,10 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 
 void cleanup() {
 	munmap((void *) area, MMAP_SIZE);
+
+#ifdef ENABLE_AMDGPU
+	amdgpu_device_deinitialize(amdgpu_dev);
+#endif
 }
 
 unsigned int readgrbm() {

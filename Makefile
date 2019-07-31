@@ -47,6 +47,7 @@ endif
 
 ifeq ($(amdgpu), 1)
 	CFLAGS += -DENABLE_AMDGPU=1
+	LIBS += $(shell pkg-config --libs libdrm_amdgpu)
 endif
 
 ifndef plain
