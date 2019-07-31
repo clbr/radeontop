@@ -18,9 +18,6 @@
 #include "radeontop.h"
 #include <getopt.h>
 
-const void *area;
-int use_ioctl;
-
 void die(const char * const why) {
 	puts(why);
 	exit(1);
@@ -46,32 +43,6 @@ static void help(const char * const me, const unsigned int ticks, const unsigned
 		"-v --version		Show the version\n"),
 		me, dumpinterval, ticks);
 	die("");
-}
-
-int get_drm_value(int fd, unsigned request, uint32_t *out) {
-	struct drm_radeon_info info;
-	int retval;
-
-	memset(&info, 0, sizeof(info));
-
-	info.value = (unsigned long)out;
-	info.request = request;
-
-	retval = drmCommandWriteRead(fd, DRM_RADEON_INFO, &info, sizeof(info));
-	return !retval;
-}
-
-unsigned int readgrbm() {
-
-	if (use_ioctl) {
-		uint32_t reg = 0x8010;
-		get_drm_value(drm_fd, RADEON_INFO_READ_REG, &reg);
-		return reg;
-	} else {
-		const void *ptr = (const char *) area + 0x10;
-		const unsigned int *inta = ptr;
-		return *inta;
-	}
 }
 
 int main(int argc, char **argv) {
@@ -171,6 +142,6 @@ int main(int argc, char **argv) {
 	else
 		present(ticks, cardname, color, bus, dumpinterval);
 
-	munmap((void *) area, MMAP_SIZE);
+	cleanup();
 	return 0;
 }

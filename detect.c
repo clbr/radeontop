@@ -32,6 +32,8 @@ unsigned long long mclk_max = 0; // kilohertz
 unsigned long long sclk_max = 0; // kilohertz
 int drm_fd = -1;
 char drm_name[10] = ""; // should be radeon or amdgpu
+const void *area;
+int use_ioctl;
 
 struct pci_device * findGPUDevice(const unsigned char bus) {
 	struct pci_device *dev;
@@ -62,6 +64,19 @@ struct pci_device * findGPUDevice(const unsigned char bus) {
 		die(_("Can't find Radeon cards"));
 
 	return dev;
+}
+
+int get_drm_value(int fd, unsigned request, uint32_t *out) {
+	struct drm_radeon_info info;
+	int retval;
+
+	memset(&info, 0, sizeof(info));
+
+	info.value = (unsigned long)out;
+	info.request = request;
+
+	retval = drmCommandWriteRead(fd, DRM_RADEON_INFO, &info, sizeof(info));
+	return !retval;
 }
 
 void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char forcemem) {
@@ -225,6 +240,23 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 	*bus = gpu_device->bus;
 	*device_id = gpu_device->device_id;
 	pci_system_cleanup();
+}
+
+void cleanup() {
+	munmap((void *) area, MMAP_SIZE);
+}
+
+unsigned int readgrbm() {
+
+	if (use_ioctl) {
+		uint32_t reg = 0x8010;
+		get_drm_value(drm_fd, RADEON_INFO_READ_REG, &reg);
+		return reg;
+	} else {
+		const void *ptr = (const char *) area + 0x10;
+		const unsigned int *inta = ptr;
+		return *inta;
+	}
 }
 
 unsigned long long getvram() {
