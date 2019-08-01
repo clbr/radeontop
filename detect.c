@@ -85,7 +85,7 @@ int getgrbm_device_radeon(uint32_t *out) {
 int getvram_device_radeon(unsigned long long *out) {
 	struct drm_radeon_info info;
 	memset(&info, 0, sizeof(info));
-	info.value = (unsigned long) &out;
+	info.value = (unsigned long) out;
 	info.request = RADEON_INFO_VRAM_USAGE;
 
 	return drmCommandWriteRead(drm_fd, DRM_RADEON_INFO, &info, sizeof(info));
@@ -94,7 +94,7 @@ int getvram_device_radeon(unsigned long long *out) {
 int getgtt_device_radeon(unsigned long long *out) {
 	struct drm_radeon_info info;
 	memset(&info, 0, sizeof(info));
-	info.value = (unsigned long) &out;
+	info.value = (unsigned long) out;
 	info.request = RADEON_INFO_GTT_USAGE;
 
 	return drmCommandWriteRead(drm_fd, DRM_RADEON_INFO, &info, sizeof(info));
