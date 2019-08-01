@@ -38,9 +38,6 @@
 #include <locale.h>
 #include <xf86drm.h>
 #include <radeon_drm.h>
-#ifdef ENABLE_AMDGPU
-#include <amdgpu_drm.h>
-#endif
 
 enum {
 	GRBM_STATUS = 0x8010,
@@ -59,16 +56,13 @@ void authenticate_drm(int fd);
 
 // radeontop.c
 void die(const char *why);
-int get_drm_value(int fd, unsigned request, uint32_t *out);
-unsigned int readgrbm();
-
-extern const void *area;
-extern int use_ioctl;
 
 // detect.c
 void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char forcemem);
 int getfamily(unsigned int id);
 void initbits(int fam);
+void cleanup();
+unsigned int readgrbm();
 unsigned long long getvram();
 unsigned long long getgtt();
 unsigned long long getmclk();

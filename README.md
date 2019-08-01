@@ -78,11 +78,11 @@ Build options can be specified to having the following variables being set to "1
     nostrip disable stripping, default off
     plain   apply neither gcc's -g nor -s.
     xcb     enable libxcb to run unprivileged in Xorg, default on
-    amdgpu  enable amdgpu VRAM size and usage reporting, default off (requires libdrm >= 2.4.77)
+    amdgpu  enable amdgpu VRAM size and usage reporting, default auto (requires libdrm >= 2.4.77)
 
 
 Example:
 
     make amdgpu=1 xcb=1
 
-This will build radeontop with amdgpu VRAM reporting and xcb support.
+This will build radeontop with amdgpu reporting and xcb support.
