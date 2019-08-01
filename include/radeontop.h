@@ -130,6 +130,7 @@ enum radeon_family {
 	VEGA12,
 	VEGA20,
 	RAVEN,
+	NAVI10,
 };
 
 extern const char * const family_str[];

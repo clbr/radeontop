@@ -68,4 +68,5 @@ const char * const family_str[] = {
 	str(VEGA12),
 	str(VEGA20),
 	str(RAVEN),
+	str(NAVI10),
 };
