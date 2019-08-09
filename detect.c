@@ -72,34 +72,29 @@ struct pci_device * findGPUDevice(const unsigned char bus) {
 	return dev;
 }
 
-static int getgrbm_radeon(uint32_t *out) {
+static int radeon_get_drm_value(int fd, unsigned request, uint32_t *out) {
 	struct drm_radeon_info info;
 
 	memset(&info, 0, sizeof(info));
+	info.value = (unsigned long) out;
+	info.request = request;
+
+	return drmCommandWriteRead(fd, DRM_RADEON_INFO, &info, sizeof(info));
+}
+
+static int getgrbm_radeon(uint32_t *out) {
 	*out = GRBM_STATUS;
-
-	info.value = (unsigned long)out;
-	info.request = RADEON_INFO_READ_REG;
-
-	return drmCommandWriteRead(drm_fd, DRM_RADEON_INFO, &info, sizeof(info));
+	return radeon_get_drm_value(drm_fd, RADEON_INFO_READ_REG, out);
 }
 
 static int getvram_radeon(uint64_t *out) {
-	struct drm_radeon_info info;
-	memset(&info, 0, sizeof(info));
-	info.value = (unsigned long) out;
-	info.request = RADEON_INFO_VRAM_USAGE;
-
-	return drmCommandWriteRead(drm_fd, DRM_RADEON_INFO, &info, sizeof(info));
+	return radeon_get_drm_value(drm_fd, RADEON_INFO_VRAM_USAGE,
+				(uint32_t *) out);
 }
 
 static int getgtt_radeon(uint64_t *out) {
-	struct drm_radeon_info info;
-	memset(&info, 0, sizeof(info));
-	info.value = (unsigned long) out;
-	info.request = RADEON_INFO_GTT_USAGE;
-
-	return drmCommandWriteRead(drm_fd, DRM_RADEON_INFO, &info, sizeof(info));
+	return radeon_get_drm_value(drm_fd, RADEON_INFO_GTT_USAGE,
+				(uint32_t *) out);
 }
 
 #ifdef ENABLE_AMDGPU
