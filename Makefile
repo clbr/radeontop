@@ -7,8 +7,8 @@
 #	nostrip	disable stripping, default off
 #	plain	apply neither -g nor -s.
 #	xcb	enable libxcb to run unprivileged in Xorg, default on
-#	amdgpu	enable amdgpu VRAM size and usage reporting, default auto
-#		it requires libdrm >= 2.4.77
+#	amdgpu	enable amdgpu usage reporting, default auto
+#		it requires libdrm >= 2.4.63
 
 PREFIX ?= /usr
 INSTALL ?= install

@@ -30,7 +30,7 @@ static void version() {
 
 static void help(const char * const me, const unsigned int ticks, const unsigned int dumpinterval) {
 	printf(_("\n\tRadeonTop for R600 and above.\n\n"
-		"\tUsage: %s [-ch] [-b bus] [-d file] [-i seconds] [-l limit] [-t ticks]\n\n"
+		"\tUsage: %s [-chmv] [-b bus] [-d file] [-i seconds] [-l limit] [-t ticks]\n\n"
 		"-b --bus 3		Pick card from this PCI bus (hexadecimal)\n"
 		"-c --color		Enable colors\n"
 		"-d --dump file		Dump data to this file, - for stdout\n"
