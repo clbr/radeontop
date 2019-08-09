@@ -123,12 +123,11 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 #ifdef ENABLE_AMDGPU
 			init_amdgpu(drm_fd);
 #else
-			printf(_("amdgpu DRM driver is used, but support is not compiled in\n"));
+			fprintf(stderr, _("amdgpu support is not compiled in (libdrm 2.4.63 required)\n"));
 #endif
 		}
 
-		uint32_t rreg;
-		use_ioctl = !getgrbm(&rreg);
+		use_ioctl = (getgrbm != getuint32_null);
 	}
 
 	if (forcemem) {
@@ -147,8 +146,6 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 		getgrbm = getgrbm_memory;
 	}
 
-	bits.vram = 0;
-	bits.gtt = 0;
 	if (drm_fd < 0) {
 		printf(_("Failed to open DRM node, no VRAM support.\n"));
 	} else {
@@ -160,29 +157,9 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 			ver->version_patchlevel,
 			ver->name);*/
 
-		// No version indicator, so we need to test once
-		// We use different codepaths for radeon and amdgpu
-		// We store vram_size and check below if the ret value is sane
-		uint64_t out64;
-
-		ret = getvram(&out64);
-		if (ret) {
-			printf(_("Failed to get VRAM usage, kernel likely too old\n"));
-			goto out;
-		}
-
-		bits.vram = 1;
-
-		ret = getgtt(&out64);
-		if (ret) {
-			printf(_("Failed to get GTT usage, kernel likely too old\n"));
-			goto out;
-		}
-
-		bits.gtt = 1;
+		bits.vram = (getvram != getuint64_null);
+		bits.gtt = (getgtt != getuint64_null);
 	}
-
-	out:
 
 	*bus = gpu_device->bus;
 	*device_id = gpu_device->device_id;
