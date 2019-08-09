@@ -30,11 +30,14 @@ static int radeon_get_drm_value(int fd, unsigned request, uint32_t *out) {
 	return drmCommandWriteRead(fd, DRM_RADEON_INFO, &info, sizeof(info));
 }
 
+#ifdef RADEON_INFO_READ_REG
 static int getgrbm_radeon(uint32_t *out) {
 	*out = GRBM_STATUS;
 	return radeon_get_drm_value(drm_fd, RADEON_INFO_READ_REG, out);
 }
+#endif
 
+#ifdef RADEON_INFO_VRAM_USAGE
 static int getvram_radeon(uint64_t *out) {
 	return radeon_get_drm_value(drm_fd, RADEON_INFO_VRAM_USAGE,
 				(uint32_t *) out);
@@ -44,30 +47,64 @@ static int getgtt_radeon(uint64_t *out) {
 	return radeon_get_drm_value(drm_fd, RADEON_INFO_GTT_USAGE,
 				(uint32_t *) out);
 }
+#endif
+
+#define DRM_ATLEAST_VERSION(maj, min) \
+	(drm_major > maj || (drm_major == maj && drm_minor >= min))
 
 void init_radeon(int fd) {
 	int drm_major, drm_minor, ret;
+	uint32_t out32;
+	uint64_t out64;
 	drmVersionPtr ver = drmGetVersion(fd);
+
+	if (!ver) {
+		perror(_("Failed to query driver version"));
+		return;
+	}
 
 	drm_fd = fd;
 	drm_major = ver->version_major;
 	drm_minor = ver->version_minor;
 	drmFreeVersion(ver);
-	getgrbm = getgrbm_radeon;
 
-	if (drm_major > 2 || (drm_major == 2 && drm_minor >= 36)) {
+#ifdef RADEON_INFO_READ_REG
+	if (DRM_ATLEAST_VERSION(2, 42)) {
+		if (!(ret = getgrbm_radeon(&out32)))
+			getgrbm = getgrbm_radeon;
+		else
+			drmError(ret, _("Failed to get GPU usage"));
+	} else
+		fprintf(stderr, _("GPU usage reporting is disabled (radeon kernel driver 2.42.0 required)\n"));
+#else
+	fprintf(stderr, _("GPU usage reporting is not compiled in (libdrm 2.4.71 required)\n"));
+#endif
+
+#ifdef RADEON_INFO_VRAM_USAGE
+	if (DRM_ATLEAST_VERSION(2, 39)) {
 		struct drm_radeon_gem_info gem;
 
 		if ((ret = drmCommandWriteRead(fd, DRM_RADEON_GEM_INFO,
 					 &gem, sizeof(gem)))) {
-			printf(_("Failed to get VRAM size, error %d\n"), ret);
+			drmError(ret, _("Failed to get VRAM size"));
 			return;
 		}
 
 		vramsize = gem.vram_size;
 		gttsize = gem.gart_size;
-		getvram = getvram_radeon;
-		getgtt = getgtt_radeon;
+
+		if (!(ret = getvram_radeon(&out64)))
+			getvram = getvram_radeon;
+		else
+			drmError(ret, _("Failed to get VRAM usage"));
+
+		if (!(ret = getgtt_radeon(&out64)))
+			getgtt = getgtt_radeon;
+		else
+			drmError(ret, _("Failed to get GTT usage"));
 	} else
-		printf(_("Kernel too old for VRAM reporting.\n"));
+		fprintf(stderr, _("Memory usage reporting is disabled (radeon kernel driver 2.39.0 required)\n"));
+#else
+	fprintf(stderr, _("Memory usage reporting is not compiled in (libdrm 2.4.53 required)\n"));
+#endif
 }
