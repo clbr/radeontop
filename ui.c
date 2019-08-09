@@ -253,7 +253,7 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 			}
 		}
 
-		if (mclk_max != 0 && mclk > 0) {
+		if (sclk_max != 0 && sclk > 0) {
 			if (color) attron(COLOR_PAIR(3));
 			percentage(start, w, mclk);
 			printright(start++, hw, _("%.2fG / %.2fG Memory Clock %6.2f%%"),
