@@ -97,6 +97,32 @@ static int getgtt_radeon(uint64_t *out) {
 				(uint32_t *) out);
 }
 
+void init_radeon(int fd) {
+	int drm_major, drm_minor, ret;
+	drmVersionPtr ver = drmGetVersion(fd);
+
+	drm_major = ver->version_major;
+	drm_minor = ver->version_minor;
+	drmFreeVersion(ver);
+	getgrbm = getgrbm_radeon;
+
+	if (drm_major > 2 || (drm_major == 2 && drm_minor >= 36)) {
+		struct drm_radeon_gem_info gem;
+
+		if ((ret = drmCommandWriteRead(fd, DRM_RADEON_GEM_INFO,
+					 &gem, sizeof(gem)))) {
+			printf(_("Failed to get VRAM size, error %d\n"), ret);
+			return;
+		}
+
+		vramsize = gem.vram_size;
+		gttsize = gem.gart_size;
+		getvram = getvram_radeon;
+		getgtt = getgtt_radeon;
+	} else
+		printf(_("Kernel too old for VRAM reporting.\n"));
+}
+
 #ifdef ENABLE_AMDGPU
 static int getgrbm_amdgpu(uint32_t *out) {
 	return amdgpu_read_mm_registers(amdgpu_dev, GRBM_STATUS / 4, 1,
@@ -176,11 +202,10 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 
 	if (drm_fd >= 0) {
 		authenticate_drm(drm_fd);
-		getgrbm = getgrbm_radeon;
-		getvram = getvram_radeon;
-		getgtt = getgtt_radeon;
 
-		if (strcmp(drm_name, "amdgpu") == 0) {
+		if (strcmp(drm_name, "radeon") == 0)
+			init_radeon(drm_fd);
+		else if (strcmp(drm_name, "amdgpu") == 0) {
 #ifdef ENABLE_AMDGPU
 			uint32_t maj, min;
 
@@ -222,21 +247,12 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 		printf(_("Failed to open DRM node, no VRAM support.\n"));
 	} else {
 		drmDropMaster(drm_fd);
-		drmVersionPtr ver = drmGetVersion(drm_fd);
 
 /*		printf("Version %u.%u.%u, name %s\n",
 			ver->version_major,
 			ver->version_minor,
 			ver->version_patchlevel,
 			ver->name);*/
-
-		if (ver->version_major < 2 ||
-			(ver->version_major == 2 && ver->version_minor < 36)) {
-			printf(_("Kernel too old for VRAM reporting.\n"));
-			drmFreeVersion(ver);
-			goto out;
-		}
-		drmFreeVersion(ver);
 
 		if (strcmp(drm_name, "amdgpu") == 0) {
 #ifdef HAS_AMDGPU_QUERY_SENSOR_INFO
@@ -257,14 +273,7 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 		// No version indicator, so we need to test once
 		// We use different codepaths for radeon and amdgpu
 		// We store vram_size and check below if the ret value is sane
-		if (strcmp(drm_name, "radeon") == 0) {
-			struct drm_radeon_gem_info gem;
-
-			ret = drmCommandWriteRead(drm_fd, DRM_RADEON_GEM_INFO,
-							&gem, sizeof(gem));
-			vramsize = gem.vram_size;
-			gttsize = gem.gart_size;
-		} else if (strcmp(drm_name, "amdgpu") == 0) {
+		if (strcmp(drm_name, "amdgpu") == 0) {
 #ifdef ENABLE_AMDGPU
 			struct drm_amdgpu_info_vram_gtt vram_gtt = {};
 			ret = amdgpu_query_info(amdgpu_dev,
