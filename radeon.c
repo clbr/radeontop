@@ -35,6 +35,14 @@ static int getgrbm_radeon(uint32_t *out) {
 	*out = GRBM_STATUS;
 	return radeon_get_drm_value(drm_fd, RADEON_INFO_READ_REG, out);
 }
+
+static int getsclk_radeon(uint32_t *out) {
+	return radeon_get_drm_value(drm_fd, RADEON_INFO_CURRENT_GPU_SCLK, out);
+}
+
+static int getmclk_radeon(uint32_t *out) {
+	return radeon_get_drm_value(drm_fd, RADEON_INFO_CURRENT_GPU_MCLK, out);
+}
 #endif
 
 #ifdef RADEON_INFO_VRAM_USAGE
@@ -74,6 +82,22 @@ void init_radeon(int fd) {
 			getgrbm = getgrbm_radeon;
 		else
 			drmError(ret, _("Failed to get GPU usage"));
+
+		if ((ret = radeon_get_drm_value(drm_fd, RADEON_INFO_MAX_SCLK,
+						&sclk_max)))
+			drmError(ret, _("Failed to get maximum shader clock"));
+
+		mclk_max = 0;	// no max memory clock info on radeon
+
+		if (!(ret = getsclk_radeon(&out32)))
+			getsclk = getsclk_radeon;
+		else
+			drmError(ret, _("Failed to get shader clock"));
+
+		if (!(ret = getmclk_radeon(&out32)))
+			getmclk = getmclk_radeon;
+		else
+			drmError(ret, _("Failed to get memory clock"));
 	} else
 		fprintf(stderr, _("GPU usage reporting is disabled (radeon kernel driver 2.42.0 required)\n"));
 #else
