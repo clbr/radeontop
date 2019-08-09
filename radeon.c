@@ -96,8 +96,8 @@ void init_radeon(int fd) {
 
 		if (!(ret = getmclk_radeon(&out32)))
 			getmclk = getmclk_radeon;
-		else	// no APU flag on radeon
-			drmError(ret, _("Failed to get memory clock (ignore this on APUs)"));
+		else
+			drmError(ret, _("Failed to get memory clock"));
 	} else
 		fprintf(stderr, _("GPU usage reporting is disabled (radeon kernel driver 2.42.0 required)\n"));
 #else
