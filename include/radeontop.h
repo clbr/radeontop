@@ -37,7 +37,6 @@
 #include <signal.h>
 #include <locale.h>
 #include <xf86drm.h>
-#include <radeon_drm.h>
 #include <stdint.h>
 
 enum {
@@ -165,5 +164,12 @@ extern uint64_t gttsize;
 extern unsigned int sclk_max;
 extern unsigned int mclk_max;
 extern int drm_fd;
+
+// radeon.c
+void init_radeon(int fd);
+
+// amdgpu.c
+void init_amdgpu(int fd);
+void cleanup_amdgpu();
 
 #endif

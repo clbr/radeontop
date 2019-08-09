@@ -35,12 +35,6 @@ int (*getgtt)(uint64_t *out);
 int (*getsclk)(uint32_t *out);
 int (*getmclk)(uint32_t *out);
 
-#ifdef ENABLE_AMDGPU
-#include <libdrm/amdgpu_drm.h>
-#include <libdrm/amdgpu.h>
-amdgpu_device_handle amdgpu_dev;
-#endif
-
 struct pci_device * findGPUDevice(const unsigned char bus) {
 	struct pci_device *dev;
 	struct pci_id_match match;
@@ -71,126 +65,6 @@ struct pci_device * findGPUDevice(const unsigned char bus) {
 
 	return dev;
 }
-
-static int radeon_get_drm_value(int fd, unsigned request, uint32_t *out) {
-	struct drm_radeon_info info;
-
-	memset(&info, 0, sizeof(info));
-	info.value = (unsigned long) out;
-	info.request = request;
-
-	return drmCommandWriteRead(fd, DRM_RADEON_INFO, &info, sizeof(info));
-}
-
-static int getgrbm_radeon(uint32_t *out) {
-	*out = GRBM_STATUS;
-	return radeon_get_drm_value(drm_fd, RADEON_INFO_READ_REG, out);
-}
-
-static int getvram_radeon(uint64_t *out) {
-	return radeon_get_drm_value(drm_fd, RADEON_INFO_VRAM_USAGE,
-				(uint32_t *) out);
-}
-
-static int getgtt_radeon(uint64_t *out) {
-	return radeon_get_drm_value(drm_fd, RADEON_INFO_GTT_USAGE,
-				(uint32_t *) out);
-}
-
-void init_radeon(int fd) {
-	int drm_major, drm_minor, ret;
-	drmVersionPtr ver = drmGetVersion(fd);
-
-	drm_major = ver->version_major;
-	drm_minor = ver->version_minor;
-	drmFreeVersion(ver);
-	getgrbm = getgrbm_radeon;
-
-	if (drm_major > 2 || (drm_major == 2 && drm_minor >= 36)) {
-		struct drm_radeon_gem_info gem;
-
-		if ((ret = drmCommandWriteRead(fd, DRM_RADEON_GEM_INFO,
-					 &gem, sizeof(gem)))) {
-			printf(_("Failed to get VRAM size, error %d\n"), ret);
-			return;
-		}
-
-		vramsize = gem.vram_size;
-		gttsize = gem.gart_size;
-		getvram = getvram_radeon;
-		getgtt = getgtt_radeon;
-	} else
-		printf(_("Kernel too old for VRAM reporting.\n"));
-}
-
-#ifdef ENABLE_AMDGPU
-static int getgrbm_amdgpu(uint32_t *out) {
-	return amdgpu_read_mm_registers(amdgpu_dev, GRBM_STATUS / 4, 1,
-					0xffffffff, 0, out);
-}
-
-static int getvram_amdgpu(uint64_t *out) {
-	return amdgpu_query_info(amdgpu_dev, AMDGPU_INFO_VRAM_USAGE,
-				sizeof(uint64_t), out);
-}
-
-static int getgtt_amdgpu(uint64_t *out) {
-	return amdgpu_query_info(amdgpu_dev, AMDGPU_INFO_GTT_USAGE,
-				sizeof(uint64_t), out);
-}
-
-#ifdef HAS_AMDGPU_QUERY_SENSOR_INFO
-static int getsclk_amdgpu(uint32_t *out) {
-	return amdgpu_query_sensor_info(amdgpu_dev, AMDGPU_INFO_SENSOR_GFX_SCLK,
-		sizeof(uint32_t), out);
-}
-
-static int getmclk_amdgpu(uint32_t *out) {
-	return amdgpu_query_sensor_info(amdgpu_dev, AMDGPU_INFO_SENSOR_GFX_MCLK,
-		sizeof(uint32_t), out);
-}
-#endif
-
-void init_amdgpu(int fd) {
-	uint32_t drm_major, drm_minor;
-	int ret;
-
-	if (amdgpu_device_initialize(fd, &drm_major, &drm_minor, &amdgpu_dev))
-		die(_("Can't initialize amdgpu driver"));
-
-	getgrbm = getgrbm_amdgpu;
-
-#ifdef HAS_AMDGPU_QUERY_SENSOR_INFO
-	struct amdgpu_gpu_info gpu;
-
-	amdgpu_query_gpu_info(amdgpu_dev, &gpu);
-	sclk_max = gpu.max_engine_clk;
-	mclk_max = gpu.max_memory_clk;
-	getsclk = getsclk_amdgpu;
-	getmclk = getmclk_amdgpu;
-#else
-	printf(_("amdgpu DRM driver is used, but clock reporting is not enabled\n"));
-#endif
-
-	struct drm_amdgpu_info_vram_gtt vram_gtt;
-
-	if ((ret = amdgpu_query_info(amdgpu_dev, AMDGPU_INFO_VRAM_GTT,
-				sizeof(vram_gtt), &vram_gtt))) {
-		printf(_("Failed to get VRAM size, error %d\n"), ret);
-		return;
-	}
-
-	vramsize = vram_gtt.vram_size;
-	gttsize = vram_gtt.gtt_size;
-	getvram = getvram_amdgpu;
-	getgtt = getgtt_amdgpu;
-}
-
-void cleanup_amdgpu() {
-	if (amdgpu_dev)
-		amdgpu_device_deinitialize(amdgpu_dev);
-}
-#endif
 
 static int getgrbm_memory(uint32_t *out) {
 	*out = *(uint32_t *)((const char *) area + 0x10);

@@ -20,8 +20,7 @@ xcb ?= 1
 
 bin = radeontop
 xcblib = libradeontop_xcb.so
-src = $(filter-out auth_xcb.c,$(wildcard *.c))
-obj = $(src:.c=.o)
+src = $(filter-out amdgpu.c auth_xcb.c,$(wildcard *.c))
 verh = include/version.h
 
 CFLAGS_SECTIONED = -ffunction-sections -fdata-sections
@@ -52,6 +51,7 @@ else
 endif
 
 ifeq ($(amdgpu), 1)
+	src += amdgpu.c
 	CFLAGS += -DENABLE_AMDGPU=1
 	LIBS += $(shell pkg-config --libs libdrm_amdgpu)
 
@@ -68,6 +68,7 @@ else ifndef nostrip
 endif
 endif
 
+obj = $(src:.c=.o)
 LDFLAGS ?= -Wl,-O1
 LDFLAGS += $(LDFLAGS_SECTIONED)
 LIBS += $(shell pkg-config --libs pciaccess)
