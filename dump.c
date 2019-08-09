@@ -134,7 +134,7 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		if (bits.gtt)
 			fprintf(f, ", gtt %.2f%% %.2fmb", gtt, gttmb);
 
-		if (mclk_max != 0 && mclk > 0)
+		if (sclk_max != 0 && sclk > 0)
 			fprintf(f, ", mclk %.2f%% %.3fghz, sclk %.2f%% %.3fghz",
 					mclk, mclk_ghz, sclk, sclk_ghz);
 
