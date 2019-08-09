@@ -38,6 +38,7 @@
 #include <locale.h>
 #include <xf86drm.h>
 #include <radeon_drm.h>
+#include <stdint.h>
 
 enum {
 	GRBM_STATUS = 0x8010,
@@ -62,11 +63,12 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 int getfamily(unsigned int id);
 void initbits(int fam);
 void cleanup();
-unsigned int readgrbm();
-unsigned long long getvram();
-unsigned long long getgtt();
-unsigned long long getmclk();
-unsigned long long getsclk();
+
+extern int (*getgrbm)(uint32_t *out);
+extern int (*getvram)(uint64_t *out);
+extern int (*getgtt)(uint64_t *out);
+extern int (*getsclk)(uint32_t *out);
+extern int (*getmclk)(uint32_t *out);
 
 // ticks.c
 void collect(unsigned int ticks, unsigned int dumpinterval);
@@ -151,17 +153,17 @@ struct bits_t {
 	unsigned int db;
 	unsigned int cb;
 	unsigned int cr;
-	unsigned long long vram;
-	unsigned long long gtt;
-	unsigned long long mclk;
-	unsigned long long sclk;
+	uint64_t vram;
+	uint64_t gtt;
+	unsigned int sclk;
+	unsigned int mclk;
 };
 
 extern struct bits_t bits;
-extern unsigned long long vramsize;
-extern unsigned long long gttsize;
-extern unsigned long long mclk_max;
-extern unsigned long long sclk_max;
+extern uint64_t vramsize;
+extern uint64_t gttsize;
+extern unsigned int sclk_max;
+extern unsigned int mclk_max;
 extern int drm_fd;
 
 #endif

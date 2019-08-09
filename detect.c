@@ -20,18 +20,20 @@
 #include <dirent.h>
 
 struct bits_t bits;
-unsigned long long vramsize;
-unsigned long long gttsize;
-unsigned long long mclk_max = 0; // kilohertz
-unsigned long long sclk_max = 0; // kilohertz
+uint64_t vramsize;
+uint64_t gttsize;
+unsigned int sclk_max = 0; // kilohertz
+unsigned int mclk_max = 0; // kilohertz
 int drm_fd = -1;
 char drm_name[10] = ""; // should be radeon or amdgpu
 const void *area;
 
 // function pointers to the right backend
-int (*getgrbm_device)(uint32_t *out);
-int (*getvram_device)(unsigned long long *out);
-int (*getgtt_device)(unsigned long long *out);
+int (*getgrbm)(uint32_t *out);
+int (*getvram)(uint64_t *out);
+int (*getgtt)(uint64_t *out);
+int (*getsclk)(uint32_t *out);
+int (*getmclk)(uint32_t *out);
 
 #ifdef ENABLE_AMDGPU
 #include <libdrm/amdgpu_drm.h>
@@ -70,7 +72,7 @@ struct pci_device * findGPUDevice(const unsigned char bus) {
 	return dev;
 }
 
-int getgrbm_device_radeon(uint32_t *out) {
+static int getgrbm_radeon(uint32_t *out) {
 	struct drm_radeon_info info;
 
 	memset(&info, 0, sizeof(info));
@@ -82,7 +84,7 @@ int getgrbm_device_radeon(uint32_t *out) {
 	return drmCommandWriteRead(drm_fd, DRM_RADEON_INFO, &info, sizeof(info));
 }
 
-int getvram_device_radeon(unsigned long long *out) {
+static int getvram_radeon(uint64_t *out) {
 	struct drm_radeon_info info;
 	memset(&info, 0, sizeof(info));
 	info.value = (unsigned long) out;
@@ -91,7 +93,7 @@ int getvram_device_radeon(unsigned long long *out) {
 	return drmCommandWriteRead(drm_fd, DRM_RADEON_INFO, &info, sizeof(info));
 }
 
-int getgtt_device_radeon(unsigned long long *out) {
+static int getgtt_radeon(uint64_t *out) {
 	struct drm_radeon_info info;
 	memset(&info, 0, sizeof(info));
 	info.value = (unsigned long) out;
@@ -101,29 +103,50 @@ int getgtt_device_radeon(unsigned long long *out) {
 }
 
 #ifdef ENABLE_AMDGPU
-int getgrbm_device_amdgpu(uint32_t *out) {
+static int getgrbm_amdgpu(uint32_t *out) {
 	return amdgpu_read_mm_registers(amdgpu_dev, GRBM_STATUS / 4, 1,
 					0xffffffff, 0, out);
 }
 
-int getvram_device_amdgpu(unsigned long long *out) {
+static int getvram_amdgpu(uint64_t *out) {
 	return amdgpu_query_info(amdgpu_dev, AMDGPU_INFO_VRAM_USAGE,
-				sizeof(unsigned long long), out);
+				sizeof(uint64_t), out);
 }
 
-int getgtt_device_amdgpu(unsigned long long *out) {
+static int getgtt_amdgpu(uint64_t *out) {
 	return amdgpu_query_info(amdgpu_dev, AMDGPU_INFO_GTT_USAGE,
-				sizeof(unsigned long long), out);
+				sizeof(uint64_t), out);
+}
+
+#ifdef HAS_AMDGPU_QUERY_SENSOR_INFO
+static int getsclk_amdgpu(uint32_t *out) {
+	return amdgpu_query_sensor_info(amdgpu_dev, AMDGPU_INFO_SENSOR_GFX_SCLK,
+		sizeof(uint32_t), out);
+}
+
+static int getmclk_amdgpu(uint32_t *out) {
+	return amdgpu_query_sensor_info(amdgpu_dev, AMDGPU_INFO_SENSOR_GFX_MCLK,
+		sizeof(uint32_t), out);
 }
 #endif
+#endif
 
-int getgrbm_device_mem(uint32_t *out) {
+static int getgrbm_memory(uint32_t *out) {
 	*out = *(uint32_t *)((const char *) area + 0x10);
 	return 0;
 }
 
+// do-nothing backend used as fallback
+#define UNUSED(v)	(void) v
+static int getuint32_null(uint32_t *out) { UNUSED(out); return -1; }
+static int getuint64_null(uint64_t *out) { UNUSED(out); return -1; }
+
 void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char forcemem) {
 	int use_ioctl = 0;
+
+	getgrbm = getsclk = getmclk = getuint32_null;
+	getvram = getgtt = getuint64_null;
+
 	int ret = pci_system_init();
 	if (ret)
 		die(_("Failed to init pciaccess"));
@@ -158,9 +181,9 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 
 	if (drm_fd >= 0) {
 		authenticate_drm(drm_fd);
-		getgrbm_device = getgrbm_device_radeon;
-		getvram_device = getvram_device_radeon;
-		getgtt_device = getgtt_device_radeon;
+		getgrbm = getgrbm_radeon;
+		getvram = getvram_radeon;
+		getgtt = getgtt_radeon;
 
 		if (strcmp(drm_name, "amdgpu") == 0) {
 #ifdef ENABLE_AMDGPU
@@ -170,16 +193,16 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 						&amdgpu_dev))
 				die(_("Can't initialize amdgpu driver"));
 
-			getgrbm_device = getgrbm_device_amdgpu;
-			getvram_device = getvram_device_amdgpu;
-			getgtt_device = getgtt_device_amdgpu;
+			getgrbm = getgrbm_amdgpu;
+			getvram = getvram_amdgpu;
+			getgtt = getgtt_amdgpu;
 #else
 			printf(_("amdgpu DRM driver is used, but support is not compiled in\n"));
 #endif
 		}
 
 		uint32_t rreg;
-		use_ioctl = !getgrbm_device(&rreg);
+		use_ioctl = !getgrbm(&rreg);
 	}
 
 	if (forcemem) {
@@ -195,7 +218,7 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 				gpu_device->regions[reg].base_addr + 0x8000);
 		if (area == MAP_FAILED) die(_("mmap failed"));
 
-		getgrbm_device = getgrbm_device_mem;
+		getgrbm = getgrbm_memory;
 	}
 
 	bits.vram = 0;
@@ -228,6 +251,8 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 			if (ret == 0) {
 				mclk_max = gpu.max_memory_clk;
 				sclk_max = gpu.max_engine_clk;
+				getsclk = getsclk_amdgpu;
+				getmclk = getmclk_amdgpu;
 			}
 #else
 			printf(_("amdgpu DRM driver is used, but clock reporting is not enabled\n"));
@@ -260,16 +285,18 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 			goto out;
 		}
 
-		ret = getvram();
-		if (ret == 0) {
+		uint64_t out64;
+
+		ret = getvram(&out64);
+		if (ret) {
 			printf(_("Failed to get VRAM usage, kernel likely too old\n"));
 			goto out;
 		}
 
 		bits.vram = 1;
 
-		ret = getgtt();
-		if (ret == 0) {
+		ret = getgtt(&out64);
+		if (ret) {
 			printf(_("Failed to get GTT usage, kernel likely too old\n"));
 			goto out;
 		}
@@ -290,58 +317,6 @@ void cleanup() {
 #ifdef ENABLE_AMDGPU
 	amdgpu_device_deinitialize(amdgpu_dev);
 #endif
-}
-
-unsigned int readgrbm() {
-	uint32_t reg;
-	getgrbm_device(&reg);
-	return reg;
-}
-
-unsigned long long getvram() {
-	unsigned long long val = 0;
-
-	if (getvram_device(&val))
-		return 0;
-
-	return val;
-}
-
-unsigned long long getgtt() {
-	unsigned long long val = 0;
-
-	if (getgtt_device(&val))
-		return 0;
-
-	return val;
-}
-
-#ifdef HAS_AMDGPU_QUERY_SENSOR_INFO
-static unsigned long long amdgpu_read_sensor(uint32_t sensor_id) {
-	int ret;
-	unsigned long long val = 0;
-
-	ret = amdgpu_query_sensor_info(amdgpu_dev, sensor_id,
-				sizeof(val), &val);
-
-	if (ret) return 0;
-
-	return val;
-}
-#endif
-
-unsigned long long getmclk() {
-#ifdef HAS_AMDGPU_QUERY_SENSOR_INFO
-	return amdgpu_read_sensor(AMDGPU_INFO_SENSOR_GFX_MCLK);
-#endif
-	return 0;
-}
-
-unsigned long long getsclk() {
-#ifdef HAS_AMDGPU_QUERY_SENSOR_INFO
-	return amdgpu_read_sensor(AMDGPU_INFO_SENSOR_GFX_SCLK);
-#endif
-	return 0;
 }
 
 int getfamily(unsigned int id) {
