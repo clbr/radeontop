@@ -39,7 +39,8 @@ static void *collector(void *arg) {
 	const useconds_t sleeptime = 1e6 / ticks;
 
 	while (1) {
-		unsigned int stat = readgrbm();
+		unsigned int stat;
+		getgrbm(&stat);
 
 		memset(&history[cur], 0, sizeof(struct bits_t));
 
@@ -57,8 +58,8 @@ static void *collector(void *arg) {
 		if (stat & bits.db) history[cur].db = 1;
 		if (stat & bits.cr) history[cur].cr = 1;
 		if (stat & bits.cb) history[cur].cb = 1;
-		history[cur].mclk = getmclk();
-		history[cur].sclk = getsclk();
+		getsclk(&history[cur].sclk);
+		getmclk(&history[cur].mclk);
 
 		usleep(sleeptime);
 		cur++;
@@ -89,8 +90,8 @@ static void *collector(void *arg) {
 				res[curres].sclk += history[i].sclk;
 			}
 
-			res[curres].vram = getvram();
-			res[curres].gtt = getgtt();
+			getvram(&res[curres].vram);
+			getgtt(&res[curres].gtt);
 
 			// Atomically write it to the pointer
 			__sync_bool_compare_and_swap(&results, results, &res[curres]);
