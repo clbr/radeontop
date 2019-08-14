@@ -37,20 +37,12 @@
 #include <signal.h>
 #include <locale.h>
 #include <xf86drm.h>
-#include <radeon_drm.h>
 #include <stdint.h>
 
 enum {
 	GRBM_STATUS = 0x8010,
 	MMAP_SIZE = 0x14
 };
-
-#ifndef RADEON_INFO_VRAM_USAGE
-#define RADEON_INFO_VRAM_USAGE 0x1e
-#endif
-#ifndef RADEON_INFO_READ_REG
-#define RADEON_INFO_READ_REG 0x24
-#endif
 
 // auth.c
 void authenticate_drm(int fd);
@@ -164,6 +156,12 @@ extern uint64_t vramsize;
 extern uint64_t gttsize;
 extern unsigned int sclk_max;
 extern unsigned int mclk_max;
-extern int drm_fd;
+
+// radeon.c
+void init_radeon(int fd);
+
+// amdgpu.c
+void init_amdgpu(int fd);
+void cleanup_amdgpu();
 
 #endif
