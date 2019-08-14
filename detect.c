@@ -150,6 +150,46 @@ static int getmclk_amdgpu(uint32_t *out) {
 		sizeof(uint32_t), out);
 }
 #endif
+
+void init_amdgpu(int fd) {
+	uint32_t drm_major, drm_minor;
+	int ret;
+
+	if (amdgpu_device_initialize(fd, &drm_major, &drm_minor, &amdgpu_dev))
+		die(_("Can't initialize amdgpu driver"));
+
+	getgrbm = getgrbm_amdgpu;
+
+#ifdef HAS_AMDGPU_QUERY_SENSOR_INFO
+	struct amdgpu_gpu_info gpu;
+
+	amdgpu_query_gpu_info(amdgpu_dev, &gpu);
+	sclk_max = gpu.max_engine_clk;
+	mclk_max = gpu.max_memory_clk;
+	getsclk = getsclk_amdgpu;
+	getmclk = getmclk_amdgpu;
+#else
+	printf(_("amdgpu DRM driver is used, but clock reporting is not enabled\n"));
+#endif
+
+	struct drm_amdgpu_info_vram_gtt vram_gtt;
+
+	if ((ret = amdgpu_query_info(amdgpu_dev, AMDGPU_INFO_VRAM_GTT,
+				sizeof(vram_gtt), &vram_gtt))) {
+		printf(_("Failed to get VRAM size, error %d\n"), ret);
+		return;
+	}
+
+	vramsize = vram_gtt.vram_size;
+	gttsize = vram_gtt.gtt_size;
+	getvram = getvram_amdgpu;
+	getgtt = getgtt_amdgpu;
+}
+
+void cleanup_amdgpu() {
+	if (amdgpu_dev)
+		amdgpu_device_deinitialize(amdgpu_dev);
+}
 #endif
 
 static int getgrbm_mem(uint32_t *out) {
@@ -207,15 +247,7 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 			init_radeon(drm_fd);
 		else if (strcmp(drm_name, "amdgpu") == 0) {
 #ifdef ENABLE_AMDGPU
-			uint32_t maj, min;
-
-			if (amdgpu_device_initialize(drm_fd, &maj, &min,
-						&amdgpu_dev))
-				die(_("Can't initialize amdgpu driver"));
-
-			getgrbm = getgrbm_amdgpu;
-			getvram = getvram_amdgpu;
-			getgtt = getgtt_amdgpu;
+			init_amdgpu(drm_fd);
 #else
 			printf(_("amdgpu DRM driver is used, but support is not compiled in\n"));
 #endif
@@ -254,41 +286,9 @@ void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char f
 			ver->version_patchlevel,
 			ver->name);*/
 
-		if (strcmp(drm_name, "amdgpu") == 0) {
-#ifdef HAS_AMDGPU_QUERY_SENSOR_INFO
-			struct amdgpu_gpu_info gpu = {};
-			ret = amdgpu_query_gpu_info(amdgpu_dev, &gpu);
-
-			if (ret == 0) {
-				mclk_max = gpu.max_memory_clk;
-				sclk_max = gpu.max_engine_clk;
-				getsclk = getsclk_amdgpu;
-				getmclk = getmclk_amdgpu;
-			}
-#else
-			printf(_("amdgpu DRM driver is used, but clock reporting is not enabled\n"));
-#endif
-		}
-
 		// No version indicator, so we need to test once
 		// We use different codepaths for radeon and amdgpu
 		// We store vram_size and check below if the ret value is sane
-		if (strcmp(drm_name, "amdgpu") == 0) {
-#ifdef ENABLE_AMDGPU
-			struct drm_amdgpu_info_vram_gtt vram_gtt = {};
-			ret = amdgpu_query_info(amdgpu_dev,
-						AMDGPU_INFO_VRAM_GTT,
-						sizeof(vram_gtt), &vram_gtt);
-			vramsize = vram_gtt.vram_size;
-			gttsize = vram_gtt.gtt_size;
-#endif
-		}
-		if (ret) {
-			printf(_("Failed to get VRAM size, error %d\n"),
-				ret);
-			goto out;
-		}
-
 		uint64_t out64;
 
 		ret = getvram(&out64);
@@ -319,7 +319,7 @@ void cleanup() {
 	munmap((void *) area, MMAP_SIZE);
 
 #ifdef ENABLE_AMDGPU
-	amdgpu_device_deinitialize(amdgpu_dev);
+	cleanup_amdgpu();
 #endif
 }
 
