@@ -33,7 +33,11 @@ int (*getgtt)(uint64_t *out);
 int (*getsclk)(uint32_t *out);
 int (*getmclk)(uint32_t *out);
 
-struct pci_device * findGPUDevice(short bus) {
+static void find_pci(short bus, struct pci_device *pci_dev) {
+	int ret = pci_system_init();
+	if (ret)
+		die(_("Failed to init pciaccess"));
+
 	struct pci_device *dev;
 	struct pci_id_match match;
 
@@ -52,8 +56,10 @@ struct pci_device * findGPUDevice(short bus) {
 		if ((dev->device_class & 0x00ffff00) != 0x00030000 &&
 			(dev->device_class & 0x00ffff00) != 0x00038000)
 			continue;
-		if (bus < 0 || bus == dev->bus)
+		if (bus < 0 || bus == dev->bus) {
+			*pci_dev = *dev;
 			break;
+		}
 	}
 
 	pci_iterator_destroy(iter);
@@ -61,12 +67,35 @@ struct pci_device * findGPUDevice(short bus) {
 	if (!dev)
 		die(_("Can't find Radeon cards"));
 
-	return dev;
+	pci_system_cleanup();
 }
 
-static int getgrbm_mem(uint32_t *out) {
+static int getgrbm_pci(uint32_t *out) {
 	*out = *(uint32_t *)((const char *) area + 0x10);
 	return 0;
+}
+
+static void open_pci(struct pci_device *gpu_device) {
+	int reg = 2;
+	if (getfamily(gpu_device->device_id) >= BONAIRE)
+		reg = 5;
+
+	if (!gpu_device->regions[reg].size) die(_("Can't get the register area size"));
+
+//	printf("Found area %p, size %lu\n", area, dev->regions[reg].size);
+
+	int mem = open("/dev/mem", O_RDONLY);
+	if (mem < 0) die(_("Cannot access GPU registers, are you root?"));
+
+	area = mmap(NULL, MMAP_SIZE, PROT_READ, MAP_PRIVATE, mem,
+			gpu_device->regions[reg].base_addr + 0x8000);
+	if (area == MAP_FAILED) die(_("mmap failed"));
+
+	getgrbm = getgrbm_pci;
+}
+
+static void cleanup_pci() {
+	munmap((void *) area, MMAP_SIZE);
 }
 
 // do-nothing backend used as fallback
@@ -82,23 +111,12 @@ void init_pci(short *bus, unsigned int *device_id, const unsigned char forcemem)
 	getgrbm = getsclk = getmclk = getuint32_null;
 	getvram = getgtt = getuint64_null;
 
-	int ret = pci_system_init();
-	if (ret)
-		die(_("Failed to init pciaccess"));
-
-	const struct pci_device * const gpu_device = findGPUDevice(*bus);
+	struct pci_device pci_dev, *gpu_device = &pci_dev;
+	find_pci(*bus, &pci_dev);
 
 	char busid[32];
 	snprintf(busid, sizeof(busid), "pci:%04x:%02x:%02x.%u",
 			 gpu_device->domain, gpu_device->bus, gpu_device->dev, gpu_device->func);
-
-	int reg = 2;
-	if (getfamily(gpu_device->device_id) >= BONAIRE)
-		reg = 5;
-
-	if (!gpu_device->regions[reg].size) die(_("Can't get the register area size"));
-
-//	printf("Found area %p, size %lu\n", area, dev->regions[reg].size);
 
 	// DRM support for VRAM
 	drm_fd = drmOpen(NULL, busid);
@@ -136,14 +154,7 @@ void init_pci(short *bus, unsigned int *device_id, const unsigned char forcemem)
 	}
 
 	if (!use_ioctl) {
-		int mem = open("/dev/mem", O_RDONLY);
-		if (mem < 0) die(_("Cannot access GPU registers, are you root?"));
-
-		area = mmap(NULL, MMAP_SIZE, PROT_READ, MAP_PRIVATE, mem,
-				gpu_device->regions[reg].base_addr + 0x8000);
-		if (area == MAP_FAILED) die(_("mmap failed"));
-
-		getgrbm = getgrbm_mem;
+		open_pci(&pci_dev);
 	}
 
 	if (drm_fd < 0) {
@@ -163,11 +174,10 @@ void init_pci(short *bus, unsigned int *device_id, const unsigned char forcemem)
 
 	*bus = gpu_device->bus;
 	*device_id = gpu_device->device_id;
-	pci_system_cleanup();
 }
 
 void cleanup() {
-	munmap((void *) area, MMAP_SIZE);
+	cleanup_pci();
 
 #ifdef ENABLE_AMDGPU
 	cleanup_amdgpu();
