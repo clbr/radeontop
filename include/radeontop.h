@@ -51,7 +51,7 @@ void authenticate_drm(int fd);
 void die(const char *why);
 
 // detect.c
-void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char forcemem);
+void init_pci(short *bus, unsigned int *device_id, const unsigned char forcemem);
 int getfamily(unsigned int id);
 void initbits(int fam);
 void cleanup();

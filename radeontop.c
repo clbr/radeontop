@@ -54,7 +54,8 @@ int main(int argc, char **argv) {
 
 	unsigned int ticks = default_ticks;
 	unsigned char color = 0;
-	unsigned char bus = 0, forcemem = 0;
+	short bus = -1;
+	unsigned char forcemem = 0;
 	unsigned int device_id = 0;
 	unsigned int limit = 0;
 	char *dump = NULL;

@@ -33,7 +33,7 @@ int (*getgtt)(uint64_t *out);
 int (*getsclk)(uint32_t *out);
 int (*getmclk)(uint32_t *out);
 
-struct pci_device * findGPUDevice(const unsigned char bus) {
+struct pci_device * findGPUDevice(short bus) {
 	struct pci_device *dev;
 	struct pci_id_match match;
 
@@ -52,7 +52,7 @@ struct pci_device * findGPUDevice(const unsigned char bus) {
 		if ((dev->device_class & 0x00ffff00) != 0x00030000 &&
 			(dev->device_class & 0x00ffff00) != 0x00038000)
 			continue;
-		if (!bus || bus == dev->bus)
+		if (bus < 0 || bus == dev->bus)
 			break;
 	}
 
@@ -74,7 +74,7 @@ static int getgrbm_mem(uint32_t *out) {
 static int getuint32_null(uint32_t *out) { UNUSED(out); return -1; }
 static int getuint64_null(uint64_t *out) { UNUSED(out); return -1; }
 
-void init_pci(unsigned char *bus, unsigned int *device_id, const unsigned char forcemem) {
+void init_pci(short *bus, unsigned int *device_id, const unsigned char forcemem) {
 	int use_ioctl = 0;
 	int drm_fd = -1;
 	char drm_name[10] = ""; // should be radeon or amdgpu
