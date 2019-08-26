@@ -99,6 +99,48 @@ static void cleanup_pci() {
 	munmap((void *) area, MMAP_SIZE);
 }
 
+static void init_drm(int drm_fd) {
+	char drm_name[10] = ""; // should be radeon or amdgpu
+	drmVersionPtr ver = drmGetVersion(drm_fd);
+	if (strcmp(ver->name, "radeon") != 0 && strcmp(ver->name, "amdgpu") != 0) {
+		close(drm_fd);
+		return;
+	}
+	strcpy(drm_name, ver->name);
+	drmFreeVersion(ver);
+	authenticate_drm(drm_fd);
+
+	if (strcmp(drm_name, "radeon") == 0)
+		init_radeon(drm_fd);
+	else if (strcmp(drm_name, "amdgpu") == 0)
+#ifdef ENABLE_AMDGPU
+		init_amdgpu(drm_fd);
+#else
+		fprintf(stderr, _("amdgpu support is not compiled in (libdrm 2.4.63 required)\n"));
+#endif
+
+	drmDropMaster(drm_fd);
+
+/*	printf("Version %u.%u.%u, name %s\n",
+		ver->version_major,
+		ver->version_minor,
+		ver->version_patchlevel,
+		ver->name);*/
+}
+
+static void open_drm_bus(const struct pci_device *dev) {
+	char busid[32];
+	snprintf(busid, sizeof(busid), "pci:%04x:%02x:%02x.%u",
+			 dev->domain, dev->bus, dev->dev, dev->func);
+
+	int fd = drmOpen(NULL, busid);
+
+	if (fd >= 0)
+		init_drm(fd);
+	else
+		printf(_("Failed to open DRM node, no VRAM support.\n"));
+}
+
 // do-nothing backend used as fallback
 #define UNUSED(v)	(void) v
 static int getuint32_null(uint32_t *out) { UNUSED(out); return -1; }
@@ -106,8 +148,6 @@ static int getuint64_null(uint64_t *out) { UNUSED(out); return -1; }
 
 void init_pci(short *bus, unsigned int *device_id, const unsigned char forcemem) {
 	int use_ioctl = 0;
-	int drm_fd = -1;
-	char drm_name[10] = ""; // should be radeon or amdgpu
 
 	getgrbm = getsclk = getmclk = getuint32_null;
 	getvram = getgtt = getuint64_null;
@@ -116,39 +156,9 @@ void init_pci(short *bus, unsigned int *device_id, const unsigned char forcemem)
 	memset(&pci_dev, 0, sizeof(struct pci_device));
 	find_pci(*bus, &pci_dev);
 
-	char busid[32];
-	snprintf(busid, sizeof(busid), "pci:%04x:%02x:%02x.%u",
-			 gpu_device->domain, gpu_device->bus, gpu_device->dev, gpu_device->func);
-
 	// DRM support for VRAM
-	drm_fd = drmOpen(NULL, busid);
-	if (drm_fd >= 0) {
-		drmVersionPtr ver = drmGetVersion(drm_fd);
-		if (strcmp(ver->name, "radeon") != 0 && strcmp(ver->name, "amdgpu") != 0) {
-			close(drm_fd);
-			drm_fd = -1;
-		}
-		strcpy(drm_name, ver->name);
-		drmFreeVersion(ver);
-	}
-	if (drm_fd < 0 && access("/dev/ati/card0", F_OK) == 0) // fglrx path
-		drm_fd = open("/dev/ati/card0", O_RDWR);
-
-	if (drm_fd >= 0) {
-		authenticate_drm(drm_fd);
-
-		if (strcmp(drm_name, "radeon") == 0)
-			init_radeon(drm_fd);
-		else if (strcmp(drm_name, "amdgpu") == 0) {
-#ifdef ENABLE_AMDGPU
-			init_amdgpu(drm_fd);
-#else
-			fprintf(stderr, _("amdgpu support is not compiled in (libdrm 2.4.63 required)\n"));
-#endif
-		}
-
-		use_ioctl = (getgrbm != getuint32_null);
-	}
+	open_drm_bus(&pci_dev);
+	use_ioctl = (getgrbm != getuint32_null);
 
 	if (forcemem) {
 		printf(_("Forcing the /dev/mem path.\n"));
@@ -159,20 +169,8 @@ void init_pci(short *bus, unsigned int *device_id, const unsigned char forcemem)
 		open_pci(&pci_dev);
 	}
 
-	if (drm_fd < 0) {
-		printf(_("Failed to open DRM node, no VRAM support.\n"));
-	} else {
-		drmDropMaster(drm_fd);
-
-/*		printf("Version %u.%u.%u, name %s\n",
-			ver->version_major,
-			ver->version_minor,
-			ver->version_patchlevel,
-			ver->name);*/
-
-		bits.vram = (getvram != getuint64_null);
-		bits.gtt = (getgtt != getuint64_null);
-	}
+	bits.vram = (getvram != getuint64_null);
+	bits.gtt = (getgtt != getuint64_null);
 
 	*bus = gpu_device->bus;
 	*device_id = gpu_device->device_id;
