@@ -17,7 +17,9 @@
 
 #include "radeontop.h"
 #include <pciaccess.h>
-#include <dirent.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <xf86drm.h>
 #include <errno.h>
 
 struct bits_t bits;
@@ -97,33 +99,39 @@ static void cleanup_pci() {
 	munmap((void *) area, MMAP_SIZE);
 }
 
-static void init_drm(int drm_fd) {
-	char drm_name[10] = ""; // should be radeon or amdgpu
+static int init_drm(int drm_fd) {
 	drmVersionPtr ver = drmGetVersion(drm_fd);
-	if (strcmp(ver->name, "radeon") != 0 && strcmp(ver->name, "amdgpu") != 0) {
+
+	if (!ver) {
+		perror(_("Failed to query driver version"));
 		close(drm_fd);
-		return;
+		return -1;
 	}
-	strcpy(drm_name, ver->name);
-	drmFreeVersion(ver);
+
 	authenticate_drm(drm_fd);
 
-	if (strcmp(drm_name, "radeon") == 0)
-		init_radeon(drm_fd);
-	else if (strcmp(drm_name, "amdgpu") == 0)
+	if (strcmp(ver->name, "radeon") == 0)
+		init_radeon(drm_fd, ver->version_major, ver->version_minor);
+	else if (strcmp(ver->name, "amdgpu") == 0)
 #ifdef ENABLE_AMDGPU
 		init_amdgpu(drm_fd);
 #else
 		fprintf(stderr, _("amdgpu support is not compiled in (libdrm 2.4.63 required)\n"));
 #endif
-
-	drmDropMaster(drm_fd);
+	else {
+		fprintf(stderr, _("Unsupported driver %s\n"), ver->name);
+		close(drm_fd);
+		drm_fd = -1;
+	}
 
 /*	printf("Version %u.%u.%u, name %s\n",
 		ver->version_major,
 		ver->version_minor,
 		ver->version_patchlevel,
 		ver->name);*/
+
+	drmFreeVersion(ver);
+	return drm_fd;
 }
 
 static void open_drm_bus(const struct pci_device *dev) {

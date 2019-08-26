@@ -74,21 +74,12 @@ static int getgtt_radeon(uint64_t *out) {
 #define DRM_ATLEAST_VERSION(maj, min) \
 	(drm_major > maj || (drm_major == maj && drm_minor >= min))
 
-void init_radeon(int fd) {
-	int drm_major, drm_minor, ret;
+void init_radeon(int fd, int drm_major, int drm_minor) {
+	int ret;
 	uint32_t out32 __attribute__((unused));
 	uint64_t out64 __attribute__((unused));
-	drmVersionPtr ver = drmGetVersion(fd);
-
-	if (!ver) {
-		perror(_("Failed to query driver version"));
-		return;
-	}
 
 	drm_fd = fd;
-	drm_major = ver->version_major;
-	drm_minor = ver->version_minor;
-	drmFreeVersion(ver);
 
 #ifdef RADEON_INFO_READ_REG
 	if (DRM_ATLEAST_VERSION(2, 42)) {

@@ -15,6 +15,7 @@
 */
 
 #include "radeontop.h"
+#include <xf86drm.h>
 #include <xcb/xcb.h>
 #include <xcb/dri2.h>
 

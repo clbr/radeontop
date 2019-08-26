@@ -15,6 +15,7 @@
 */
 
 #include "radeontop.h"
+#include <xf86drm.h>
 #include <libdrm/amdgpu_drm.h>
 #include <libdrm/amdgpu.h>
 
@@ -55,10 +56,8 @@ void init_amdgpu(int fd) {
 	uint64_t out64;
 	int ret;
 
-	if (amdgpu_device_initialize(fd, &drm_major, &drm_minor, &amdgpu_dev)) {
-		fprintf(stderr, _("Failed to query amdgpu driver\n"));
+	if (amdgpu_device_initialize(fd, &drm_major, &drm_minor, &amdgpu_dev))
 		return;
-	}
 
 	if (!(ret = getgrbm_amdgpu(&out32)))
 		getgrbm = getgrbm_amdgpu;

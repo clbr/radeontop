@@ -15,11 +15,10 @@
 */
 
 #include "radeontop.h"
+#include <xf86drm.h>
 #ifdef ENABLE_XCB
 #include <dlfcn.h>
-#endif
 
-#ifdef ENABLE_XCB
 typedef void (*auth_magic_func)(drm_magic_t magic);
 
 static void call_authenticate_drm_xcb(drm_magic_t magic) {
@@ -47,6 +46,8 @@ void authenticate_drm(int fd) {
 
 	/* Try self-authenticate (if we are somehow the master). */
 	if (drmAuthMagic(fd, magic) == 0) {
+		if (drmDropMaster(fd))
+			perror(_("Failed to drop DRM master"));
 		return;
 	}
 

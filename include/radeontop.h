@@ -26,17 +26,12 @@
 #include "gettext.h"
 
 #include <stdio.h>
-#include <sys/mman.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <sys/time.h>
-#include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
 #include <signal.h>
 #include <locale.h>
-#include <xf86drm.h>
 #include <stdint.h>
 
 enum {
@@ -159,7 +154,7 @@ extern unsigned int sclk_max;
 extern unsigned int mclk_max;
 
 // radeon.c
-void init_radeon(int fd);
+void init_radeon(int fd, int drm_major, int drm_minor);
 
 // amdgpu.c
 void init_amdgpu(int fd);
