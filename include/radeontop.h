@@ -41,7 +41,8 @@
 
 enum {
 	GRBM_STATUS = 0x8010,
-	MMAP_SIZE = 0x14
+	MMAP_SIZE = 0x14,
+	VENDOR_AMD = 0x1002
 };
 
 // auth.c

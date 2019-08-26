@@ -18,6 +18,7 @@
 #include "radeontop.h"
 #include <pciaccess.h>
 #include <dirent.h>
+#include <errno.h>
 
 struct bits_t bits;
 uint64_t vramsize;
@@ -33,7 +34,7 @@ int (*getgtt)(uint64_t *out);
 int (*getsclk)(uint32_t *out);
 int (*getmclk)(uint32_t *out);
 
-static void find_pci(short bus, struct pci_device *pci_dev) {
+static int find_pci(short bus, struct pci_device *pci_dev) {
 	int ret = pci_system_init();
 	if (ret)
 		die(_("Failed to init pciaccess"));
@@ -41,7 +42,7 @@ static void find_pci(short bus, struct pci_device *pci_dev) {
 	struct pci_device *dev;
 	struct pci_id_match match;
 
-	match.vendor_id = 0x1002;
+	match.vendor_id = VENDOR_AMD;
 	match.device_id = PCI_MATCH_ANY;
 	match.subvendor_id = PCI_MATCH_ANY;
 	match.subdevice_id = PCI_MATCH_ANY;
@@ -63,11 +64,8 @@ static void find_pci(short bus, struct pci_device *pci_dev) {
 	}
 
 	pci_iterator_destroy(iter);
-
-	if (!dev)
-		die(_("Can't find Radeon cards"));
-
 	pci_system_cleanup();
+	return (dev == NULL);
 }
 
 static int getgrbm_pci(uint32_t *out) {
@@ -141,39 +139,111 @@ static void open_drm_bus(const struct pci_device *dev) {
 		printf(_("Failed to open DRM node, no VRAM support.\n"));
 }
 
+#ifdef DRM_DEVICE_GET_PCI_REVISION
+#define DRMGETDEVICES(dev, max)	drmGetDevices2(0, dev, max)
+#else
+#define DRMGETDEVICES(dev, max)	drmGetDevices(dev, max)
+#endif
+
+#ifdef DRM_BUS_PCI
+static int find_drm(short bus, short *device_bus, unsigned int *device_id) {
+	drmDevicePtr *devs;
+	int count, i, j, fd = -1;
+
+	count = DRMGETDEVICES(NULL, 0);
+
+	if (count <= 0) {
+		if (count < 0)
+			drmError(-count, _("Failed to find DRM devices"));
+		return 1;
+	}
+
+	if (!(devs = calloc(count, sizeof(drmDevicePtr))))
+		die(_("Failed to allocate memory for DRM\n"));
+
+	if ((count = DRMGETDEVICES(devs, count)) < 0) {
+		drmError(-count, _("Failed to get DRM devices"));
+		return 1;
+	}
+
+	for (i = 0; i < count; i++) {
+		if (devs[i]->bustype != DRM_BUS_PCI ||
+			devs[i]->deviceinfo.pci->vendor_id != VENDOR_AMD ||
+			(bus >= 0 && bus != devs[i]->businfo.pci->bus))
+			continue;
+
+		// try render node first, as it does not require to drop master
+		for (j = DRM_NODE_MAX - 1; j >= 0; j--) {
+			if (!(1 << j & devs[i]->available_nodes))
+				continue;
+			if ((fd = open(devs[i]->nodes[j], O_RDWR)) < 0) {
+				fprintf(stderr, _("Failed to open %s: %s\n"),
+					devs[i]->nodes[j], strerror(errno));
+				continue;
+			}
+
+			init_drm(fd);
+			*device_bus = devs[i]->businfo.pci->bus;
+			*device_id = devs[i]->deviceinfo.pci->device_id;
+			break;
+		}
+
+		if (fd >= 0)
+			break;
+	}
+
+	drmFreeDevices(devs, count);
+	free(devs);
+	return (fd < 0);
+}
+#endif
+
 // do-nothing backend used as fallback
 #define UNUSED(v)	(void) v
 static int getuint32_null(uint32_t *out) { UNUSED(out); return -1; }
 static int getuint64_null(uint64_t *out) { UNUSED(out); return -1; }
 
 void init_pci(short *bus, unsigned int *device_id, const unsigned char forcemem) {
-	int use_ioctl = 0;
-
+	short device_bus = -1;
+	int err = 1;
 	getgrbm = getsclk = getmclk = getuint32_null;
 	getvram = getgtt = getuint64_null;
 
-	struct pci_device pci_dev, *gpu_device = &pci_dev;
-	memset(&pci_dev, 0, sizeof(struct pci_device));
-	find_pci(*bus, &pci_dev);
+#ifdef DRM_BUS_PCI
+	if (!forcemem)
+		err = find_drm(*bus, &device_bus, device_id);
+#endif
 
-	// DRM support for VRAM
-	open_drm_bus(&pci_dev);
-	use_ioctl = (getgrbm != getuint32_null);
+	// This is the fallback method for older libdrm that doesn't
+	// have drmGetDevices, operating systems where drmGetDevices
+	// is not implemented, older radeon kernel driver without GRBM
+	// readings, AMD Catalyst driver or when no driver is loaded
+	if (getgrbm == getuint32_null) {
+		struct pci_device pci_dev;
+		memset(&pci_dev, 0, sizeof(struct pci_device));
+		err = find_pci(*bus, &pci_dev);
 
-	if (forcemem) {
-		printf(_("Forcing the /dev/mem path.\n"));
-		use_ioctl = 0;
+		if (!err) {
+			// DRM support for VRAM
+			open_drm_bus(&pci_dev);
+
+			if (forcemem)
+				printf(_("Forcing the /dev/mem path.\n"));
+
+			if (forcemem || getgrbm == getuint32_null)
+				open_pci(&pci_dev);
+
+			device_bus = pci_dev.bus;
+			*device_id = pci_dev.device_id;
+		}
 	}
 
-	if (!use_ioctl) {
-		open_pci(&pci_dev);
-	}
+	if (err)
+		die(_("Can't find Radeon cards"));
 
 	bits.vram = (getvram != getuint64_null);
 	bits.gtt = (getgtt != getuint64_null);
-
-	*bus = gpu_device->bus;
-	*device_id = gpu_device->device_id;
+	*bus = device_bus;
 }
 
 void cleanup() {
