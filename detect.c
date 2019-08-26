@@ -147,9 +147,23 @@ static void open_drm_bus(const struct pci_device *dev) {
 		printf(_("Failed to open DRM node, no VRAM support.\n"));
 }
 
+static int open_drm_path(const char *path) {
+	int fd = open(path, O_RDWR);
+
+	if (fd >= 0)
+		fd = init_drm(fd);
+	else
+		fprintf(stderr, _("Failed to open %s: %s\n"),
+			path, strerror(errno));
+
+	return fd;
+}
+
 #ifdef DRM_DEVICE_GET_PCI_REVISION
+#define DRMGETDEVICE(fd, dev)	drmGetDevice2(fd, 0, dev)
 #define DRMGETDEVICES(dev, max)	drmGetDevices2(0, dev, max)
 #else
+#define DRMGETDEVICE(fd, dev)	drmGetDevice(fd, dev)
 #define DRMGETDEVICES(dev, max)	drmGetDevices(dev, max)
 #endif
 
@@ -184,13 +198,9 @@ static int find_drm(short bus, short *device_bus, unsigned int *device_id) {
 		for (j = DRM_NODE_MAX - 1; j >= 0; j--) {
 			if (!(1 << j & devs[i]->available_nodes))
 				continue;
-			if ((fd = open(devs[i]->nodes[j], O_RDWR)) < 0) {
-				fprintf(stderr, _("Failed to open %s: %s\n"),
-					devs[i]->nodes[j], strerror(errno));
+			if ((fd = open_drm_path(devs[i]->nodes[j])) < 0)
 				continue;
-			}
 
-			init_drm(fd);
 			*device_bus = devs[i]->businfo.pci->bus;
 			*device_id = devs[i]->deviceinfo.pci->device_id;
 			break;
@@ -206,19 +216,57 @@ static int find_drm(short bus, short *device_bus, unsigned int *device_id) {
 }
 #endif
 
+#ifdef HAS_DRMGETDEVICE
+static void device_info_drm(int fd, short *bus, unsigned int *device_id) {
+	drmDevicePtr dev;
+	int err;
+
+	if ((err = DRMGETDEVICE(fd, &dev))) {
+		drmError(err, _("Failed to get device info"));
+		return;
+	}
+
+	if (dev->bustype != DRM_BUS_PCI) {
+		fprintf(stderr, _("Unsupported bus type %d\n"),
+			dev->bustype);
+		return;
+	}
+
+	*bus = dev->businfo.pci->bus;
+	*device_id = dev->deviceinfo.pci->device_id;
+	drmFreeDevice(&dev);
+}
+#endif
+
 // do-nothing backend used as fallback
 #define UNUSED(v)	(void) v
 static int getuint32_null(uint32_t *out) { UNUSED(out); return -1; }
 static int getuint64_null(uint64_t *out) { UNUSED(out); return -1; }
 
-void init_pci(short *bus, unsigned int *device_id, const unsigned char forcemem) {
+void init_pci(const char *path, short *bus, unsigned int *device_id, const unsigned char forcemem) {
 	short device_bus = -1;
 	int err = 1;
 	getgrbm = getsclk = getmclk = getuint32_null;
 	getvram = getgtt = getuint64_null;
 
+	if (path) {
+		int fd = open_drm_path(path);
+
+		if (fd < 0 || getgrbm == getuint32_null)
+			exit(1);
+
+#ifdef HAS_DRMGETDEVICE
+		device_info_drm(fd, &device_bus, device_id);
+#else
+		fprintf(stderr, _("DRM device detection is not compiled in (libdrm 2.4.66 required)\n"));
+#endif
+		err = 0;
+	}
+
+	// If a path was not specified, search and open the first AMD
+	// video card, picking the correct PCI bus if provided.
 #ifdef DRM_BUS_PCI
-	if (!forcemem)
+	if (!forcemem && err)
 		err = find_drm(*bus, &device_bus, device_id);
 #endif
 

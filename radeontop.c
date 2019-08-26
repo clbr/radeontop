@@ -30,13 +30,14 @@ static void version() {
 
 static void help(const char * const me, const unsigned int ticks, const unsigned int dumpinterval) {
 	printf(_("\n\tRadeonTop for R600 and above.\n\n"
-		"\tUsage: %s [-chmv] [-b bus] [-d file] [-i seconds] [-l limit] [-t ticks]\n\n"
+		"\tUsage: %s [-chmv] [-b bus] [-d file] [-i seconds] [-l limit] [-p device] [-t ticks]\n\n"
 		"-b --bus 3		Pick card from this PCI bus (hexadecimal)\n"
 		"-c --color		Enable colors\n"
 		"-d --dump file		Dump data to this file, - for stdout\n"
 		"-i --dump-interval 1	Number of seconds between dumps (default %u)\n"
 		"-l --limit 3		Quit after dumping N lines, default forever\n"
 		"-m --mem		Force the /dev/mem path, for the proprietary driver\n"
+		"-p --path device	Open DRM device node by path\n"
 		"-t --ticks 50		Samples per second (default %u)\n"
 		"\n"
 		"-h --help		Show this help\n"
@@ -60,6 +61,7 @@ int main(int argc, char **argv) {
 	unsigned int limit = 0;
 	char *dump = NULL;
 	unsigned int dumpinterval = default_dumpinterval;
+	const char *path = NULL;
 
 	// Translations
 #ifdef ENABLE_NLS
@@ -77,13 +79,14 @@ int main(int argc, char **argv) {
 		{"help", 0, 0, 'h'},
 		{"limit", 1, 0, 'l'},
 		{"mem", 0, 0, 'm'},
+		{"path", 1, 0, 'p'},
 		{"ticks", 1, 0, 't'},
 		{"version", 0, 0, 'v'},
 		{0, 0, 0, 0}
 	};
 
 	while (1) {
-		int c = getopt_long(argc, argv, "b:cd:hi:l:mt:v", opts, NULL);
+		int c = getopt_long(argc, argv, "b:cd:hi:l:mp:t:v", opts, NULL);
 		if (c == -1) break;
 
 		switch(c) {
@@ -117,12 +120,15 @@ int main(int argc, char **argv) {
 				if (dumpinterval < 1)
 					dumpinterval = 1;
 			break;
+			case 'p':
+				path = optarg;
+			break;
 		}
 	}
 
 	// init (regain privileges for bus initialization and ultimately drop them afterwards)
 	seteuid(0);
-	init_pci(&bus, &device_id, forcemem);
+	init_pci(path, &bus, &device_id, forcemem);
 	// after init_pci we can assume that bus/device_id exists (otherwise it would die())
 
 	setuid(getuid());

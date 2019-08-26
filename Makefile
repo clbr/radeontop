@@ -43,7 +43,11 @@ ifeq ($(nls), 1)
 	CFLAGS += -DENABLE_NLS=1
 endif
 
-# autodetect libdrm_amdgpu features
+# autodetect libdrm features
+ifeq ($(shell pkg-config --atleast-version=2.4.66 libdrm && echo ok), ok)
+	CFLAGS += -DHAS_DRMGETDEVICE=1
+endif
+
 ifeq ($(shell pkg-config --atleast-version=2 libdrm_amdgpu && echo ok), ok)
 	amdgpu ?= 1
 else
