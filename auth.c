@@ -46,8 +46,11 @@ void authenticate_drm(int fd) {
 
 	/* Try self-authenticate (if we are somehow the master). */
 	if (drmAuthMagic(fd, magic) == 0) {
-		if (drmDropMaster(fd))
+		if (drmDropMaster(fd)) {
 			perror(_("Failed to drop DRM master"));
+			fprintf(stderr, _("\nWARNING: other DRM clients will crash on VT switch while radeontop is running!\npress ENTER to continue\n"));
+			fgetc(stdin);
+		}
 		return;
 	}
 
