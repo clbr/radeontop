@@ -15,6 +15,7 @@ LIBDIR ?= $(PREFIX)/lib
 MANDIR ?= $(PREFIX)/share/man
 LOCALEDIR ?= $(PREFIX)/share/locale
 INSTALL ?= install
+PKG_CONFIG ?= pkg-config
 TARGET_OS ?= $(shell uname)
 
 nls ?= 1
@@ -31,10 +32,10 @@ LDFLAGS_SECTIONED = -Wl,-gc-sections
 CFLAGS ?= -Os $(CFLAGS_SECTIONED)
 CFLAGS += -Wall -Wextra -pthread
 CFLAGS += -Iinclude
-CFLAGS += $(shell pkg-config --cflags pciaccess)
-CFLAGS += $(shell pkg-config --cflags libdrm)
+CFLAGS += $(shell $(PKG_CONFIG) --cflags pciaccess)
+CFLAGS += $(shell $(PKG_CONFIG) --cflags libdrm)
 ifeq ($(xcb), 1)
-	CFLAGS += $(shell pkg-config --cflags xcb xcb-dri2)
+	CFLAGS += $(shell $(PKG_CONFIG) --cflags xcb xcb-dri2)
 	CFLAGS += -DENABLE_XCB=1
 endif
 
@@ -44,13 +45,13 @@ else ifneq ($(filter $(TARGET_OS), DragonFly FreeBSD OpenBSD),)
 	libintl = -lintl
 endif
 
-ifeq ($(shell pkg-config ncursesw && echo 1), 1)
+ifeq ($(shell $(PKG_CONFIG) ncursesw && echo 1), 1)
 	ncurses = ncursesw
 else
 	ncurses = ncurses
 endif
 
-CFLAGS += $(shell pkg-config --cflags $(ncurses))
+CFLAGS += $(shell $(PKG_CONFIG) --cflags $(ncurses))
 
 # Comment this if you don't want translations
 ifeq ($(nls), 1)
@@ -59,11 +60,11 @@ ifeq ($(nls), 1)
 endif
 
 # autodetect libdrm features
-ifeq ($(shell pkg-config --atleast-version=2.4.66 libdrm && echo ok), ok)
+ifeq ($(shell $(PKG_CONFIG) 'libdrm >= 2.4.66' && echo 1), 1)
 	CFLAGS += -DHAS_DRMGETDEVICE=1
 endif
 
-ifeq ($(shell pkg-config --atleast-version=2 libdrm_amdgpu && echo ok), ok)
+ifeq ($(shell $(PKG_CONFIG) libdrm_amdgpu && echo 1), 1)
 	amdgpu ?= 1
 else
 	amdgpu ?= 0
@@ -72,9 +73,9 @@ endif
 ifeq ($(amdgpu), 1)
 	src += amdgpu.c
 	CFLAGS += -DENABLE_AMDGPU=1
-	LIBS += $(shell pkg-config --libs libdrm_amdgpu)
+	LIBS += $(shell $(PKG_CONFIG) --libs libdrm_amdgpu)
 
-	ifeq ($(shell pkg-config --atleast-version=2.4.79 libdrm_amdgpu && echo ok), ok)
+	ifeq ($(shell $(PKG_CONFIG) 'libdrm_amdgpu >= 2.4.79' && echo 1), 1)
 		CFLAGS += -DHAS_AMDGPU_QUERY_SENSOR_INFO=1
 	endif
 endif
@@ -89,15 +90,15 @@ endif
 
 obj = $(src:.c=.o)
 LDFLAGS ?= -Wl,-O1 $(LDFLAGS_SECTIONED)
-LIBS += $(shell pkg-config --libs pciaccess)
-LIBS += $(shell pkg-config --libs libdrm)
+LIBS += $(shell $(PKG_CONFIG) --libs pciaccess)
+LIBS += $(shell $(PKG_CONFIG) --libs libdrm)
 ifeq ($(xcb), 1)
-	xcb_LIBS += $(shell pkg-config --libs xcb xcb-dri2)
+	xcb_LIBS += $(shell $(PKG_CONFIG) --libs xcb xcb-dri2)
 	LIBS += $(libdl)
 endif
 
 # On some distros, you might have to change this to ncursesw
-LIBS += $(shell pkg-config --libs $(ncurses))
+LIBS += $(shell $(PKG_CONFIG) --libs $(ncurses))
 
 export PREFIX LOCALEDIR INSTALL
 
