@@ -1,3 +1,5 @@
+PREFIX ?= /usr
+LOCALEDIR ?= $(PREFIX)/share/locale
 INSTALL ?= install
 MSGFMT ?= msgfmt
 
@@ -15,6 +17,7 @@ $(obj): $(src)
 	$(MSGFMT) -o $@ $<
 
 %.inst: %.mo
-	$(INSTALL) -D -m 644 $< $(DESTDIR)/$(PREFIX)/share/locale/$*/LC_MESSAGES/radeontop.mo
+	$(INSTALL) -d $(DESTDIR)$(LOCALEDIR)/$*/LC_MESSAGES
+	$(INSTALL) -m 644 $< $(DESTDIR)$(LOCALEDIR)/$*/LC_MESSAGES/radeontop.mo
 
 install: all $(inst)

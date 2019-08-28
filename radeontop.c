@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
 	// Translations
 #ifdef ENABLE_NLS
 	setlocale(LC_ALL, "");
-	bindtextdomain("radeontop", "/usr/share/locale");
+	bindtextdomain("radeontop", LOCALEDIR);
 	textdomain("radeontop");
 #endif
 

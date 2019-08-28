@@ -11,9 +11,11 @@
 #		it requires libdrm >= 2.4.63
 
 PREFIX ?= /usr
+LIBDIR ?= $(PREFIX)/lib
+MANDIR ?= $(PREFIX)/share/man
+LOCALEDIR ?= $(PREFIX)/share/locale
 INSTALL ?= install
-LIBDIR ?= lib
-MANDIR ?= share/man
+TARGET_OS ?= $(shell uname)
 
 nls ?= 1
 xcb ?= 1
@@ -26,21 +28,34 @@ verh = include/version.h
 CFLAGS_SECTIONED = -ffunction-sections -fdata-sections
 LDFLAGS_SECTIONED = -Wl,-gc-sections
 
-CFLAGS ?= -Os
+CFLAGS ?= -Os $(CFLAGS_SECTIONED)
 CFLAGS += -Wall -Wextra -pthread
 CFLAGS += -Iinclude
-CFLAGS += $(CFLAGS_SECTIONED)
 CFLAGS += $(shell pkg-config --cflags pciaccess)
 CFLAGS += $(shell pkg-config --cflags libdrm)
 ifeq ($(xcb), 1)
 	CFLAGS += $(shell pkg-config --cflags xcb xcb-dri2)
 	CFLAGS += -DENABLE_XCB=1
 endif
-CFLAGS += $(shell pkg-config --cflags ncurses 2>/dev/null)
+
+ifneq ($(filter $(TARGET_OS), GNU/kFreeBSD Linux),)
+	libdl = -ldl
+else ifneq ($(filter $(TARGET_OS), DragonFly FreeBSD OpenBSD),)
+	libintl = -lintl
+endif
+
+ifeq ($(shell pkg-config ncursesw && echo 1), 1)
+	ncurses = ncursesw
+else
+	ncurses = ncurses
+endif
+
+CFLAGS += $(shell pkg-config --cflags $(ncurses))
 
 # Comment this if you don't want translations
 ifeq ($(nls), 1)
-	CFLAGS += -DENABLE_NLS=1
+	CFLAGS += -DENABLE_NLS=1 -DLOCALEDIR=\"$(LOCALEDIR)\"
+	LIBS += $(libintl)
 endif
 
 # autodetect libdrm features
@@ -73,19 +88,18 @@ endif
 endif
 
 obj = $(src:.c=.o)
-LDFLAGS ?= -Wl,-O1
-LDFLAGS += $(LDFLAGS_SECTIONED)
+LDFLAGS ?= -Wl,-O1 $(LDFLAGS_SECTIONED)
 LIBS += $(shell pkg-config --libs pciaccess)
 LIBS += $(shell pkg-config --libs libdrm)
 ifeq ($(xcb), 1)
 	xcb_LIBS += $(shell pkg-config --libs xcb xcb-dri2)
-	LIBS += -ldl
+	LIBS += $(libdl)
 endif
 
 # On some distros, you might have to change this to ncursesw
-LIBS += $(shell pkg-config --libs ncursesw 2>/dev/null || \
-		shell pkg-config --libs ncurses 2>/dev/null || \
-		echo "-lncurses")
+LIBS += $(shell pkg-config --libs $(ncurses))
+
+export PREFIX LOCALEDIR INSTALL
 
 .PHONY: all clean install man dist
 
@@ -107,6 +121,7 @@ clean:
 	rm -f *.o $(bin) $(xcblib)
 
 .git:
+	mkdir .git
 
 $(verh): .git
 	./getver.sh
@@ -116,13 +131,16 @@ trans:
 	--package-name radeontop
 
 install: all
-	$(INSTALL) -D -m755 $(bin) $(DESTDIR)/$(PREFIX)/sbin/$(bin)
+	$(INSTALL) -d $(DESTDIR)$(PREFIX)/sbin
+	$(INSTALL) $(bin) $(DESTDIR)$(PREFIX)/sbin
 ifeq ($(xcb), 1)
-	$(INSTALL) -D -m755 $(xcblib) $(DESTDIR)/$(PREFIX)/$(LIBDIR)/$(xcblib)
+	$(INSTALL) -d $(DESTDIR)$(LIBDIR)
+	$(INSTALL) $(xcblib) $(DESTDIR)$(LIBDIR)
 endif
-	$(INSTALL) -D -m644 radeontop.1 $(DESTDIR)/$(PREFIX)/$(MANDIR)/man1/radeontop.1
+	$(INSTALL) -d $(DESTDIR)$(MANDIR)/man1
+	$(INSTALL) -m644 radeontop.1 $(DESTDIR)$(MANDIR)/man1
 ifeq ($(nls), 1)
-	$(MAKE) -C translations install PREFIX=$(PREFIX)
+	$(MAKE) -C translations install
 endif
 
 man:

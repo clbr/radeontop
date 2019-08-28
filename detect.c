@@ -88,7 +88,7 @@ static void open_pci(struct pci_device *gpu_device) {
 	int mem = open("/dev/mem", O_RDONLY);
 	if (mem < 0) die(_("Cannot access GPU registers, are you root?"));
 
-	area = mmap(NULL, MMAP_SIZE, PROT_READ, MAP_PRIVATE, mem,
+	area = mmap(NULL, MMAP_SIZE, PROT_READ, MAP_SHARED, mem,
 			gpu_device->regions[reg].base_addr + 0x8000);
 	if (area == MAP_FAILED) die(_("mmap failed"));
 
