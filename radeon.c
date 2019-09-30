@@ -18,6 +18,20 @@
 #include <radeon_drm.h>
 #include <xf86drm.h>
 
+// It's safe to make these queries on older kernels.
+#ifndef RADEON_INFO_VRAM_USAGE
+#define RADEON_INFO_VRAM_USAGE 0x1e
+#endif
+#ifndef RADEON_INFO_READ_REG
+#define RADEON_INFO_READ_REG 0x24
+#endif
+#ifndef RADEON_INFO_CURRENT_GPU_SCLK
+#define RADEON_INFO_CURRENT_GPU_SCLK 0x22
+#endif
+#ifndef RADEON_INFO_CURRENT_GPU_MCLK
+#define RADEON_INFO_CURRENT_GPU_MCLK 0x23
+#endif
+
 static int drm_fd;
 
 static int radeon_get_drm_value(int fd, unsigned request, uint32_t *out) {
