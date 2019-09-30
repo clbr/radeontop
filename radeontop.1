@@ -31,7 +31,7 @@
 radeontop \- tool to show GPU utilization
 .SH "SYNOPSIS"
 .sp
-\fBradeontop [\-chmv] [\-b \fR\fB\fIbus\fR\fR\fB] [\-d \fR\fB\fIfile\fR\fR\fB] [\-l \fR\fB\fIlimit\fR\fR\fB] [\-i \fR\fB\fIsecs\fR\fR\fB] [\-t \fR\fB\fIticks\fR\fR\fB]\fR
+\fBradeontop [\-chmv] [\-b \fR\fB\fIbus\fR\fR\fB] [\-d \fR\fB\fIfile\fR\fR\fB] [\-l \fR\fB\fIlimit\fR\fR\fB] [\-i \fR\fB\fIsecs\fR\fR\fB] [\-p \fR\fB\fIdevice\fR\fR\fB] [\-t \fR\fB\fIticks\fR\fR\fB]\fR
 .SH "DESCRIPTION"
 .sp
 RadeonTop shows the utilization of your GPU, both in general and by blocks\&.
@@ -89,6 +89,13 @@ for graceful termination\&.
 \fB\-m, \-\-mem\fR
 .RS 4
 Forces the use of the /dev/mem path, in case autodetection fails\&. Useful for the proprietary driver\&.
+.RE
+.PP
+\fB\-p, \-\-path \fR\fB\fIdevice\fR\fR
+.RS 4
+Open the DRM device node specified by
+\fIdevice\fR
+path\&. Usually it is located at /dev/dri/card0 or /dev/drm0\&. If this option used, \-\-bus and \-\-mem are ignored\&.
 .RE
 .PP
 \fB\-t, \-\-ticks \fR\fB\fIticks\fR\fR
