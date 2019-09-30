@@ -76,6 +76,7 @@ static int getgrbm_pci(uint32_t *out) {
 }
 
 static void open_pci(struct pci_device *gpu_device) {
+	// Warning: gpu_device is a copy of a freed struct. Do not access any pointers!
 	int reg = 2;
 	if (getfamily(gpu_device->device_id) >= BONAIRE)
 		reg = 5;
@@ -112,6 +113,7 @@ void init_pci(short *bus, unsigned int *device_id, const unsigned char forcemem)
 	getvram = getgtt = getuint64_null;
 
 	struct pci_device pci_dev, *gpu_device = &pci_dev;
+	memset(&pci_dev, 0, sizeof(struct pci_device));
 	find_pci(*bus, &pci_dev);
 
 	char busid[32];
