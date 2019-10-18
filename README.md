@@ -5,6 +5,8 @@ View your GPU utilization, both for the total activity percent and individual bl
 
 Requires access to /dev/dri/cardN files or /dev/mem (root privileges).
 
+![Screenshot from 2019-10-19 01-34-53](https://user-images.githubusercontent.com/11575/67134148-da74d880-f210-11e9-984e-b697c3056c00.png)
+
 Supported cards
 ---------------
 
