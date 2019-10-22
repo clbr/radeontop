@@ -108,15 +108,23 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		float sclk_ghz = results->sclk * k / 1000.0f;
 
 		fprintf(f, "gpu %.2f%%, ", gui);
-		fprintf(f, "ee %.2f%%, ", ee);
-		fprintf(f, "vgt %.2f%%, ", vgt);
+
+		if (bits.ee)
+			fprintf(f, "ee %.2f%%, ", ee);
+
+		if (bits.vgt)
+			fprintf(f, "vgt %.2f%%, ", vgt);
+
 		fprintf(f, "ta %.2f%%, ", ta);
 
 		if (bits.tc)
 			fprintf(f, "tc %.2f%%, ", tc);
 
 		fprintf(f, "sx %.2f%%, ", sx);
-		fprintf(f, "sh %.2f%%, ", sh);
+
+		if (bits.sh)
+			fprintf(f, "sh %.2f%%, ", sh);
+
 		fprintf(f, "spi %.2f%%, ", spi);
 
 		if (bits.smx)

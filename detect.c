@@ -347,29 +347,36 @@ void initbits(int fam) {
 
 	// The majority of these is the same from R600 to Southern Islands.
 
-	bits.ee = (1U << 10);
-	bits.vgt = (1U << 16) | (1U << 17);
 	bits.ta = (1U << 14);
-	bits.tc = (1U << 19);
 	bits.sx = (1U << 20);
-	bits.sh = (1U << 21);
 	bits.spi = (1U << 22);
-	bits.smx = (1U << 23);
 	bits.sc = (1U << 24);
 	bits.pa = (1U << 25);
 	bits.db = (1U << 26);
-	bits.cr = (1U << 27);
 	bits.cb = (1U << 30);
 	bits.gui = (1U << 31);
 
 	// R600 has a different texture bit, and only R600 has the TC, CR, SMX bits
 	if (fam < RV770) {
 		bits.ta = (1U << 18);
-	} else {
-		bits.tc = 0;
-		bits.cr = 0;
-		bits.smx = 0;
+		bits.tc = (1U << 19);
+		bits.smx = (1U << 23);
+		bits.cr = (1U << 27);
 	}
+
+	// non-dma VGT and SH were removed since TAHITI
+	if (fam < TAHITI) {
+		bits.vgt = (1U << 16);
+		bits.sh = (1U << 21);
+	}
+
+	// EE was removed since BONAIRE
+	if (fam < BONAIRE)
+		bits.ee = (1U << 10);
+
+	// VGT was removed since NAVI10
+	if (fam < NAVI10)
+		bits.vgt |= (1U << 17);
 
 	// SRBM
 	if (bits.uvd) bits.uvd = (1U << 19);
