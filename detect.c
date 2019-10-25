@@ -31,6 +31,8 @@ const void *area;
 
 // function pointers to the right backend
 int (*getgrbm)(uint32_t *out);
+int (*getsrbm)(uint32_t *out);
+int (*getsrbm2)(uint32_t *out);
 int (*getvram)(uint64_t *out);
 int (*getgtt)(uint64_t *out);
 int (*getsclk)(uint32_t *out);
@@ -71,14 +73,26 @@ static int find_pci(short bus, struct pci_device *pci_dev) {
 }
 
 static int getgrbm_pci(uint32_t *out) {
-	*out = *(uint32_t *)((const char *) area + 0x10);
+	*out = *(uint32_t *)((const char *) area + GRBM_STATUS);
+	return 0;
+}
+
+static int getsrbm_pci(uint32_t *out) {
+	*out = *(uint32_t *)((const char *) area + SRBM_STATUS);
+	return 0;
+}
+
+static int getsrbm2_pci(uint32_t *out) {
+	*out = *(uint32_t *)((const char *) area + SRBM_STATUS2);
 	return 0;
 }
 
 static void open_pci(struct pci_device *gpu_device) {
 	// Warning: gpu_device is a copy of a freed struct. Do not access any pointers!
+	unsigned int family_id = getfamily(gpu_device->device_id);
 	int reg = 2;
-	if (getfamily(gpu_device->device_id) >= BONAIRE)
+
+	if (family_id >= BONAIRE)
 		reg = 5;
 
 	if (!gpu_device->regions[reg].size) die(_("Can't get the register area size"));
@@ -89,10 +103,16 @@ static void open_pci(struct pci_device *gpu_device) {
 	if (mem < 0) die(_("Cannot access GPU registers, are you root?"));
 
 	area = mmap(NULL, MMAP_SIZE, PROT_READ, MAP_SHARED, mem,
-			gpu_device->regions[reg].base_addr + 0x8000);
+			gpu_device->regions[reg].base_addr);
 	if (area == MAP_FAILED) die(_("mmap failed"));
 
 	getgrbm = getgrbm_pci;
+
+	if (family_id >= RV610)
+		getsrbm = getsrbm_pci;
+
+	if (family_id >= ARUBA)
+		getsrbm2 = getsrbm2_pci;
 }
 
 static void cleanup_pci() {
@@ -246,7 +266,7 @@ static int getuint64_null(uint64_t *out) { UNUSED(out); return -1; }
 void init_pci(const char *path, short *bus, unsigned int *device_id, const unsigned char forcemem) {
 	short device_bus = -1;
 	int err = 1;
-	getgrbm = getsclk = getmclk = getuint32_null;
+	getgrbm = getsrbm = getsrbm2 = getsclk = getmclk = getuint32_null;
 	getvram = getgtt = getuint64_null;
 
 	if (path) {
@@ -297,6 +317,8 @@ void init_pci(const char *path, short *bus, unsigned int *device_id, const unsig
 	if (err)
 		die(_("Can't find Radeon cards"));
 
+	bits.uvd = (getsrbm != getuint32_null);
+	bits.vce0 = (getsrbm2 != getuint32_null);
 	bits.vram = (getvram != getuint64_null);
 	bits.gtt = (getgtt != getuint64_null);
 	*bus = device_bus;
@@ -348,4 +370,10 @@ void initbits(int fam) {
 		bits.cr = 0;
 		bits.smx = 0;
 	}
+
+	// SRBM
+	if (bits.uvd) bits.uvd = (1U << 19);
+
+	// SRBM2
+	if (bits.vce0) bits.vce0 = (1U << 7);
 }

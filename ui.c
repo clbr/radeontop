@@ -139,6 +139,8 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 		float db = 100 * results->db * k;
 		float cr = 100 * results->cr * k;
 		float cb = 100 * results->cb * k;
+		float uvd = 100 * results->uvd * k;
+		float vce0 = 100 * results->vce0 * k;
 		float vram = 100.0f * results->vram / vramsize;
 		float vrammb = results->vram / 1024.0f / 1024.0f;
 		float vramsizemb = vramsize / 1024.0f / 1024.0f;
@@ -262,6 +264,19 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 			printright(start++, hw, _("%.2fG / %.2fG Shader Clock %6.2f%%"),
 					sclk_ghz, sclk_max * 1e-6f, sclk);
 			if (color) attroff(COLOR_PAIR(3));
+		}
+
+		if (bits.uvd || bits.vce0)
+			if (h > bigh) start++;
+
+		if (bits.uvd) {
+			percentage(start, w, uvd);
+			printright(start++, hw, _("Unified Video Decoder %6.2f%%"), uvd);
+		}
+
+		if (bits.vce0) {
+			percentage(start, w, vce0);
+			printright(start++, hw, _("Video Compression Engine %6.2f%%"), vce0);
 		}
 
 		//move the cursor away to fix some resizing artifacts on some terminals

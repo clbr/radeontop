@@ -36,7 +36,9 @@
 
 enum {
 	GRBM_STATUS = 0x8010,
-	MMAP_SIZE = 0x14,
+	SRBM_STATUS = 0x0E50,
+	SRBM_STATUS2 = 0x0E4C,
+	MMAP_SIZE = 0x9000,
 	VENDOR_AMD = 0x1002
 };
 
@@ -53,6 +55,8 @@ void initbits(int fam);
 void cleanup();
 
 extern int (*getgrbm)(uint32_t *out);
+extern int (*getsrbm)(uint32_t *out);
+extern int (*getsrbm2)(uint32_t *out);
 extern int (*getvram)(uint64_t *out);
 extern int (*getgtt)(uint64_t *out);
 extern int (*getsclk)(uint32_t *out);
@@ -141,6 +145,8 @@ struct bits_t {
 	unsigned int db;
 	unsigned int cb;
 	unsigned int cr;
+	unsigned int uvd;
+	unsigned int vce0;
 	uint64_t vram;
 	uint64_t gtt;
 	unsigned int sclk;
