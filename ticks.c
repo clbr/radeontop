@@ -24,6 +24,33 @@ struct collector_args_t {
 	unsigned int dumpinterval;
 };
 
+// increment timer by interval and sleep until timer is reached
+static void sleep_until(struct timespec *timer, unsigned int interval)
+{
+	struct timespec now, sleep;
+	int sec = 0, nsec = 0;
+
+	timer->tv_nsec += interval;
+
+	if (timer->tv_nsec >= 1e9) {
+		timer->tv_sec++;
+		timer->tv_nsec -= 1e9;
+	}
+
+	clock_gettime(CLOCK_MONOTONIC, &now);
+
+	if (timer->tv_nsec < now.tv_nsec) {
+		sec--;
+		nsec = 1e9;
+	}
+
+	sleep.tv_sec = timer->tv_sec - now.tv_sec + sec;
+	sleep.tv_nsec = timer->tv_nsec - now.tv_nsec + nsec;
+
+	if (sleep.tv_sec >= 0 && sleep.tv_nsec > 0)
+		nanosleep(&sleep, NULL);
+}
+
 static void *collector(void *arg) {
 	struct collector_args_t *args = (struct collector_args_t *) arg;
 
@@ -36,7 +63,9 @@ static void *collector(void *arg) {
 	struct bits_t *history = calloc(ticks * dumpinterval, sizeof(struct bits_t));
 	unsigned int cur = 0, curres = 0;
 
-	const useconds_t sleeptime = 1e6 / ticks;
+	const unsigned int sleeptime = 1e9 / ticks;
+	struct timespec timer;
+	clock_gettime(CLOCK_MONOTONIC, &timer);
 
 	while (1) {
 		unsigned int stat;
@@ -68,7 +97,6 @@ static void *collector(void *arg) {
 		getsclk(&history[cur].sclk);
 		getmclk(&history[cur].mclk);
 
-		usleep(sleeptime);
 		cur++;
 		cur %= ticks * dumpinterval;
 
@@ -108,6 +136,8 @@ static void *collector(void *arg) {
 			curres++;
 			curres %= 2;
 		}
+
+		sleep_until(&timer, sleeptime);
 	}
 
 	return NULL;
