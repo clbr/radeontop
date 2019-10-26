@@ -81,7 +81,7 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 
 		// Again, no need to protect these. Worst that happens is a slightly
 		// wrong number.
-		float k = 1.0f / ticks / dumpinterval;
+		float k = 1.0f * TIME_RES / ticks / dumpinterval;
 		float ee = 100 * results->ee * k;
 		float vgt = 100 * results->vgt * k;
 		float gui = 100 * results->gui * k;
@@ -163,7 +163,7 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 
 		// No sleeping on the last line.
 		if (!limit || count > 1)
-			sleep(dumpinterval);
+			usleep(dumpinterval * (1e6 / TIME_RES));
 	}
 
 	fflush(f);

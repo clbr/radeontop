@@ -60,7 +60,8 @@ static void *collector(void *arg) {
 	struct bits_t res[2];
 
 	// Save one second's worth of history
-	struct bits_t *history = calloc(ticks * dumpinterval, sizeof(struct bits_t));
+	const unsigned int histsize = ticks * dumpinterval / TIME_RES;
+	struct bits_t *history = calloc(histsize, sizeof(struct bits_t));
 	unsigned int cur = 0, curres = 0;
 
 	const unsigned int sleeptime = 1e9 / ticks;
@@ -98,7 +99,7 @@ static void *collector(void *arg) {
 		getmclk(&history[cur].mclk);
 
 		cur++;
-		cur %= ticks * dumpinterval;
+		cur %= histsize;
 
 		// One second has passed, we have one sec's worth of data
 		if (cur == 0) {
@@ -106,7 +107,7 @@ static void *collector(void *arg) {
 
 			memset(&res[curres], 0, sizeof(struct bits_t));
 
-			for (i = 0; i < ticks * dumpinterval; i++) {
+			for (i = 0; i < histsize; i++) {
 				res[curres].ee += history[i].ee;
 				res[curres].vgt += history[i].vgt;
 				res[curres].gui += history[i].gui;

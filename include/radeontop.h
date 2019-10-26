@@ -39,7 +39,8 @@ enum {
 	SRBM_STATUS = 0x0E50,
 	SRBM_STATUS2 = 0x0E4C,
 	MMAP_SIZE = 0x9000,
-	VENDOR_AMD = 0x1002
+	VENDOR_AMD = 0x1002,
+	TIME_RES = 100,
 };
 
 // auth.c
