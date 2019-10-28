@@ -81,7 +81,7 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 
 		// Again, no need to protect these. Worst that happens is a slightly
 		// wrong number.
-		float k = 1.0f / ticks / dumpinterval;
+		float k = 1.0f * TIME_RES / ticks / dumpinterval;
 		float ee = 100 * results->ee * k;
 		float vgt = 100 * results->vgt * k;
 		float gui = 100 * results->gui * k;
@@ -96,6 +96,8 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		float db = 100 * results->db * k;
 		float cr = 100 * results->cr * k;
 		float cb = 100 * results->cb * k;
+		float uvd = 100 * results->uvd * k;
+		float vce0 = 100 * results->vce0 * k;
 		float vram = 100.0f * results->vram / vramsize;
 		float vrammb = results->vram / 1024.0f / 1024.0f;
 		float gtt = 100.0f * results->gtt / gttsize;
@@ -106,15 +108,23 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		float sclk_ghz = results->sclk * k / 1000.0f;
 
 		fprintf(f, "gpu %.2f%%, ", gui);
-		fprintf(f, "ee %.2f%%, ", ee);
-		fprintf(f, "vgt %.2f%%, ", vgt);
+
+		if (bits.ee)
+			fprintf(f, "ee %.2f%%, ", ee);
+
+		if (bits.vgt)
+			fprintf(f, "vgt %.2f%%, ", vgt);
+
 		fprintf(f, "ta %.2f%%, ", ta);
 
 		if (bits.tc)
 			fprintf(f, "tc %.2f%%, ", tc);
 
 		fprintf(f, "sx %.2f%%, ", sx);
-		fprintf(f, "sh %.2f%%, ", sh);
+
+		if (bits.sh)
+			fprintf(f, "sh %.2f%%, ", sh);
+
 		fprintf(f, "spi %.2f%%, ", spi);
 
 		if (bits.smx)
@@ -138,6 +148,12 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 			fprintf(f, ", mclk %.2f%% %.3fghz, sclk %.2f%% %.3fghz",
 					mclk, mclk_ghz, sclk, sclk_ghz);
 
+		if (bits.uvd)
+			fprintf(f, ", uvd %.2f%%", uvd);
+
+		if (bits.vce0)
+			fprintf(f, ", vce %.2f%%", vce0);
+
 		fprintf(f, "\n");
 		fflush(f);
 
@@ -147,7 +163,7 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 
 		// No sleeping on the last line.
 		if (!limit || count > 1)
-			sleep(dumpinterval);
+			usleep(dumpinterval * (1e6 / TIME_RES));
 	}
 
 	fflush(f);

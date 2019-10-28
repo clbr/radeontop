@@ -16,23 +16,87 @@
 
 #include "radeontop.h"
 #include <xf86drm.h>
+
 #ifdef ENABLE_XCB
+#include <xcb/xcb.h>
+#include <xcb/dri2.h>
+
+#ifdef ENABLE_XCB_DL
 #include <dlfcn.h>
 
-typedef void (*auth_magic_func)(drm_magic_t magic);
+#define xcb_connect			DL_xcb_connect
+#define xcb_connection_has_error	DL_xcb_connection_has_error
+#define xcb_disconnect			DL_xcb_disconnect
+#define xcb_get_setup			DL_xcb_get_setup
+#define xcb_setup_roots_iterator	DL_xcb_setup_roots_iterator
+#define xcb_dri2_authenticate		DL_xcb_dri2_authenticate
+#define xcb_dri2_authenticate_reply	DL_xcb_dri2_authenticate_reply
 
-static void call_authenticate_drm_xcb(drm_magic_t magic) {
-	void *handle = dlopen("libradeontop_xcb.so", RTLD_NOW);
-	if (!handle) {
+static xcb_connection_t *(*DL_xcb_connect)(const char *, int *);
+static int (*DL_xcb_connection_has_error)(xcb_connection_t *);
+static void (*DL_xcb_disconnect)(xcb_connection_t *);
+static const struct xcb_setup_t *(*DL_xcb_get_setup)(xcb_connection_t *);
+static xcb_screen_iterator_t (*DL_xcb_setup_roots_iterator)(
+	const xcb_setup_t *);
+static xcb_dri2_authenticate_cookie_t (*DL_xcb_dri2_authenticate)(
+	xcb_connection_t *, xcb_window_t, uint32_t);
+static xcb_dri2_authenticate_reply_t *(*DL_xcb_dri2_authenticate_reply)(
+	xcb_connection_t *, xcb_dri2_authenticate_cookie_t,
+	xcb_generic_error_t **);
+
+static void *dl_handle;
+
+static int dl_load(void) {
+	if (!(dl_handle = dlopen("libxcb-dri2.so.0", RTLD_NOW))) {
+		fprintf(stderr, "%s\n", dlerror());
+		return 1;
+	}
+
+#define DLSYM(sym) \
+	if (!(DL_##sym = dlsym(dl_handle, #sym))) { \
+		fprintf(stderr, "%s\n", dlerror()); \
+		return 1; \
+	}
+
+	DLSYM(xcb_connect);
+	DLSYM(xcb_connection_has_error);
+	DLSYM(xcb_disconnect);
+	DLSYM(xcb_get_setup);
+	DLSYM(xcb_setup_roots_iterator);
+	DLSYM(xcb_dri2_authenticate);
+	DLSYM(xcb_dri2_authenticate_reply);
+#undef DLSYM
+
+	return 0;
+}
+
+static void dl_unload(void) {
+	dlclose(dl_handle);
+}
+#endif
+
+/* Try to authenticate the DRM client with help from the X server. */
+static void authenticate_drm_xcb(drm_magic_t magic) {
+	xcb_connection_t *conn = xcb_connect(NULL, NULL);
+	if (!conn) {
+		return;
+	}
+	if (xcb_connection_has_error(conn)) {
+		xcb_disconnect(conn);
 		return;
 	}
 
-	auth_magic_func func = (auth_magic_func) dlsym(handle,
-			"authenticate_drm_xcb");
-	if (func) {
-		func(magic);
-	}
-	dlclose(handle);
+	xcb_screen_t *screen = xcb_setup_roots_iterator(xcb_get_setup(conn)).data;
+	xcb_window_t window = screen->root;
+
+	/* Authenticate our client via the X server using the magic. */
+	xcb_dri2_authenticate_cookie_t auth_cookie =
+		xcb_dri2_authenticate(conn, window, magic);
+	xcb_dri2_authenticate_reply_t *auth_reply =
+		xcb_dri2_authenticate_reply(conn, auth_cookie, NULL);
+	free(auth_reply);
+
+	xcb_disconnect(conn);
 }
 #endif
 
@@ -55,6 +119,14 @@ void authenticate_drm(int fd) {
 	}
 
 #ifdef ENABLE_XCB
-	call_authenticate_drm_xcb(magic);
+#ifdef ENABLE_XCB_DL
+	if (dl_load()) return;
+#endif
+
+	authenticate_drm_xcb(magic);
+
+#ifdef ENABLE_XCB_DL
+	dl_unload();
+#endif
 #endif
 }

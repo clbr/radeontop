@@ -31,6 +31,8 @@ const void *area;
 
 // function pointers to the right backend
 int (*getgrbm)(uint32_t *out);
+int (*getsrbm)(uint32_t *out);
+int (*getsrbm2)(uint32_t *out);
 int (*getvram)(uint64_t *out);
 int (*getgtt)(uint64_t *out);
 int (*getsclk)(uint32_t *out);
@@ -71,14 +73,26 @@ static int find_pci(short bus, struct pci_device *pci_dev) {
 }
 
 static int getgrbm_pci(uint32_t *out) {
-	*out = *(uint32_t *)((const char *) area + 0x10);
+	*out = *(uint32_t *)((const char *) area + GRBM_STATUS);
+	return 0;
+}
+
+static int getsrbm_pci(uint32_t *out) {
+	*out = *(uint32_t *)((const char *) area + SRBM_STATUS);
+	return 0;
+}
+
+static int getsrbm2_pci(uint32_t *out) {
+	*out = *(uint32_t *)((const char *) area + SRBM_STATUS2);
 	return 0;
 }
 
 static void open_pci(struct pci_device *gpu_device) {
 	// Warning: gpu_device is a copy of a freed struct. Do not access any pointers!
+	unsigned int family_id = getfamily(gpu_device->device_id);
 	int reg = 2;
-	if (getfamily(gpu_device->device_id) >= BONAIRE)
+
+	if (family_id >= BONAIRE)
 		reg = 5;
 
 	if (!gpu_device->regions[reg].size) die(_("Can't get the register area size"));
@@ -88,11 +102,17 @@ static void open_pci(struct pci_device *gpu_device) {
 	int mem = open("/dev/mem", O_RDONLY);
 	if (mem < 0) die(_("Cannot access GPU registers, are you root?"));
 
-	area = mmap(NULL, MMAP_SIZE, PROT_READ, MAP_PRIVATE, mem,
-			gpu_device->regions[reg].base_addr + 0x8000);
+	area = mmap(NULL, MMAP_SIZE, PROT_READ, MAP_SHARED, mem,
+			gpu_device->regions[reg].base_addr);
 	if (area == MAP_FAILED) die(_("mmap failed"));
 
 	getgrbm = getgrbm_pci;
+
+	if (family_id >= RV610)
+		getsrbm = getsrbm_pci;
+
+	if (family_id >= ARUBA)
+		getsrbm2 = getsrbm2_pci;
 }
 
 static void cleanup_pci() {
@@ -246,7 +266,7 @@ static int getuint64_null(uint64_t *out) { UNUSED(out); return -1; }
 void init_pci(const char *path, short *bus, unsigned int *device_id, const unsigned char forcemem) {
 	short device_bus = -1;
 	int err = 1;
-	getgrbm = getsclk = getmclk = getuint32_null;
+	getgrbm = getsrbm = getsrbm2 = getsclk = getmclk = getuint32_null;
 	getvram = getgtt = getuint64_null;
 
 	if (path) {
@@ -297,6 +317,8 @@ void init_pci(const char *path, short *bus, unsigned int *device_id, const unsig
 	if (err)
 		die(_("Can't find Radeon cards"));
 
+	bits.uvd = (getsrbm != getuint32_null);
+	bits.vce0 = (getsrbm2 != getuint32_null);
 	bits.vram = (getvram != getuint64_null);
 	bits.gtt = (getgtt != getuint64_null);
 	*bus = device_bus;
@@ -325,27 +347,40 @@ void initbits(int fam) {
 
 	// The majority of these is the same from R600 to Southern Islands.
 
-	bits.ee = (1U << 10);
-	bits.vgt = (1U << 16) | (1U << 17);
 	bits.ta = (1U << 14);
-	bits.tc = (1U << 19);
 	bits.sx = (1U << 20);
-	bits.sh = (1U << 21);
 	bits.spi = (1U << 22);
-	bits.smx = (1U << 23);
 	bits.sc = (1U << 24);
 	bits.pa = (1U << 25);
 	bits.db = (1U << 26);
-	bits.cr = (1U << 27);
 	bits.cb = (1U << 30);
 	bits.gui = (1U << 31);
 
 	// R600 has a different texture bit, and only R600 has the TC, CR, SMX bits
 	if (fam < RV770) {
 		bits.ta = (1U << 18);
-	} else {
-		bits.tc = 0;
-		bits.cr = 0;
-		bits.smx = 0;
+		bits.tc = (1U << 19);
+		bits.smx = (1U << 23);
+		bits.cr = (1U << 27);
 	}
+
+	// non-dma VGT and SH were removed since TAHITI
+	if (fam < TAHITI) {
+		bits.vgt = (1U << 16);
+		bits.sh = (1U << 21);
+	}
+
+	// EE was removed since BONAIRE
+	if (fam < BONAIRE)
+		bits.ee = (1U << 10);
+
+	// VGT was removed since NAVI10
+	if (fam < NAVI10)
+		bits.vgt |= (1U << 17);
+
+	// SRBM
+	if (bits.uvd) bits.uvd = (1U << 19);
+
+	// SRBM2
+	if (bits.vce0) bits.vce0 = (1U << 7);
 }

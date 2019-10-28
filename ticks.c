@@ -24,6 +24,33 @@ struct collector_args_t {
 	unsigned int dumpinterval;
 };
 
+// increment timer by interval and sleep until timer is reached
+static void sleep_until(struct timespec *timer, unsigned int interval)
+{
+	struct timespec now, sleep;
+	int sec = 0, nsec = 0;
+
+	timer->tv_nsec += interval;
+
+	if (timer->tv_nsec >= 1e9) {
+		timer->tv_sec++;
+		timer->tv_nsec -= 1e9;
+	}
+
+	clock_gettime(CLOCK_MONOTONIC, &now);
+
+	if (timer->tv_nsec < now.tv_nsec) {
+		sec--;
+		nsec = 1e9;
+	}
+
+	sleep.tv_sec = timer->tv_sec - now.tv_sec + sec;
+	sleep.tv_nsec = timer->tv_nsec - now.tv_nsec + nsec;
+
+	if (sleep.tv_sec >= 0 && sleep.tv_nsec > 0)
+		nanosleep(&sleep, NULL);
+}
+
 static void *collector(void *arg) {
 	struct collector_args_t *args = (struct collector_args_t *) arg;
 
@@ -33,10 +60,13 @@ static void *collector(void *arg) {
 	struct bits_t res[2];
 
 	// Save one second's worth of history
-	struct bits_t *history = calloc(ticks * dumpinterval, sizeof(struct bits_t));
+	const unsigned int histsize = ticks * dumpinterval / TIME_RES;
+	struct bits_t *history = calloc(histsize, sizeof(struct bits_t));
 	unsigned int cur = 0, curres = 0;
 
-	const useconds_t sleeptime = 1e6 / ticks;
+	const unsigned int sleeptime = 1e9 / ticks;
+	struct timespec timer;
+	clock_gettime(CLOCK_MONOTONIC, &timer);
 
 	while (1) {
 		unsigned int stat;
@@ -58,12 +88,18 @@ static void *collector(void *arg) {
 		if (stat & bits.db) history[cur].db = 1;
 		if (stat & bits.cr) history[cur].cr = 1;
 		if (stat & bits.cb) history[cur].cb = 1;
+
+		getsrbm(&stat);
+		if (stat & bits.uvd) history[cur].uvd = 1;
+
+		getsrbm2(&stat);
+		if (stat & bits.vce0) history[cur].vce0 = 1;
+
 		getsclk(&history[cur].sclk);
 		getmclk(&history[cur].mclk);
 
-		usleep(sleeptime);
 		cur++;
-		cur %= ticks * dumpinterval;
+		cur %= histsize;
 
 		// One second has passed, we have one sec's worth of data
 		if (cur == 0) {
@@ -71,7 +107,7 @@ static void *collector(void *arg) {
 
 			memset(&res[curres], 0, sizeof(struct bits_t));
 
-			for (i = 0; i < ticks * dumpinterval; i++) {
+			for (i = 0; i < histsize; i++) {
 				res[curres].ee += history[i].ee;
 				res[curres].vgt += history[i].vgt;
 				res[curres].gui += history[i].gui;
@@ -86,6 +122,8 @@ static void *collector(void *arg) {
 				res[curres].db += history[i].db;
 				res[curres].cb += history[i].cb;
 				res[curres].cr += history[i].cr;
+				res[curres].uvd += history[i].uvd;
+				res[curres].vce0 += history[i].vce0;
 				res[curres].mclk += history[i].mclk;
 				res[curres].sclk += history[i].sclk;
 			}
@@ -99,6 +137,8 @@ static void *collector(void *arg) {
 			curres++;
 			curres %= 2;
 		}
+
+		sleep_until(&timer, sleeptime);
 	}
 
 	return NULL;

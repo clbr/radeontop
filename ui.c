@@ -87,9 +87,13 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 
 	initscr();
 	noecho();
-	halfdelay(10);
 	curs_set(0);
 	clear();
+
+	if (dumpinterval >= TIME_RES / 10)
+		halfdelay(1);
+	else
+		nodelay(stdscr, 1);
 
 	start_color();
 	init_pair(1, COLOR_GREEN, COLOR_BLACK);
@@ -98,7 +102,12 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 	init_pair(4, COLOR_MAGENTA, COLOR_BLACK);
 	init_pair(5, COLOR_YELLOW, COLOR_BLACK);
 
-	const unsigned int bigh = 23;
+	const unsigned int bigh = 13 +
+		!!bits.ee * 2 + !!bits.vgt * 2 + !!bits.sh +
+		!!bits.tc + !!bits.smx + !!bits.cr +
+		(bits.vram || bits.gtt) + !!bits.vram + !!bits.gtt +
+		!!sclk_max * 3 +
+		(bits.uvd || bits.vce0) + !!bits.uvd + !!bits.vce0;
 
 	// Screen dimensions. (Re)calculated only when resize is non-zero.
 	unsigned int h = 1, w = 1, hw = 1;
@@ -124,7 +133,7 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 
 		// Again, no need to protect these. Worst that happens is a slightly
 		// wrong number.
-		float k = 1.0f / ticks / dumpinterval;
+		float k = 1.0f * TIME_RES / ticks / dumpinterval;
 		float ee = 100 * results->ee * k;
 		float vgt = 100 * results->vgt * k;
 		float gui = 100 * results->gui * k;
@@ -139,6 +148,8 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 		float db = 100 * results->db * k;
 		float cr = 100 * results->cr * k;
 		float cb = 100 * results->cb * k;
+		float uvd = 100 * results->uvd * k;
+		float vce0 = 100 * results->vce0 * k;
 		float vram = 100.0f * results->vram / vramsize;
 		float vrammb = results->vram / 1024.0f / 1024.0f;
 		float vramsizemb = vramsize / 1024.0f / 1024.0f;
@@ -161,19 +172,23 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 
 		unsigned int start = 4;
 
-		percentage(start, w, ee);
-		printright(start++, hw, _("Event Engine %6.2f%%"), ee);
+		if (bits.ee) {
+			percentage(start, w, ee);
+			printright(start++, hw, _("Event Engine %6.2f%%"), ee);
 
-		// Enough height?
-		if (h > bigh) start++;
+			// Enough height?
+			if (h > bigh) start++;
+		}
 
-		if (color) attron(COLOR_PAIR(2));
-		percentage(start, w, vgt);
-		printright(start++, hw, _("Vertex Grouper + Tesselator %6.2f%%"), vgt);
-		if (color) attroff(COLOR_PAIR(2));
+		if (bits.vgt) {
+			if (color) attron(COLOR_PAIR(2));
+			percentage(start, w, vgt);
+			printright(start++, hw, _("Vertex Grouper + Tesselator %6.2f%%"), vgt);
+			if (color) attroff(COLOR_PAIR(2));
 
-		// Enough height?
-		if (h > bigh) start++;
+			// Enough height?
+			if (h > bigh) start++;
+		}
 
 		if (color) attron(COLOR_PAIR(3));
 		percentage(start, w, ta);
@@ -193,8 +208,10 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 		percentage(start, w, sx);
 		printright(start++, hw, _("Shader Export %6.2f%%"), sx);
 
-		percentage(start, w, sh);
-		printright(start++, hw, _("Sequencer Instruction Cache %6.2f%%"), sh);
+		if (bits.sh) {
+			percentage(start, w, sh);
+			printright(start++, hw, _("Sequencer Instruction Cache %6.2f%%"), sh);
+		}
 
 		percentage(start, w, spi);
 		printright(start++, hw, _("Shader Interpolator %6.2f%%"), spi);
@@ -254,6 +271,7 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 		}
 
 		if (sclk_max != 0 && sclk > 0) {
+			if (h > bigh) start++;
 			if (color) attron(COLOR_PAIR(3));
 			percentage(start, w, mclk);
 			printright(start++, hw, _("%.2fG / %.2fG Memory Clock %6.2f%%"),
@@ -262,6 +280,19 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 			printright(start++, hw, _("%.2fG / %.2fG Shader Clock %6.2f%%"),
 					sclk_ghz, sclk_max * 1e-6f, sclk);
 			if (color) attroff(COLOR_PAIR(3));
+		}
+
+		if (bits.uvd || bits.vce0)
+			if (h > bigh) start++;
+
+		if (bits.uvd) {
+			percentage(start, w, uvd);
+			printright(start++, hw, _("Unified Video Decoder %6.2f%%"), uvd);
+		}
+
+		if (bits.vce0) {
+			percentage(start, w, vce0);
+			printright(start++, hw, _("Video Compression Engine %6.2f%%"), vce0);
 		}
 
 		//move the cursor away to fix some resizing artifacts on some terminals
@@ -273,6 +304,9 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 		if (c == 'q' || c == 'Q') break;
 		if (c == 'c' || c == 'C') color = !color;
 		if (c == KEY_RESIZE) resize = 1;
+
+		if (dumpinterval < TIME_RES / 10)
+			usleep(dumpinterval * (1e6 / TIME_RES));
 	}
 
 	endwin();

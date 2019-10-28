@@ -79,6 +79,7 @@ Build options can be specified to having the following variables being set to "1
     nostrip disable stripping, default off
     plain   apply neither gcc's -g nor -s.
     xcb     enable libxcb to run unprivileged in Xorg, default on
+    xcbdl   enable libxcb dynamic linking at runtime, default on
     amdgpu  enable amdgpu usage reporting, default auto (requires libdrm >= 2.4.63)
 
 
@@ -87,3 +88,13 @@ Example:
     make amdgpu=1 xcb=1
 
 This will build radeontop with amdgpu reporting and xcb support.
+
+
+Packaging notes
+--------
+
+Installation of libxcb-dri2 is optional. It allows radeontop to run as
+a normal user under Xorg when a DRM primary node is opened.
+It is not needed when opening a render node, which is the default.
+On Linux, /dev/dri/card0 is a primary node, while /dev/dri/renderD128
+is a render node.

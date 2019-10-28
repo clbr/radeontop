@@ -34,7 +34,7 @@ static void help(const char * const me, const unsigned int ticks, const unsigned
 		"-b --bus 3		Pick card from this PCI bus (hexadecimal)\n"
 		"-c --color		Enable colors\n"
 		"-d --dump file		Dump data to this file, - for stdout\n"
-		"-i --dump-interval 1	Number of seconds between dumps (default %u)\n"
+		"-i --interval 0.1	Number of seconds between data output (default %u)\n"
 		"-l --limit 3		Quit after dumping N lines, default forever\n"
 		"-m --mem		Force the /dev/mem path, for the proprietary driver\n"
 		"-p --path device	Open DRM device node by path\n"
@@ -60,13 +60,13 @@ int main(int argc, char **argv) {
 	unsigned int device_id = 0;
 	unsigned int limit = 0;
 	char *dump = NULL;
-	unsigned int dumpinterval = default_dumpinterval;
+	unsigned int dumpinterval = default_dumpinterval * TIME_RES;
 	const char *path = NULL;
 
 	// Translations
 #ifdef ENABLE_NLS
 	setlocale(LC_ALL, "");
-	bindtextdomain("radeontop", "/usr/share/locale");
+	bindtextdomain("radeontop", LOCALEDIR);
 	textdomain("radeontop");
 #endif
 
@@ -76,6 +76,7 @@ int main(int argc, char **argv) {
 		{"color", 0, 0, 'c'},
 		{"dump", 1, 0, 'd'},
 		{"dump-interval", 1, 0, 'i'},
+		{"interval", 1, 0, 'i'},
 		{"help", 0, 0, 'h'},
 		{"limit", 1, 0, 'l'},
 		{"mem", 0, 0, 'm'},
@@ -116,7 +117,7 @@ int main(int argc, char **argv) {
 				dump = optarg;
 			break;
 			case 'i':
-				dumpinterval = atoi(optarg);
+				dumpinterval = atof(optarg) * TIME_RES;
 				if (dumpinterval < 1)
 					dumpinterval = 1;
 			break;

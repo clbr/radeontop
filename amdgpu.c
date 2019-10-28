@@ -26,6 +26,16 @@ static int getgrbm_amdgpu(uint32_t *out) {
 					0xffffffff, 0, out);
 }
 
+static int getsrbm_amdgpu(uint32_t *out) {
+	return amdgpu_read_mm_registers(amdgpu_dev, SRBM_STATUS / 4, 1,
+					0xffffffff, 0, out);
+}
+
+static int getsrbm2_amdgpu(uint32_t *out) {
+	return amdgpu_read_mm_registers(amdgpu_dev, SRBM_STATUS2 / 4, 1,
+					0xffffffff, 0, out);
+}
+
 static int getvram_amdgpu(uint64_t *out) {
 	return amdgpu_query_info(amdgpu_dev, AMDGPU_INFO_VRAM_USAGE,
 				sizeof(uint64_t), out);
@@ -54,21 +64,34 @@ static int getmclk_amdgpu(uint32_t *out) {
 void init_amdgpu(int fd) {
 	uint32_t drm_major, drm_minor, out32;
 	uint64_t out64;
+	struct amdgpu_gpu_info gpu;
 	int ret;
 
 	if (amdgpu_device_initialize(fd, &drm_major, &drm_minor, &amdgpu_dev))
 		return;
+
+	amdgpu_query_gpu_info(amdgpu_dev, &gpu);
 
 	if (!(ret = getgrbm_amdgpu(&out32)))
 		getgrbm = getgrbm_amdgpu;
 	else
 		drmError(ret, _("Failed to get GPU usage"));
 
+	if (DRM_ATLEAST_VERSION(3, 1) && gpu.family_id >= AMDGPU_FAMILY_VI) {
+		if (!(ret = getsrbm_amdgpu(&out32)))
+			getsrbm = getsrbm_amdgpu;
+		else
+			drmError(ret, _("Failed to get UVD usage"));
+
+		if (!(ret = getsrbm2_amdgpu(&out32)))
+			getsrbm2 = getsrbm2_amdgpu;
+		else
+			drmError(ret, _("Failed to get VCE usage"));
+	} else if (gpu.family_id >= AMDGPU_FAMILY_VI)
+		fprintf(stderr, _("UVD/VCE reporting is disabled (amdgpu kernel driver 3.1.0 required)\n"));
+
 #ifdef HAS_AMDGPU_QUERY_SENSOR_INFO
 	if (DRM_ATLEAST_VERSION(3, 11)) {
-		struct amdgpu_gpu_info gpu;
-
-		amdgpu_query_gpu_info(amdgpu_dev, &gpu);
 		sclk_max = gpu.max_engine_clk;
 		mclk_max = gpu.max_memory_clk;
 

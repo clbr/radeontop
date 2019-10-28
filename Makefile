@@ -7,48 +7,68 @@
 #	nostrip	disable stripping, default off
 #	plain	apply neither -g nor -s.
 #	xcb	enable libxcb to run unprivileged in Xorg, default on
+#	xcbdl	enable libxcb dynamic linking at runtime, default on
 #	amdgpu	enable amdgpu usage reporting, default auto
 #		it requires libdrm >= 2.4.63
 
 PREFIX ?= /usr
+MANDIR ?= $(PREFIX)/share/man
+LOCALEDIR ?= $(PREFIX)/share/locale
 INSTALL ?= install
-LIBDIR ?= lib
-MANDIR ?= share/man
+PKG_CONFIG ?= pkg-config
+TARGET_OS ?= $(shell uname)
 
 nls ?= 1
 xcb ?= 1
 
 bin = radeontop
-xcblib = libradeontop_xcb.so
-src = $(filter-out amdgpu.c auth_xcb.c,$(wildcard *.c))
+src = $(filter-out amdgpu.c, $(wildcard *.c))
 verh = include/version.h
 
 CFLAGS_SECTIONED = -ffunction-sections -fdata-sections
 LDFLAGS_SECTIONED = -Wl,-gc-sections
 
-CFLAGS ?= -Os
+CFLAGS ?= -Os $(CFLAGS_SECTIONED)
 CFLAGS += -Wall -Wextra -pthread
 CFLAGS += -Iinclude
-CFLAGS += $(CFLAGS_SECTIONED)
-CFLAGS += $(shell pkg-config --cflags pciaccess)
-CFLAGS += $(shell pkg-config --cflags libdrm)
+CFLAGS += $(shell $(PKG_CONFIG) --cflags pciaccess)
+CFLAGS += $(shell $(PKG_CONFIG) --cflags libdrm)
 ifeq ($(xcb), 1)
-	CFLAGS += $(shell pkg-config --cflags xcb xcb-dri2)
+	CFLAGS += $(shell $(PKG_CONFIG) --cflags xcb xcb-dri2)
 	CFLAGS += -DENABLE_XCB=1
+	xcbdl ?= 1
 endif
-CFLAGS += $(shell pkg-config --cflags ncurses 2>/dev/null)
+
+ifeq ($(xcbdl), 1)
+	CFLAGS += -DENABLE_XCB_DL=1
+endif
+
+ifneq ($(filter $(TARGET_OS), GNU/kFreeBSD Linux),)
+	libdl = -ldl
+else ifneq ($(filter $(TARGET_OS), DragonFly FreeBSD OpenBSD),)
+	libintl = -lintl
+endif
+
+ifeq ($(shell $(PKG_CONFIG) ncursesw && echo 1), 1)
+	ncurses = ncursesw
+else
+	ncurses = ncurses
+endif
+
+CFLAGS += $(shell $(PKG_CONFIG) --cflags $(ncurses))
 
 # Comment this if you don't want translations
 ifeq ($(nls), 1)
-	CFLAGS += -DENABLE_NLS=1
+	CFLAGS += -DENABLE_NLS=1 -DLOCALEDIR=\"$(LOCALEDIR)\"
+	LIBS += $(libintl)
 endif
 
 # autodetect libdrm features
-ifeq ($(shell pkg-config --atleast-version=2.4.66 libdrm && echo ok), ok)
+ifeq ($(shell $(PKG_CONFIG) 'libdrm >= 2.4.66' && echo 1), 1)
 	CFLAGS += -DHAS_DRMGETDEVICE=1
 endif
 
-ifeq ($(shell pkg-config --atleast-version=2 libdrm_amdgpu && echo ok), ok)
+ifeq ($(shell $(PKG_CONFIG) libdrm_amdgpu && echo 1), 1)
 	amdgpu ?= 1
 else
 	amdgpu ?= 0
@@ -57,9 +77,9 @@ endif
 ifeq ($(amdgpu), 1)
 	src += amdgpu.c
 	CFLAGS += -DENABLE_AMDGPU=1
-	LIBS += $(shell pkg-config --libs libdrm_amdgpu)
+	LIBS += $(shell $(PKG_CONFIG) --libs libdrm_amdgpu)
 
-	ifeq ($(shell pkg-config --atleast-version=2.4.79 libdrm_amdgpu && echo ok), ok)
+	ifeq ($(shell $(PKG_CONFIG) 'libdrm_amdgpu >= 2.4.79' && echo 1), 1)
 		CFLAGS += -DHAS_AMDGPU_QUERY_SENSOR_INFO=1
 	endif
 endif
@@ -73,30 +93,27 @@ endif
 endif
 
 obj = $(src:.c=.o)
-LDFLAGS ?= -Wl,-O1
-LDFLAGS += $(LDFLAGS_SECTIONED)
-LIBS += $(shell pkg-config --libs pciaccess)
-LIBS += $(shell pkg-config --libs libdrm)
+LDFLAGS ?= -Wl,-O1 $(LDFLAGS_SECTIONED)
+LIBS += $(shell $(PKG_CONFIG) --libs pciaccess)
+LIBS += $(shell $(PKG_CONFIG) --libs libdrm)
 ifeq ($(xcb), 1)
-	xcb_LIBS += $(shell pkg-config --libs xcb xcb-dri2)
-	LIBS += -ldl
+	libxcb = $(shell $(PKG_CONFIG) --libs xcb xcb-dri2)
+endif
+
+ifeq ($(xcbdl), 1)
+	LIBS += $(libdl)
+else
+	LIBS += $(libxcb)
 endif
 
 # On some distros, you might have to change this to ncursesw
-LIBS += $(shell pkg-config --libs ncursesw 2>/dev/null || \
-		shell pkg-config --libs ncurses 2>/dev/null || \
-		echo "-lncurses")
+LIBS += $(shell $(PKG_CONFIG) --libs $(ncurses))
+
+export PREFIX LOCALEDIR INSTALL
 
 .PHONY: all clean install man dist
 
 all: $(bin)
-
-ifeq ($(xcb), 1)
-all: $(xcblib)
-
-$(xcblib): auth_xcb.c $(wildcard include/*.h) $(verh)
-	$(CC) -shared -fPIC -Wl,-soname,$@ -o $@ $< $(CFLAGS) $(LDFLAGS) $(xcb_LIBS)
-endif
 
 $(obj): $(wildcard include/*.h) $(verh)
 
@@ -104,9 +121,10 @@ $(bin): $(obj)
 	$(CC) -o $(bin) $(obj) $(CFLAGS) $(LDFLAGS) $(LIBS)
 
 clean:
-	rm -f *.o $(bin) $(xcblib)
+	rm -f *.o $(bin)
 
 .git:
+	mkdir .git
 
 $(verh): .git
 	./getver.sh
@@ -116,13 +134,12 @@ trans:
 	--package-name radeontop
 
 install: all
-	$(INSTALL) -D -m755 $(bin) $(DESTDIR)/$(PREFIX)/sbin/$(bin)
-ifeq ($(xcb), 1)
-	$(INSTALL) -D -m755 $(xcblib) $(DESTDIR)/$(PREFIX)/$(LIBDIR)/$(xcblib)
-endif
-	$(INSTALL) -D -m644 radeontop.1 $(DESTDIR)/$(PREFIX)/$(MANDIR)/man1/radeontop.1
+	$(INSTALL) -d $(DESTDIR)$(PREFIX)/sbin
+	$(INSTALL) $(bin) $(DESTDIR)$(PREFIX)/sbin
+	$(INSTALL) -d $(DESTDIR)$(MANDIR)/man1
+	$(INSTALL) -m644 radeontop.1 $(DESTDIR)$(MANDIR)/man1
 ifeq ($(nls), 1)
-	$(MAKE) -C translations install PREFIX=$(PREFIX)
+	$(MAKE) -C translations install
 endif
 
 man:
