@@ -11,7 +11,6 @@
 #		it requires libdrm >= 2.4.63
 
 PREFIX ?= /usr
-LIBDIR ?= $(PREFIX)/lib
 MANDIR ?= $(PREFIX)/share/man
 LOCALEDIR ?= $(PREFIX)/share/locale
 INSTALL ?= install
@@ -22,8 +21,7 @@ nls ?= 1
 xcb ?= 1
 
 bin = radeontop
-xcblib = libradeontop_xcb.so
-src = $(filter-out amdgpu.c auth_xcb.c,$(wildcard *.c))
+src = $(filter-out amdgpu.c, $(wildcard *.c))
 verh = include/version.h
 
 CFLAGS_SECTIONED = -ffunction-sections -fdata-sections
@@ -93,7 +91,7 @@ LDFLAGS ?= -Wl,-O1 $(LDFLAGS_SECTIONED)
 LIBS += $(shell $(PKG_CONFIG) --libs pciaccess)
 LIBS += $(shell $(PKG_CONFIG) --libs libdrm)
 ifeq ($(xcb), 1)
-	xcb_LIBS += $(shell $(PKG_CONFIG) --libs xcb xcb-dri2)
+	LIBS += $(shell $(PKG_CONFIG) --libs xcb xcb-dri2)
 	LIBS += $(libdl)
 endif
 
@@ -106,20 +104,13 @@ export PREFIX LOCALEDIR INSTALL
 
 all: $(bin)
 
-ifeq ($(xcb), 1)
-all: $(xcblib)
-
-$(xcblib): auth_xcb.c $(wildcard include/*.h) $(verh)
-	$(CC) -shared -fPIC -Wl,-soname,$@ -o $@ $< $(CFLAGS) $(LDFLAGS) $(xcb_LIBS)
-endif
-
 $(obj): $(wildcard include/*.h) $(verh)
 
 $(bin): $(obj)
 	$(CC) -o $(bin) $(obj) $(CFLAGS) $(LDFLAGS) $(LIBS)
 
 clean:
-	rm -f *.o $(bin) $(xcblib)
+	rm -f *.o $(bin)
 
 .git:
 	mkdir .git
@@ -134,10 +125,6 @@ trans:
 install: all
 	$(INSTALL) -d $(DESTDIR)$(PREFIX)/sbin
 	$(INSTALL) $(bin) $(DESTDIR)$(PREFIX)/sbin
-ifeq ($(xcb), 1)
-	$(INSTALL) -d $(DESTDIR)$(LIBDIR)
-	$(INSTALL) $(xcblib) $(DESTDIR)$(LIBDIR)
-endif
 	$(INSTALL) -d $(DESTDIR)$(MANDIR)/man1
 	$(INSTALL) -m644 radeontop.1 $(DESTDIR)$(MANDIR)/man1
 ifeq ($(nls), 1)
