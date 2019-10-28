@@ -7,6 +7,7 @@
 #	nostrip	disable stripping, default off
 #	plain	apply neither -g nor -s.
 #	xcb	enable libxcb to run unprivileged in Xorg, default on
+#	xcbdl	enable libxcb dynamic linking at runtime, default on
 #	amdgpu	enable amdgpu usage reporting, default auto
 #		it requires libdrm >= 2.4.63
 
@@ -35,6 +36,11 @@ CFLAGS += $(shell $(PKG_CONFIG) --cflags libdrm)
 ifeq ($(xcb), 1)
 	CFLAGS += $(shell $(PKG_CONFIG) --cflags xcb xcb-dri2)
 	CFLAGS += -DENABLE_XCB=1
+	xcbdl ?= 1
+endif
+
+ifeq ($(xcbdl), 1)
+	CFLAGS += -DENABLE_XCB_DL=1
 endif
 
 ifneq ($(filter $(TARGET_OS), GNU/kFreeBSD Linux),)
@@ -91,8 +97,13 @@ LDFLAGS ?= -Wl,-O1 $(LDFLAGS_SECTIONED)
 LIBS += $(shell $(PKG_CONFIG) --libs pciaccess)
 LIBS += $(shell $(PKG_CONFIG) --libs libdrm)
 ifeq ($(xcb), 1)
-	LIBS += $(shell $(PKG_CONFIG) --libs xcb xcb-dri2)
+	libxcb = $(shell $(PKG_CONFIG) --libs xcb xcb-dri2)
+endif
+
+ifeq ($(xcbdl), 1)
 	LIBS += $(libdl)
+else
+	LIBS += $(libxcb)
 endif
 
 # On some distros, you might have to change this to ncursesw
