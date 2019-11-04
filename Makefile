@@ -77,6 +77,7 @@ LDFLAGS ?= -Wl,-O1
 LDFLAGS += $(LDFLAGS_SECTIONED)
 LIBS += $(shell pkg-config --libs pciaccess)
 LIBS += $(shell pkg-config --libs libdrm)
+LIBS += -lm
 ifeq ($(xcb), 1)
 	xcb_LIBS += $(shell pkg-config --libs xcb xcb-dri2)
 	LIBS += -ldl
