@@ -15,6 +15,7 @@
 */
 
 #include "radeontop.h"
+#include <math.h>
 #include <ncurses.h>
 #include <stdarg.h>
 
@@ -69,7 +70,7 @@ static void percentage(const unsigned int y, const unsigned int w, const float p
 	const unsigned int x = (w/2) + 2;
 	unsigned int len = w - x - 1;
 
-	len = len * (p / 100.0);
+	len = roundf(len * (p / 100.0f));
 
 	attron(A_REVERSE);
 	mvhline(y, x, ' ', len);
