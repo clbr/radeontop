@@ -93,11 +93,20 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 	clear();
 
 	start_color();
+#ifdef ENABLE_TRANSPARENT
+	use_default_colors();
+	init_pair(1, COLOR_GREEN, -1);
+	init_pair(2, COLOR_RED, -1);
+	init_pair(3, COLOR_CYAN, -1);
+	init_pair(4, COLOR_MAGENTA, -1);
+	init_pair(5, COLOR_YELLOW, -1);
+#else
 	init_pair(1, COLOR_GREEN, COLOR_BLACK);
 	init_pair(2, COLOR_RED, COLOR_BLACK);
 	init_pair(3, COLOR_CYAN, COLOR_BLACK);
 	init_pair(4, COLOR_MAGENTA, COLOR_BLACK);
 	init_pair(5, COLOR_YELLOW, COLOR_BLACK);
+#endif
 
 	const unsigned int bigh = 23;
 
