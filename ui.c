@@ -77,7 +77,7 @@ static void percentage(const unsigned int y, const unsigned int w, const float p
 	attroff(A_REVERSE);
 }
 
-void present(const unsigned int ticks, const char card[], unsigned int color,
+void present(const unsigned int ticks, const char card[], unsigned int color,unsigned int transparency,
 		const unsigned char bus, const unsigned int dumpinterval) {
 
 	printf(_("Collecting data, please wait....\n"));
@@ -93,11 +93,23 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 	clear();
 
 	start_color();
-	init_pair(1, COLOR_GREEN, COLOR_BLACK);
-	init_pair(2, COLOR_RED, COLOR_BLACK);
-	init_pair(3, COLOR_CYAN, COLOR_BLACK);
-	init_pair(4, COLOR_MAGENTA, COLOR_BLACK);
-	init_pair(5, COLOR_YELLOW, COLOR_BLACK);
+	if (transparency)
+	{
+		use_default_colors();
+		init_pair(1, COLOR_GREEN, -1);
+		init_pair(2, COLOR_RED, -1);
+		init_pair(3, COLOR_CYAN, -1);
+		init_pair(4, COLOR_MAGENTA, -1);
+		init_pair(5, COLOR_YELLOW, -1);
+	}else{
+		init_pair(1, COLOR_GREEN, COLOR_BLACK);
+		init_pair(2, COLOR_RED, COLOR_BLACK);
+		init_pair(3, COLOR_CYAN, COLOR_BLACK);
+		init_pair(4, COLOR_MAGENTA, COLOR_BLACK);
+		init_pair(5, COLOR_YELLOW, COLOR_BLACK);
+	}
+	
+	
 
 	const unsigned int bigh = 23;
 

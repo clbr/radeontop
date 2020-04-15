@@ -64,7 +64,7 @@ void collect(unsigned int ticks, unsigned int dumpinterval);
 extern struct bits_t *results;
 
 // ui.c
-void present(const unsigned int ticks, const char card[], unsigned int color, const unsigned char bus, const unsigned int dumpinterval);
+void present(const unsigned int ticks, const char card[], unsigned int color, unsigned int transparency, const unsigned char bus, const unsigned int dumpinterval);
 
 // dump.c
 void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit, const unsigned char bus, const unsigned int dumpinterval);

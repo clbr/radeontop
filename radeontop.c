@@ -39,6 +39,7 @@ static void help(const char * const me, const unsigned int ticks, const unsigned
 		"-m --mem		Force the /dev/mem path, for the proprietary driver\n"
 		"-p --path device	Open DRM device node by path\n"
 		"-t --ticks 50		Samples per second (default %u)\n"
+		"-T --transparency	Enable transparency\n"
 		"\n"
 		"-h --help		Show this help\n"
 		"-v --version		Show the version\n"),
@@ -55,6 +56,7 @@ int main(int argc, char **argv) {
 
 	unsigned int ticks = default_ticks;
 	unsigned char color = 0;
+	unsigned char transparency = 0;
 	short bus = -1;
 	unsigned char forcemem = 0;
 	unsigned int device_id = 0;
@@ -81,12 +83,13 @@ int main(int argc, char **argv) {
 		{"mem", 0, 0, 'm'},
 		{"path", 1, 0, 'p'},
 		{"ticks", 1, 0, 't'},
+		{"transparency", 0, 0, 'T'},
 		{"version", 0, 0, 'v'},
 		{0, 0, 0, 0}
 	};
 
 	while (1) {
-		int c = getopt_long(argc, argv, "b:cd:hi:l:mp:t:v", opts, NULL);
+		int c = getopt_long(argc, argv, "b:cTd:hi:l:mp:t:v", opts, NULL);
 		if (c == -1) break;
 
 		switch(c) {
@@ -96,6 +99,9 @@ int main(int argc, char **argv) {
 			break;
 			case 't':
 				ticks = atoi(optarg);
+			break;
+			case 'T':
+				transparency = 1;
 			break;
 			case 'c':
 				color = 1;
@@ -147,7 +153,7 @@ int main(int argc, char **argv) {
 	if (dump)
 		dumpdata(ticks, dump, limit, bus, dumpinterval);
 	else
-		present(ticks, cardname, color, bus, dumpinterval);
+		present(ticks, cardname, color,transparency, bus, dumpinterval);
 
 	cleanup();
 	return 0;
