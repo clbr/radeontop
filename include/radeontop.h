@@ -124,7 +124,8 @@ enum radeon_family {
 	NAVI10,
 	NAVI14,
 	RENOIR,
-	NAVI12
+	NAVI12,
+	SIENNA_CICHLID,
 };
 
 extern const char * const family_str[];
