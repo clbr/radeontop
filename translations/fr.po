@@ -1,0 +1,186 @@
+# French translation for radeontop
+# Copyright (c) 2013 Rosetta Contributors and Canonical Ltd 2013
+# This file is distributed under the same license as the radeontop package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: radeontop\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2014-04-23 15:04+0300\n"
+"PO-Revision-Date: 2016-01-09 16:18+0000\n"
+"Last-Translator: Pierre Barthélemy <pimanipb@gmail.com>\n"
+"Language-Team: French <fr@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2020-12-26 18:12+0000\n"
+"X-Generator: Launchpad (build 34b3ffd45c9543b7f7aa5aa313925241e9e7ca3f)\n"
+
+#: detect.c:85
+msgid "Failed to init pciaccess"
+msgstr "Échec d'initialisation de pciacces"
+
+#: detect.c:112
+msgid "Can't find Radeon cards"
+msgstr "Ne peux pas trouver de carte Radeon"
+
+#: detect.c:114
+msgid "Can't get the register area size"
+msgstr "Ne peux pas obtenir la taille de zone de registre"
+
+#: detect.c:119
+msgid "Can't open /dev/mem, are you root?"
+msgstr "Ne peut pas ouvrir /dev/mem, êtes-vous super-utilisateur ?"
+
+#: detect.c:123
+msgid "mmap failed"
+msgstr "Echec de mmap"
+
+#: detect.c:133
+#, c-format
+msgid "Failed to open DRM node, no VRAM support.\n"
+msgstr "Échec d'ouverture de la node DRM, la VRAM n'est pas suporté\n"
+
+#: detect.c:145
+#, c-format
+msgid "Kernel too old for VRAM reporting.\n"
+msgstr "Kernel trop ancien pour les rapport sur la VRAM\n"
+
+#: detect.c:156
+#, c-format
+msgid "Failed to get VRAM size, error %d\n"
+msgstr "Échec d’acquisition de la taille de la VRAM, erreur %d\n"
+
+#: detect.c:164
+#, c-format
+msgid "Failed to get VRAM usage, kernel likely too old\n"
+msgstr ""
+"Échec d'obtention de l'usage de la VRAM, le kernel est surement trop vieux\n"
+
+#: dump.c:46
+#, c-format
+msgid "Dumping to %s, "
+msgstr "Basculement vers %s "
+
+#: dump.c:49
+#, c-format
+msgid "line limit %u.\n"
+msgstr ""
+
+#: dump.c:51
+msgid "until termination."
+msgstr "jusqu'à la fin."
+
+#: dump.c:61
+msgid "Can't open file for writing."
+msgstr "Ne peux pas ouvrir le fichier pour écriture"
+
+#: radeontop.c:33
+#, c-format
+msgid ""
+"\n"
+"\tRadeonTop for R600 and above.\n"
+"\n"
+"\tUsage: %s [-ch] [-b bus] [-d file] [-l limit] [-t ticks]\n"
+"\n"
+"-b --bus 3\t\tPick card from this PCI bus\n"
+"-c --color\t\tEnable colors\n"
+"-d --dump file\t\tDump data to this file, - for stdout\n"
+"-l --limit 3\t\tQuit after dumping N lines, default forever\n"
+"-t --ticks 50\t\tSamples per second (default %u)\n"
+"\n"
+"-h --help\t\tShow this help\n"
+"-v --version\t\tShow the version\n"
+msgstr ""
+
+#: radeontop.c:118
+msgid "Unknown Radeon card. <= R500 won't work, new cards might."
+msgstr ""
+"Carte Radeon inconnus. <= R500 ne vont pas marcher, les nouvelles cartes "
+"pourrait."
+
+#: ui.c:81
+#, c-format
+msgid "Collecting data, please wait....\n"
+msgstr "Données collectées, veuillez patienter...\n"
+
+#: ui.c:111
+#, c-format
+msgid "radeontop %s, running on %s, %u samples/sec"
+msgstr "radeontop %s, tourne à %s, %u données/seconde"
+
+#: ui.c:145
+#, c-format
+msgid "Graphics pipe %6.2f%%"
+msgstr ""
+
+#: ui.c:151
+#, c-format
+msgid "Event Engine %6.2f%%"
+msgstr ""
+
+#: ui.c:158
+#, c-format
+msgid "Vertex Grouper + Tesselator %6.2f%%"
+msgstr ""
+
+#: ui.c:166
+#, c-format
+msgid "Texture Addresser %6.2f%%"
+msgstr ""
+
+#: ui.c:171
+#, c-format
+msgid "Texture Cache %6.2f%%"
+msgstr "Cache de texture %6.2f%%"
+
+#: ui.c:180
+#, c-format
+msgid "Shader Export %6.2f%%"
+msgstr ""
+
+#: ui.c:183
+#, c-format
+msgid "Sequencer Instruction Cache %6.2f%%"
+msgstr ""
+
+#: ui.c:186
+#, c-format
+msgid "Shader Interpolator %6.2f%%"
+msgstr ""
+
+#: ui.c:191
+#, c-format
+msgid "Shader Memory Exchange %6.2f%%"
+msgstr ""
+
+#: ui.c:199
+#, c-format
+msgid "Scan Converter %6.2f%%"
+msgstr ""
+
+#: ui.c:202
+#, c-format
+msgid "Primitive Assembly %6.2f%%"
+msgstr ""
+
+#: ui.c:209
+#, c-format
+msgid "Depth Block %6.2f%%"
+msgstr ""
+
+#: ui.c:212
+#, c-format
+msgid "Color Block %6.2f%%"
+msgstr ""
+
+#: ui.c:217
+#, c-format
+msgid "Clip Rectangle %6.2f%%"
+msgstr ""
+
+#: ui.c:227
+#, c-format
+msgid "%.0fM / %.0fM VRAM %6.2f%%"
+msgstr "%.0fM / %.0fM VRAM %6.2f%%"

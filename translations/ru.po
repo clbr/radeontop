@@ -7,55 +7,77 @@ msgid ""
 msgstr ""
 "Project-Id-Version: radeontop\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2012-07-11 15:00+0300\n"
-"PO-Revision-Date: 2013-12-07 13:32+0000\n"
-"Last-Translator: Nikoli <Unknown>\n"
+"POT-Creation-Date: 2014-04-23 15:04+0300\n"
+"PO-Revision-Date: 2016-01-27 16:27+0000\n"
+"Last-Translator: Lev Lamberov <l.lamberov@gmail.com>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2013-12-07 14:24+0000\n"
-"X-Generator: Launchpad (build 16869)\n"
+"X-Launchpad-Export-Date: 2020-12-26 18:12+0000\n"
+"X-Generator: Launchpad (build 34b3ffd45c9543b7f7aa5aa313925241e9e7ca3f)\n"
 
-#: detect.c:26
+#: detect.c:85
 msgid "Failed to init pciaccess"
 msgstr "Не удалось инициализировать pciaccess"
 
-#: detect.c:53
+#: detect.c:112
 msgid "Can't find Radeon cards"
 msgstr "Не удалось найти карты Radeon"
 
-#: detect.c:55
+#: detect.c:114
 msgid "Can't get the register area size"
 msgstr "Не удалось получить размер register area"
 
-#: detect.c:60
+#: detect.c:119
 msgid "Can't open /dev/mem, are you root?"
 msgstr "Не удалось открыть /dev/mem, имеете ли вы права root?"
 
-#: detect.c:64
+#: detect.c:123
 msgid "mmap failed"
 msgstr "mmap не удался"
 
-#: dump.c:44
+#: detect.c:133
+#, c-format
+msgid "Failed to open DRM node, no VRAM support.\n"
+msgstr "Не удалось открыть ноду DRM, поддержка VRAM отсутствует.\n"
+
+#: detect.c:145
+#, c-format
+msgid "Kernel too old for VRAM reporting.\n"
+msgstr "Слишком старое ядро, нет поддержки вывода информации о VRAM.\n"
+
+#: detect.c:156
+#, c-format
+msgid "Failed to get VRAM size, error %d\n"
+msgstr "Не удалось получить сведения о размере VRAM, ошибка %d\n"
+
+#: detect.c:164
+#, c-format
+msgid "Failed to get VRAM usage, kernel likely too old\n"
+msgstr ""
+"Не удалось получить сведения об использовании VRAM, скорее всего "
+"используется слишком старое ядро\n"
+
+#: dump.c:46
 #, c-format
 msgid "Dumping to %s, "
 msgstr "Сбрасываем в %s, "
 
-#: dump.c:47
+#: dump.c:49
 #, c-format
 msgid "line limit %u.\n"
 msgstr "ограничение строк %u.\n"
 
-#: dump.c:49
+#: dump.c:51
 msgid "until termination."
 msgstr "до завершения."
 
-#: dump.c:59
+#: dump.c:61
 msgid "Can't open file for writing."
 msgstr "Не удалось открыть файл для записи."
 
-#: radeontop.c:37
+#: radeontop.c:33
 #, c-format
 msgid ""
 "\n"
@@ -86,87 +108,92 @@ msgstr ""
 "-h --help\t\tПоказать помощь\n"
 "-v --version\t\tПоказать версию\n"
 
-#: radeontop.c:122
+#: radeontop.c:118
 msgid "Unknown Radeon card. <= R500 won't work, new cards might."
 msgstr ""
 "Неизвестная видеокарта Radeon. <= R500 не будут работать, новые могут."
 
-#: ui.c:71
+#: ui.c:81
 #, c-format
 msgid "Collecting data, please wait....\n"
 msgstr "Сбор данных, пожалуйста, ждите....\n"
 
-#: ui.c:101
+#: ui.c:111
 #, c-format
 msgid "radeontop %s, running on %s, %u samples/sec"
 msgstr "radeontop %s запущен на %s, %u сэмплов/сек"
 
-#: ui.c:133
+#: ui.c:145
 #, c-format
 msgid "Graphics pipe %6.2f%%"
 msgstr "Графический канал %6.2f%%"
 
-#: ui.c:139
+#: ui.c:151
 #, c-format
 msgid "Event Engine %6.2f%%"
 msgstr "Обработка событий %6.2f%%"
 
-#: ui.c:146
+#: ui.c:158
 #, c-format
 msgid "Vertex Grouper + Tesselator %6.2f%%"
 msgstr "Вертексный группировщик + Тесселятор %6.2f%%"
 
-#: ui.c:154
+#: ui.c:166
 #, c-format
 msgid "Texture Addresser %6.2f%%"
 msgstr "Адрессовщик текстур %6.2f%%"
 
-#: ui.c:159
+#: ui.c:171
 #, c-format
 msgid "Texture Cache %6.2f%%"
 msgstr "Кэш текстур %6.2f%%"
 
-#: ui.c:168
+#: ui.c:180
 #, c-format
 msgid "Shader Export %6.2f%%"
 msgstr "Экспорт шейдеров %6.2f%%"
 
-#: ui.c:171
+#: ui.c:183
 #, c-format
 msgid "Sequencer Instruction Cache %6.2f%%"
 msgstr "Кэш секвенсора инструкций %6.2f%%"
 
-#: ui.c:174
+#: ui.c:186
 #, c-format
 msgid "Shader Interpolator %6.2f%%"
 msgstr "Интерполятор шейдеров %6.2f%%"
 
-#: ui.c:179
+#: ui.c:191
 #, c-format
 msgid "Shader Memory Exchange %6.2f%%"
 msgstr "Обмен шейдерной памяти %6.2f%%"
 
-#: ui.c:187
+#: ui.c:199
 #, c-format
 msgid "Scan Converter %6.2f%%"
 msgstr "Конвертер сканирования %6.2f%%"
 
-#: ui.c:190
+#: ui.c:202
 #, c-format
 msgid "Primitive Assembly %6.2f%%"
 msgstr "Сборщик примитивов %6.2f%%"
 
-#: ui.c:197
+#: ui.c:209
 #, c-format
 msgid "Depth Block %6.2f%%"
 msgstr "Блок глубины %6.2f%%"
 
-#: ui.c:200
+#: ui.c:212
 #, c-format
 msgid "Color Block %6.2f%%"
 msgstr "Блок цвета %6.2f%%"
 
-#: ui.c:205
+#: ui.c:217
 #, c-format
 msgid "Clip Rectangle %6.2f%%"
 msgstr "Обрезка прямоугольников %6.2f%%"
+
+#: ui.c:227
+#, c-format
+msgid "%.0fM / %.0fM VRAM %6.2f%%"
+msgstr "%.0fМ / %.0fМ VRAM %6.2f%%"

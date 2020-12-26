@@ -1,0 +1,205 @@
+# Czech translation for radeontop
+# Copyright (c) 2013 Rosetta Contributors and Canonical Ltd 2013
+# This file is distributed under the same license as the radeontop package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: radeontop\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2014-04-23 15:04+0300\n"
+"PO-Revision-Date: 2017-09-12 15:59+0000\n"
+"Last-Translator: Pavel Borecki <Unknown>\n"
+"Language-Team: Czech <cs@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2020-12-26 18:12+0000\n"
+"X-Generator: Launchpad (build 34b3ffd45c9543b7f7aa5aa313925241e9e7ca3f)\n"
+
+#: detect.c:85
+msgid "Failed to init pciaccess"
+msgstr "Inicializace knihovny pciaccess se nezdařila"
+
+#: detect.c:112
+msgid "Can't find Radeon cards"
+msgstr "Není přítomna karta Radeon"
+
+#: detect.c:114
+msgid "Can't get the register area size"
+msgstr "Nezdařilo se zjistit velikost oblasti registru"
+
+#: detect.c:119
+msgid "Can't open /dev/mem, are you root?"
+msgstr "Nelze otevřít /dev/mem - spouštíte s právy správce systému?"
+
+#: detect.c:123
+msgid "mmap failed"
+msgstr "systémové volání mmap se nezdařilo"
+
+#: detect.c:133
+#, c-format
+msgid "Failed to open DRM node, no VRAM support.\n"
+msgstr ""
+"Nezdařilo se otevřít uzel DRM - údaje o videopaměti proto nebudou k "
+"dispozici.\n"
+
+#: detect.c:145
+#, c-format
+msgid "Kernel too old for VRAM reporting.\n"
+msgstr ""
+"Příliš neaktuální jádro systému - nebude možné monitorovat využití "
+"videopaměti.\n"
+
+#: detect.c:156
+#, c-format
+msgid "Failed to get VRAM size, error %d\n"
+msgstr "Nezdařilo se zjistit velikost videopaměti, chyba %d\n"
+
+#: detect.c:164
+#, c-format
+msgid "Failed to get VRAM usage, kernel likely too old\n"
+msgstr ""
+"Nezdařilo se zjistit velikost videopaměti, nejspíš neaktuální jádro "
+"systému?\n"
+
+#: dump.c:46
+#, c-format
+msgid "Dumping to %s, "
+msgstr "Probíhá výpis do %s, "
+
+#: dump.c:49
+#, c-format
+msgid "line limit %u.\n"
+msgstr "max. počet řádků %u.\n"
+
+#: dump.c:51
+msgid "until termination."
+msgstr "dokud není dokončeno."
+
+#: dump.c:61
+msgid "Can't open file for writing."
+msgstr "Do souboru nelze zapisovat."
+
+#: radeontop.c:33
+#, c-format
+msgid ""
+"\n"
+"\tRadeonTop for R600 and above.\n"
+"\n"
+"\tUsage: %s [-ch] [-b bus] [-d file] [-l limit] [-t ticks]\n"
+"\n"
+"-b --bus 3\t\tPick card from this PCI bus\n"
+"-c --color\t\tEnable colors\n"
+"-d --dump file\t\tDump data to this file, - for stdout\n"
+"-l --limit 3\t\tQuit after dumping N lines, default forever\n"
+"-t --ticks 50\t\tSamples per second (default %u)\n"
+"\n"
+"-h --help\t\tShow this help\n"
+"-v --version\t\tShow the version\n"
+msgstr ""
+"\n"
+"\tRadeonTop pro čipy R600 a novější.\n"
+"\n"
+"\tPoužití: %s [-ch] [-b sběrnice] [-d soubor] [-l omezeni] [-t interval]\n"
+"\n"
+"-b --bus 3\t\tZvolit kartu na této PCI sběrnici\n"
+"-c --color\t\tZapnout barevné zobrazení\n"
+"-d --dump soubor\t\tZapsat data do tohoto souboru, nebo - pro výpis na "
+"standardní výstup\n"
+"-l --limit 3\t\tUkončit po vypsání N řádek, výchozí pokračovat bez omezení\n"
+"-t --ticks 50\t\tVzorků za sekundu (výchozí %u)\n"
+"\n"
+"-h --help\t\tVypsání této nápovědy\n"
+"-v --version\t\tVypsání verze\n"
+
+#: radeontop.c:118
+msgid "Unknown Radeon card. <= R500 won't work, new cards might."
+msgstr ""
+"Neznámá karta Radeon. Aplikace nefunguje s čipy R500 a staršími, s novějšími "
+"by měla."
+
+#: ui.c:81
+#, c-format
+msgid "Collecting data, please wait....\n"
+msgstr "Sběr dat - čekejte prosím...\n"
+
+#: ui.c:111
+#, c-format
+msgid "radeontop %s, running on %s, %u samples/sec"
+msgstr "radeontop %s, spuštěný na %s, %u vzorků/sek"
+
+#: ui.c:145
+#, c-format
+msgid "Graphics pipe %6.2f%%"
+msgstr "Grafické \"potrubí\" %6.2f%%"
+
+#: ui.c:151
+#, c-format
+msgid "Event Engine %6.2f%%"
+msgstr "Engine událostí %6.2f%%"
+
+#: ui.c:158
+#, c-format
+msgid "Vertex Grouper + Tesselator %6.2f%%"
+msgstr "Obvody pro seskupování vertexů a teselaci %6.2f%%"
+
+#: ui.c:166
+#, c-format
+msgid "Texture Addresser %6.2f%%"
+msgstr "Popisovač textur %6.2f%%"
+
+#: ui.c:171
+#, c-format
+msgid "Texture Cache %6.2f%%"
+msgstr "Mezipaměť textur %6.2f%%"
+
+#: ui.c:180
+#, c-format
+msgid "Shader Export %6.2f%%"
+msgstr "Export obvodů pro stínování %6.2f%%"
+
+#: ui.c:183
+#, c-format
+msgid "Sequencer Instruction Cache %6.2f%%"
+msgstr "Mezipaměť instrukcí sekvenceru %6.2f%%"
+
+#: ui.c:186
+#, c-format
+msgid "Shader Interpolator %6.2f%%"
+msgstr "Obvody pro interpolaci stínů %6.2f%%"
+
+#: ui.c:191
+#, c-format
+msgid "Shader Memory Exchange %6.2f%%"
+msgstr "Výměna paměti obvodů pro stínování %6.2f%%"
+
+#: ui.c:199
+#, c-format
+msgid "Scan Converter %6.2f%%"
+msgstr "Konvertor skenů %6.2f%%"
+
+#: ui.c:202
+#, c-format
+msgid "Primitive Assembly %6.2f%%"
+msgstr "Sestavování základní geometrie %6.2f%%"
+
+#: ui.c:209
+#, c-format
+msgid "Depth Block %6.2f%%"
+msgstr "Obvody pro výpočet hloubky %6.2f%%"
+
+#: ui.c:212
+#, c-format
+msgid "Color Block %6.2f%%"
+msgstr "Obvody pro transformace barev %6.2f%%"
+
+#: ui.c:217
+#, c-format
+msgid "Clip Rectangle %6.2f%%"
+msgstr "Výřez %6.2f%%"
+
+#: ui.c:227
+#, c-format
+msgid "%.0fM / %.0fM VRAM %6.2f%%"
+msgstr "%.0fM / %.0fM VRAM %6.2f%%"
