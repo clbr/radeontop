@@ -117,7 +117,7 @@ trans:
 	--package-name radeontop
 
 install: all
-	$(INSTALL) -D -m755 $(bin) $(DESTDIR)/$(PREFIX)/sbin/$(bin)
+	$(INSTALL) -D -m755 $(bin) $(DESTDIR)/$(PREFIX)/bin/$(bin)
 ifeq ($(xcb), 1)
 	$(INSTALL) -D -m755 $(xcblib) $(DESTDIR)/$(PREFIX)/$(LIBDIR)/$(xcblib)
 endif
