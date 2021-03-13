@@ -16,6 +16,7 @@
 */
 
 #include "radeontop.h"
+#include <bits/getopt_core.h>
 #include <getopt.h>
 
 void die(const char * const why) {
@@ -28,13 +29,24 @@ static void version() {
 	exit(1);
 }
 
-static void help(const char * const me, const unsigned int ticks, const unsigned int dumpinterval) {
+static void help(const char * const me, const unsigned int ticks, const unsigned int dumpinterval, const enum DumpFormat dumpformat) {
+	char * dumpformat_str = "";
+	switch (dumpformat) {
+		case Json:
+			dumpformat_str = "json";
+		break;
+		case Custom:
+			dumpformat_str = "custom";
+		break;
+	}
+
 	printf(_("\n\tRadeonTop for R600 and above.\n\n"
 		"\tUsage: %s [-chmv] [-b bus] [-d file] [-i seconds] [-l limit] [-p device] [-t ticks]\n\n"
 		"-b --bus 3		Pick card from this PCI bus (hexadecimal)\n"
 		"-c --color		Enable colors\n"
 		"-d --dump file		Dump data to this file, - for stdout\n"
 		"-i --dump-interval 1	Number of seconds between dumps (default %u)\n"
+		"-f --dump-format custom	Foramt to use for dumping, can be `custom` or `json` (default %s)\n"
 		"-l --limit 3		Quit after dumping N lines, default forever\n"
 		"-m --mem		Force the /dev/mem path, for the proprietary driver\n"
 		"-p --path device	Open DRM device node by path\n"
@@ -43,7 +55,7 @@ static void help(const char * const me, const unsigned int ticks, const unsigned
 		"\n"
 		"-h --help		Show this help\n"
 		"-v --version		Show the version\n"),
-		me, dumpinterval, ticks);
+		me, dumpinterval, dumpformat_str, ticks);
 	die("");
 }
 
@@ -53,6 +65,7 @@ int main(int argc, char **argv) {
 
 	const unsigned int default_ticks = 120;
 	const unsigned int default_dumpinterval = 1;
+	const enum DumpFormat default_dumpformat = Custom;
 
 	unsigned int ticks = default_ticks;
 	unsigned char color = 0;
@@ -63,6 +76,7 @@ int main(int argc, char **argv) {
 	unsigned int limit = 0;
 	char *dump = NULL;
 	unsigned int dumpinterval = default_dumpinterval;
+	enum DumpFormat dumpformat = default_dumpformat;
 	const char *path = NULL;
 
 	// Translations
@@ -78,6 +92,7 @@ int main(int argc, char **argv) {
 		{"color", 0, 0, 'c'},
 		{"dump", 1, 0, 'd'},
 		{"dump-interval", 1, 0, 'i'},
+		{"dump-format", 1, 0, 'f'},
 		{"help", 0, 0, 'h'},
 		{"limit", 1, 0, 'l'},
 		{"mem", 0, 0, 'm'},
@@ -89,13 +104,13 @@ int main(int argc, char **argv) {
 	};
 
 	while (1) {
-		int c = getopt_long(argc, argv, "b:cTd:hi:l:mp:t:v", opts, NULL);
+		int c = getopt_long(argc, argv, "b:cTd:f:hi:l:mp:t:v", opts, NULL);
 		if (c == -1) break;
 
 		switch(c) {
 			case 'h':
 			case '?':
-				help(argv[0], default_ticks, default_dumpinterval);
+				help(argv[0], default_ticks, default_dumpinterval, default_dumpformat);
 			break;
 			case 't':
 				ticks = atoi(optarg);
@@ -126,6 +141,15 @@ int main(int argc, char **argv) {
 				if (dumpinterval < 1)
 					dumpinterval = 1;
 			break;
+			case 'f':
+				if (strcmp(optarg, "custom") == 0) {
+					dumpformat = Custom;
+				} else if (strcmp(optarg, "json") == 0) {
+					dumpformat = Json;
+				} else {
+					die("Unknown dump format");
+				}
+			break;
 			case 'p':
 				path = optarg;
 			break;
@@ -151,7 +175,7 @@ int main(int argc, char **argv) {
 	collect(ticks, dumpinterval);
 
 	if (dump)
-		dumpdata(ticks, dump, limit, bus, dumpinterval);
+		dumpdata(ticks, dump, limit, bus, dumpinterval, dumpformat);
 	else
 		present(ticks, cardname, color,transparency, bus, dumpinterval);
 

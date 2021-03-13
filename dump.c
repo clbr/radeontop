@@ -30,7 +30,7 @@ static void sighandler(int sig) {
 }
 
 void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit,
-		const unsigned char bus, const unsigned int dumpinterval) {
+		const unsigned char bus, const unsigned int dumpinterval, const enum DumpFormat dumpformat) {
 
 #ifdef ENABLE_NLS
 	// This is a data format, so disable decimal point localization
@@ -70,73 +70,121 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 	unsigned int count;
 
 	for (count = limit; !limit || count; count--) {
-
 		struct timeval t;
 		gettimeofday(&t, NULL);
-
-		fprintf(f, "%llu.%llu: ", (unsigned long long) t.tv_sec,
-				(unsigned long long) t.tv_usec);
-
-		fprintf(f, "bus %02x, ", bus);
+		char timestamp[17];
+		sprintf(timestamp, "%llu.%llu", (unsigned long long) t.tv_sec, (unsigned long long) t.tv_usec);
 
 		// Again, no need to protect these. Worst that happens is a slightly
 		// wrong number.
 		float k = 1.0f / ticks / dumpinterval;
-		float ee = 100 * results->ee * k;
-		float vgt = 100 * results->vgt * k;
-		float gui = 100 * results->gui * k;
-		float ta = 100 * results->ta * k;
-		float tc = 100 * results->tc * k;
-		float sx = 100 * results->sx * k;
-		float sh = 100 * results->sh * k;
-		float spi = 100 * results->spi * k;
-		float smx = 100 * results->smx * k;
-		float sc = 100 * results->sc * k;
-		float pa = 100 * results->pa * k;
-		float db = 100 * results->db * k;
-		float cr = 100 * results->cr * k;
-		float cb = 100 * results->cb * k;
-		float vram = 100.0f * results->vram / vramsize;
-		float vrammb = results->vram / 1024.0f / 1024.0f;
-		float gtt = 100.0f * results->gtt / gttsize;
-		float gttmb = results->gtt / 1024.0f / 1024.0f;
-		float mclk = 100.0f * (results->mclk * k) / (mclk_max / 1e3f);
-		float sclk = 100.0f * (results->sclk * k) / (sclk_max / 1e3f);
-		float mclk_ghz = results->mclk * k / 1000.0f;
-		float sclk_ghz = results->sclk * k / 1000.0f;
+		float ee = results->ee * k;
+		float vgt = results->vgt * k;
+		float gui = results->gui * k;
+		float ta = results->ta * k;
+		float tc = results->tc * k;
+		float sx = results->sx * k;
+		float sh = results->sh * k;
+		float spi = results->spi * k;
+		float smx = results->smx * k;
+		float sc = results->sc * k;
+		float pa = results->pa * k;
+		float db = results->db * k;
+		float cr = results->cr * k;
+		float cb = results->cb * k;
+		float vram_max_bi = vramsize;
+		float vram_bi = results->vram;
+		float vram = vram_bi / vram_max_bi;
+		float gtt_max_bi = gttsize;
+		float gtt_bi = results->gtt;
+		float gtt = gtt_bi / gtt_max_bi;
+		float mclk_max_hz = mclk_max / 1e3f;
+		float mclk_hz = results->mclk * k;
+		float mclk = mclk_hz / mclk_max_hz;
+		float sclk_max_hz = sclk_max / 1e3f;
+		float sclk_hz = results->sclk * k;
+		float sclk = sclk_hz / sclk_max_hz;
 
-		fprintf(f, "gpu %.2f%%, ", gui);
-		fprintf(f, "ee %.2f%%, ", ee);
-		fprintf(f, "vgt %.2f%%, ", vgt);
-		fprintf(f, "ta %.2f%%, ", ta);
+		switch (dumpformat) {
+			case Custom:
+				fprintf(f, "%s: ", timestamp);
 
-		if (bits.tc)
-			fprintf(f, "tc %.2f%%, ", tc);
+				fprintf(f, "bus %02x, ", bus);
 
-		fprintf(f, "sx %.2f%%, ", sx);
-		fprintf(f, "sh %.2f%%, ", sh);
-		fprintf(f, "spi %.2f%%, ", spi);
+				fprintf(f, "gpu %.2f%%, ", 100 * gui);
+				fprintf(f, "ee %.2f%%, ", 100 * ee);
+				fprintf(f, "vgt %.2f%%, ", 100 * vgt);
+				fprintf(f, "ta %.2f%%, ", 100 * ta);
 
-		if (bits.smx)
-			fprintf(f, "smx %.2f%%, ", smx);
+				if (bits.tc)
+					fprintf(f, "tc %.2f%%, ", 100 * tc);
 
-		if (bits.cr)
-			fprintf(f, "cr %.2f%%, ", cr);
+				fprintf(f, "sx %.2f%%, ", 100 * sx);
+				fprintf(f, "sh %.2f%%, ", 100 * sh);
+				fprintf(f, "spi %.2f%%, ", 100 * spi);
 
-		fprintf(f, "sc %.2f%%, ", sc);
-		fprintf(f, "pa %.2f%%, ", pa);
-		fprintf(f, "db %.2f%%, ", db);
-		fprintf(f, "cb %.2f%%", cb);
+				if (bits.smx)
+					fprintf(f, "smx %.2f%%, ", 100 * smx);
 
-		if (bits.vram)
-			fprintf(f, ", vram %.2f%% %.2fmb", vram, vrammb);
+				if (bits.cr)
+					fprintf(f, "cr %.2f%%, ", 100 * cr);
 
-		if (bits.gtt)
-			fprintf(f, ", gtt %.2f%% %.2fmb", gtt, gttmb);
+				fprintf(f, "sc %.2f%%, ", 100 * sc);
+				fprintf(f, "pa %.2f%%, ", 100 * pa);
+				fprintf(f, "db %.2f%%, ", 100 * db);
+				fprintf(f, "cb %.2f%%", 100 * cb);
 
-		if (sclk_max != 0 && sclk > 0)
-			fprintf(f, ", mclk %.2f%% %.3fghz, sclk %.2f%% %.3fghz",
-					mclk, mclk_ghz, sclk, sclk_ghz);
+				if (bits.vram)
+					fprintf(f, ", vram %.2f%% %.2fmb %.2fmb", 100.0f * vram, vram_bi / 1024.0f / 1024.0f, vram_max_bi / 1024.0f / 1024.0f);
+
+				if (bits.gtt)
+					fprintf(f, ", gtt %.2f%% %.2fmb %.2fmb", 100.0f * gtt, gtt_bi / 1024.0f / 1024.0f, gtt_max_bi / 1024.0f / 1024.0f);
+
+				if (sclk_max != 0 && sclk > 0)
+					fprintf(f, ", mclk %.2f%% %.3fghz %.3fghz, sclk %.2f%% %.3fghz %.3fghz",
+							100.0f * mclk, mclk_hz / 1000.0f, mclk_max_hz / 1000.0f, 100.0f * sclk, sclk_hz / 1000.0f, sclk_max_hz / 1000.0f);
+			break;
+			case Json:
+				fprintf(f, "{\"timestamp\": %s", timestamp);
+
+				fprintf(f, ", \"bus\": %u", bus);
+
+				fprintf(f, ", \"gpu\": %f", gui);
+				fprintf(f, ", \"ee\": %f", ee);
+				fprintf(f, ", \"vgt\": %f", vgt);
+				fprintf(f, ", \"ta\": %f", ta);
+
+				if (bits.tc)
+					fprintf(f, ", \"tc\" %f", tc);
+
+				fprintf(f, ", \"sx\": %f", sx);
+				fprintf(f, ", \"sh\": %f", sh);
+				fprintf(f, ", \"spi\": %f", spi);
+
+				if (bits.smx)
+					fprintf(f, ", \"smx\" %f", smx);
+
+				if (bits.cr)
+					fprintf(f, ", \"cr\" %f", cr);
+
+				fprintf(f, ", \"sc\": %f", sc);
+				fprintf(f, ", \"pa\": %f", pa);
+				fprintf(f, ", \"db\" %f", db);
+				fprintf(f, ", \"cb\" %f", cb);
+
+				if (bits.vram)
+					fprintf(f, ", \"vram\": {\"used_per\": %f, \"used_bi\": %.0f, \"max_bi\": %.0f}", vram, vram_bi, vram_max_bi);
+
+				if (bits.gtt)
+					fprintf(f, ", \"gtt\": {\"used_per\": %f, \"used_bi\": %.0f, \"max_bi\": %.0f}", gtt, gtt_bi, gtt_max_bi);
+
+				if (sclk_max != 0 && sclk > 0)
+					fprintf(f, ", \"mclk\": {\"used_per\": %f, \"used_hz\": %f, \"max_hz\": %f}, \"sclk\": {\"used_per\": %f, \"used_hz\": %f, \"max_hz\": %f}",
+							mclk, mclk_hz, mclk_max_hz, sclk, sclk_hz, sclk_max_hz);
+
+				fprintf(f, "}");
+			break;
+		}
 
 		fprintf(f, "\n");
 		fflush(f);

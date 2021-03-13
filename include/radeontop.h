@@ -34,6 +34,11 @@
 #include <locale.h>
 #include <stdint.h>
 
+enum DumpFormat {
+	Json,
+	Custom,
+};
+
 enum {
 	GRBM_STATUS = 0x8010,
 	MMAP_SIZE = 0x14,
@@ -67,7 +72,7 @@ extern struct bits_t *results;
 void present(const unsigned int ticks, const char card[], unsigned int color, unsigned int transparency, const unsigned char bus, const unsigned int dumpinterval);
 
 // dump.c
-void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit, const unsigned char bus, const unsigned int dumpinterval);
+void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit, const unsigned char bus, const unsigned int dumpinterval, const enum DumpFormat dumpformat);
 
 // chips
 enum radeon_family {
