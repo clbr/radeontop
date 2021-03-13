@@ -96,12 +96,12 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		float db = results->db * k;
 		float cr = results->cr * k;
 		float cb = results->cb * k;
-		float vram_max_bi = vramsize;
-		float vram_bi = results->vram;
-		float vram = vram_bi / vram_max_bi;
-		float gtt_max_bi = gttsize;
-		float gtt_bi = results->gtt;
-		float gtt = gtt_bi / gtt_max_bi;
+		float vram_max_b = vramsize;
+		float vram_b = results->vram;
+		float vram = vram_b / vram_max_b;
+		float gtt_max_b = gttsize;
+		float gtt_b = results->gtt;
+		float gtt = gtt_b / gtt_max_b;
 		float mclk_max_hz = mclk_max / 1e3f;
 		float mclk_hz = results->mclk * k;
 		float mclk = mclk_hz / mclk_max_hz;
@@ -139,10 +139,10 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 				fprintf(f, "cb %.2f%%", 100 * cb);
 
 				if (bits.vram)
-					fprintf(f, ", vram %.2f%% %.2fmb %.2fmb", 100.0f * vram, vram_bi / 1024.0f / 1024.0f, vram_max_bi / 1024.0f / 1024.0f);
+					fprintf(f, ", vram %.2f%% %.2fmb %.2fmb", 100.0f * vram, vram_b / 1024.0f / 1024.0f, vram_max_b / 1024.0f / 1024.0f);
 
 				if (bits.gtt)
-					fprintf(f, ", gtt %.2f%% %.2fmb %.2fmb", 100.0f * gtt, gtt_bi / 1024.0f / 1024.0f, gtt_max_bi / 1024.0f / 1024.0f);
+					fprintf(f, ", gtt %.2f%% %.2fmb %.2fmb", 100.0f * gtt, gtt_b / 1024.0f / 1024.0f, gtt_max_b / 1024.0f / 1024.0f);
 
 				if (sclk_max != 0 && sclk > 0)
 					fprintf(f, ", mclk %.2f%% %.3fghz %.3fghz, sclk %.2f%% %.3fghz %.3fghz",
@@ -177,10 +177,10 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 				fprintf(f, ", \"cb\": %f", cb);
 
 				if (bits.vram)
-					fprintf(f, ", \"vram\": {\"used_per\": %f, \"used_bi\": %.0f, \"max_bi\": %.0f}", vram, vram_bi, vram_max_bi);
+					fprintf(f, ", \"vram\": {\"used_per\": %f, \"used_b\": %.0f, \"max_b\": %.0f}", vram, vram_b, vram_max_b);
 
 				if (bits.gtt)
-					fprintf(f, ", \"gtt\": {\"used_per\": %f, \"used_bi\": %.0f, \"max_bi\": %.0f}", gtt, gtt_bi, gtt_max_bi);
+					fprintf(f, ", \"gtt\": {\"used_per\": %f, \"used_b\": %.0f, \"max_b\": %.0f}", gtt, gtt_b, gtt_max_b);
 
 				if (sclk_max != 0 && sclk > 0)
 					fprintf(f, ", \"mclk\": {\"used_per\": %f, \"used_hz\": %f, \"max_hz\": %f}, \"sclk\": {\"used_per\": %f, \"used_hz\": %f, \"max_hz\": %f}",
