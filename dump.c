@@ -76,8 +76,6 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 	for (count = limit; !limit || count; count--) {
 		struct timeval t;
 		gettimeofday(&t, NULL);
-		char timestamp[17];
-		sprintf(timestamp, "%llu.%llu", (unsigned long long) t.tv_sec, (unsigned long long) t.tv_usec);
 
 		// Again, no need to protect these. Worst that happens is a slightly
 		// wrong number.
@@ -111,7 +109,7 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 
 		switch (dumpformat) {
 			case Custom:
-				fprintf(f, "%s: ", timestamp);
+				fprintf(f, "%llu.%llu: ", (unsigned long long) t.tv_sec, (unsigned long long) t.tv_usec);
 
 				fprintf(f, "bus %02x, ", bus);
 
@@ -149,7 +147,7 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 							100.0f * mclk, mclk_hz / 1000.0f, mclk_max_hz / 1000.0f, 100.0f * sclk, sclk_hz / 1000.0f, sclk_max_hz / 1000.0f);
 			break;
 			case Json:
-				fprintf(f, "{\"timestamp\": %s", timestamp);
+				fprintf(f, "{\"timestamp\": %llu.%llu", (unsigned long long) t.tv_sec, (unsigned long long) t.tv_usec);
 
 				fprintf(f, ", \"bus\": %u", bus);
 
