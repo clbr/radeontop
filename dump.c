@@ -159,22 +159,22 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 				fprintf(f, ", \"ta\": %f", ta);
 
 				if (bits.tc)
-					fprintf(f, ", \"tc\" %f", tc);
+					fprintf(f, ", \"tc\": %f", tc);
 
 				fprintf(f, ", \"sx\": %f", sx);
 				fprintf(f, ", \"sh\": %f", sh);
 				fprintf(f, ", \"spi\": %f", spi);
 
 				if (bits.smx)
-					fprintf(f, ", \"smx\" %f", smx);
+					fprintf(f, ", \"smx\": %f", smx);
 
 				if (bits.cr)
-					fprintf(f, ", \"cr\" %f", cr);
+					fprintf(f, ", \"cr\": %f", cr);
 
 				fprintf(f, ", \"sc\": %f", sc);
 				fprintf(f, ", \"pa\": %f", pa);
-				fprintf(f, ", \"db\" %f", db);
-				fprintf(f, ", \"cb\" %f", cb);
+				fprintf(f, ", \"db\": %f", db);
+				fprintf(f, ", \"cb\": %f", cb);
 
 				if (bits.vram)
 					fprintf(f, ", \"vram\": {\"used_per\": %f, \"used_bi\": %.0f, \"max_bi\": %.0f}", vram, vram_bi, vram_max_bi);
