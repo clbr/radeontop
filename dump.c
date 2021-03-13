@@ -45,22 +45,26 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 	sigaction(SIGTERM, &sig, NULL);
 	sigaction(SIGINT, &sig, NULL);
 
-	printf(_("Dumping to %s, "), file);
-
-	if (limit)
-		printf(_("line limit %u.\n"), limit);
-	else
-		puts(_("until termination."));
-
 	// Check the file can be output to
 	FILE *f = NULL;
 	if (file[0] == '-')
 		f = stdout;
-	else
-		f = fopen(file, "a");
+	else {
+		// Don't print info messages if dumping to stdout, will just confuse parsers
+		printf(_("Dumping to %s, "), file);
 
-	if (!f)
-		die(_("Can't open file for writing."));
+		if (limit)
+			printf(_("line limit %u.\n"), limit);
+		else
+			puts(_("until termination."));
+
+		f = fopen(file, "a");
+	}
+
+	if (!f) {
+		printf(_("Can't open file %s for writing."), file);
+		die("");
+	}
 
 	// This does not need to be atomic. A delay here is acceptable.
 	while(!results)
