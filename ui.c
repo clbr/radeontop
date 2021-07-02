@@ -160,6 +160,8 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 		float sclk = 100.0f * (results->sclk * k) / (sclk_max / 1e3f);
 		float mclk_ghz = results->mclk * k / 1000.0f;
 		float sclk_ghz = results->sclk * k / 1000.0f;
+		float temp_c = results->temp / 100000.0f;
+		float temp = 100.0f / temp_max * temp_c;
 
 		mvhline(3, 0, ACS_HLINE, w);
 		mvvline(1, (w/2) + 1, ACS_VLINE, h);
@@ -273,6 +275,17 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 			printright(start++, hw, _("%.2fG / %.2fG Shader Clock %6.2f%%"),
 					sclk_ghz, sclk_max * 1e-6f, sclk);
 			if (color) attroff(COLOR_PAIR(3));
+		}
+
+		if (gettemp != NULL && temp > 0) {
+			// Enough height?
+			if (h > bigh) start++;
+
+			if (color) attron(COLOR_PAIR(5));
+
+			percentage(start, w, temp_c);
+			printright(start++, hw, _("%.1fC GPU Temperature %6.2f%%"),
+				temp_c, temp);
 		}
 
 		//move the cursor away to fix some resizing artifacts on some terminals

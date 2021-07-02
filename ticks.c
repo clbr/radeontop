@@ -40,6 +40,8 @@ static void *collector(void *arg) {
 
 	while (1) {
 		unsigned int stat;
+
+		// safe call: initialized in detect.c -> init_pci
 		getgrbm(&stat);
 
 		memset(&history[cur], 0, sizeof(struct bits_t));
@@ -58,8 +60,11 @@ static void *collector(void *arg) {
 		if (stat & bits.db) history[cur].db = 1;
 		if (stat & bits.cr) history[cur].cr = 1;
 		if (stat & bits.cb) history[cur].cb = 1;
+
+		// safe call: initialized in detect.c -> init_pci
 		getsclk(&history[cur].sclk);
 		getmclk(&history[cur].mclk);
+		gettemp(&history[cur].temp);
 
 		usleep(sleeptime);
 		cur++;
@@ -88,8 +93,10 @@ static void *collector(void *arg) {
 				res[curres].cr += history[i].cr;
 				res[curres].mclk += history[i].mclk;
 				res[curres].sclk += history[i].sclk;
+				res[curres].temp += history[i].temp;
 			}
 
+			// safe call: initialized in detect.c -> init_pci
 			getvram(&res[curres].vram);
 			getgtt(&res[curres].gtt);
 

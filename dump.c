@@ -104,6 +104,8 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		float sclk = 100.0f * (results->sclk * k) / (sclk_max / 1e3f);
 		float mclk_ghz = results->mclk * k / 1000.0f;
 		float sclk_ghz = results->sclk * k / 1000.0f;
+        float temp_c = results->temp / 100000.0f;
+        float temp = 100.0f / temp_max * temp_c;
 
 		fprintf(f, "gpu %.2f%%, ", gui);
 		fprintf(f, "ee %.2f%%, ", ee);
@@ -137,6 +139,9 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		if (sclk_max != 0 && sclk > 0)
 			fprintf(f, ", mclk %.2f%% %.3fghz, sclk %.2f%% %.3fghz",
 					mclk, mclk_ghz, sclk, sclk_ghz);
+
+		if (gettemp != NULL && temp > 0)
+			fprintf(f, ", temp %.2f%% %.1fC", temp, temp_c);
 
 		fprintf(f, "\n");
 		fflush(f);
