@@ -70,7 +70,8 @@ void present(const unsigned int ticks, const char card[], unsigned int color, un
 void dumpdata(const unsigned int ticks, const char file[], const unsigned int limit, const unsigned char bus, const unsigned int dumpinterval);
 
 // chips
-enum radeon_family {
+enum radeon_family
+{
 	UNKNOWN_CHIP,
 	R600,
 	RV610,
@@ -126,6 +127,7 @@ enum radeon_family {
 	RENOIR,
 	NAVI12,
 	SIENNA_CICHLID,
+	NAVY_FLOUNDER,
 };
 
 extern const char * const family_str[];
