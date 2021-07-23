@@ -127,7 +127,11 @@ enum radeon_family
 	RENOIR,
 	NAVI12,
 	SIENNA_CICHLID,
+	VANGOGH,
+	YELLOW_CARP,
 	NAVY_FLOUNDER,
+	DIMGREY_CAVEFISH,
+	ALDEBARAN,
 };
 
 extern const char * const family_str[];
