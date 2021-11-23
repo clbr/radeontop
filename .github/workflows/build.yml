@@ -1,0 +1,19 @@
+on: [push, pull_request]
+
+name: Linux Build
+jobs:
+  build_job:
+    name: Build Radeontop
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install package dependencies
+      run: sudo apt install -y libdrm-dev libncurses-dev libpciaccess-dev libxcb1-dev libxcb-dri2-0-dev
+
+    - name: Build
+      run: make amdgpu=1
+
+    - uses: actions/upload-artifact@v2
+    with:
+      name: radeontop-binary
+      path: radeontop
