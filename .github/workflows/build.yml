@@ -14,6 +14,6 @@ jobs:
       run: make amdgpu=1
 
     - uses: actions/upload-artifact@v2
-    with:
-      name: radeontop-binary
-      path: radeontop
+      with:
+        name: radeontop-binary
+        path: radeontop
