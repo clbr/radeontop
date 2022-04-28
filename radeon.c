@@ -57,6 +57,10 @@ static int getsclk_radeon(uint32_t *out) {
 static int getmclk_radeon(uint32_t *out) {
 	return radeon_get_drm_value(drm_fd, RADEON_INFO_CURRENT_GPU_MCLK, out);
 }
+
+static int gettemp_radeon(uint32_t *out) {
+    return radeon_get_drm_value(drm_fd, RADEON_INFO_CURRENT_GPU_TEMP, out);
+}
 #endif
 
 #ifdef RADEON_INFO_VRAM_USAGE
@@ -103,6 +107,12 @@ void init_radeon(int fd, int drm_major, int drm_minor) {
 			getmclk = getmclk_radeon;
 		else
 			drmError(ret, _("Failed to get memory clock"));
+
+		if (!(ret = gettemp_radeon(&out32)))
+			gettemp = gettemp_radeon;
+		else
+			drmError(ret, _("Failed to get GPU temparature"));
+
 	} else
 		fprintf(stderr, _("GPU usage reporting via libdrm is disabled (radeon kernel driver 2.42.0 required), attempting memory path\n"));
 #else
