@@ -50,6 +50,16 @@ static int getgrbm_radeon(uint32_t *out) {
 	return radeon_get_drm_value(drm_fd, RADEON_INFO_READ_REG, out);
 }
 
+static int getsrbm_radeon(uint32_t *out) {
+	*out = SRBM_STATUS;
+	return radeon_get_drm_value(drm_fd, RADEON_INFO_READ_REG, out);
+}
+
+static int getsrbm2_radeon(uint32_t *out) {
+	*out = SRBM_STATUS2;
+	return radeon_get_drm_value(drm_fd, RADEON_INFO_READ_REG, out);
+}
+
 static int getsclk_radeon(uint32_t *out) {
 	return radeon_get_drm_value(drm_fd, RADEON_INFO_CURRENT_GPU_SCLK, out);
 }
@@ -83,9 +93,11 @@ void init_radeon(int fd, int drm_major, int drm_minor) {
 
 #ifdef RADEON_INFO_READ_REG
 	if (DRM_ATLEAST_VERSION(2, 42)) {
-		if (!(ret = getgrbm_radeon(&out32)))
+		if (!(ret = getgrbm_radeon(&out32))) {
 			getgrbm = getgrbm_radeon;
-		else
+			getsrbm = getsrbm_radeon;
+			getsrbm2 = getsrbm2_radeon;
+		} else
 			drmError(ret, _("Failed to get GPU usage"));
 
 		if ((ret = radeon_get_drm_value(drm_fd, RADEON_INFO_MAX_SCLK,

@@ -150,6 +150,8 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 		float db = 100 * results->db * k;
 		float cr = 100 * results->cr * k;
 		float cb = 100 * results->cb * k;
+		float uvd = 100.0 * (float) results->uvd / ticks;
+		float vce0 = 100.0 * (float) results->vce0 / ticks;
 		float vram = 100.0f * results->vram / vramsize;
 		float vrammb = results->vram / 1024.0f / 1024.0f;
 		float vramsizemb = vramsize / 1024.0f / 1024.0f;
@@ -242,6 +244,13 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 			printright(start++, hw, _("Clip Rectangle %6.2f%%"), cr);
 		}
 		if (color) attroff(COLOR_PAIR(5));
+
+		percentage(start, w, uvd);
+		printright(start++, hw, _("UVD %6.2f%%"), uvd);
+		percentage(start, w, vce0);
+		printright(start++, hw, _("VCE %6.2f%%"), vce0);
+
+		if(h > bigh) start++;
 
 		if (bits.vram || bits.gtt) {
 			// Enough height?
