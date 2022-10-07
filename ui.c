@@ -109,7 +109,7 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 		init_pair(5, COLOR_YELLOW, COLOR_BLACK);
 	}
 
-	const unsigned int bigh = 23;
+	const unsigned int bigh = 26;
 
 	// Screen dimensions. (Re)calculated only when resize is non-zero.
 	unsigned int h = 1, w = 1, hw = 1;
@@ -150,8 +150,8 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 		float db = 100 * results->db * k;
 		float cr = 100 * results->cr * k;
 		float cb = 100 * results->cb * k;
-		float uvd = 100.0 * (float) results->uvd / ticks;
-		float vce0 = 100.0 * (float) results->vce0 / ticks;
+		float uvd = 100 * results->uvd * k;
+		float vce0 = 100 * results->vce0 * k;
 		float vram = 100.0f * results->vram / vramsize;
 		float vrammb = results->vram / 1024.0f / 1024.0f;
 		float vramsizemb = vramsize / 1024.0f / 1024.0f;
@@ -250,6 +250,7 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 		percentage(start, w, vce0);
 		printright(start++, hw, _("VCE %6.2f%%"), vce0);
 
+		// Enough height?
 		if(h > bigh) start++;
 
 		if (bits.vram || bits.gtt) {
