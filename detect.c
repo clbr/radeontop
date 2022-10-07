@@ -115,7 +115,7 @@ static void open_pci(struct pci_device *gpu_device) {
 
 static void cleanup_pci() {
 	munmap((void *) area, MMAP_SIZE);
-	munmap((void *) srbm_area, MMAP_SIZE);
+	munmap((void *) srbm_area, SRBM_MMAP_SIZE);
 }
 
 static int init_drm(int drm_fd) {
