@@ -359,8 +359,8 @@ void initbits(int fam) {
 	bits.cr = (1U << 27);
 	bits.cb = (1U << 30);
 	bits.gui = (1U << 31);
-	bits.uvd = (1U << 19);
-	bits.vce0 = (1U << 7);
+	bits.uvd = 0;
+	bits.vce0 = 0;
 
 	// R600 has a different texture bit, and only R600 has the TC, CR, SMX bits
 	if (fam < RV770) {
@@ -369,5 +369,12 @@ void initbits(int fam) {
 		bits.tc = 0;
 		bits.cr = 0;
 		bits.smx = 0;
+	}
+
+	if (fam >= RV610 && fam < VEGAM) {
+		bits.uvd = (1U << 19);
+		if (fam >= CAYMAN) {
+			bits.vce0 = (1U << 7);
+		}
 	}
 }

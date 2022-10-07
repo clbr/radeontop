@@ -129,8 +129,10 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		fprintf(f, "pa %.2f%%, ", pa);
 		fprintf(f, "db %.2f%%, ", db);
 		fprintf(f, "cb %.2f%%", cb);
-		fprintf(f, ", uvd %.2f%%", uvd);
-		fprintf(f, ", vce0 %.2f%%", vce0);
+		if (bits.uvd)
+			fprintf(f, ", uvd %.2f%%", uvd);
+		if (bits.vce0)
+			fprintf(f, ", vce0 %.2f%%", vce0);
 
 		if (bits.vram)
 			fprintf(f, ", vram %.2f%% %.2fmb", vram, vrammb);

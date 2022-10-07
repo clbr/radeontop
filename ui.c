@@ -245,10 +245,14 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 		}
 		if (color) attroff(COLOR_PAIR(5));
 
-		percentage(start, w, uvd);
-		printright(start++, hw, _("UVD %6.2f%%"), uvd);
-		percentage(start, w, vce0);
-		printright(start++, hw, _("VCE %6.2f%%"), vce0);
+		if (bits.uvd) {
+			percentage(start, w, uvd);
+			printright(start++, hw, _("UVD %6.2f%%"), uvd);
+		}
+		if (bits.vce0) {
+			percentage(start, w, vce0);
+			printright(start++, hw, _("VCE %6.2f%%"), vce0);
+		}
 
 		// Enough height?
 		if(h > bigh) start++;
