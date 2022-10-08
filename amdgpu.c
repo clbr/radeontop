@@ -26,6 +26,16 @@ static int getgrbm_amdgpu(uint32_t *out) {
 					0xffffffff, 0, out);
 }
 
+static int getsrbm_amdgpu(uint32_t *out) {
+	return amdgpu_read_mm_registers(amdgpu_dev, SRBM_STATUS / 4, 1,
+					0xffffffff, 0, out);
+}
+
+static int getsrbm2_amdgpu(uint32_t *out) {
+	return amdgpu_read_mm_registers(amdgpu_dev, SRBM_STATUS2 / 4, 1,
+					0xffffffff, 0, out);
+}
+
 static int getvram_amdgpu(uint64_t *out) {
 	return amdgpu_query_info(amdgpu_dev, AMDGPU_INFO_VRAM_USAGE,
 				sizeof(uint64_t), out);
@@ -59,9 +69,11 @@ void init_amdgpu(int fd) {
 	if (amdgpu_device_initialize(fd, &drm_major, &drm_minor, &amdgpu_dev))
 		return;
 
-	if (!(ret = getgrbm_amdgpu(&out32)))
+	if (!(ret = getgrbm_amdgpu(&out32))) {
 		getgrbm = getgrbm_amdgpu;
-	else
+		getsrbm = getsrbm_amdgpu;
+		getsrbm2 = getsrbm2_amdgpu;
+	} else
 		drmError(ret, _("Failed to get GPU usage"));
 
 #ifdef HAS_AMDGPU_QUERY_SENSOR_INFO

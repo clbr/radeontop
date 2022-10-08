@@ -28,9 +28,12 @@ uint64_t gttsize;
 unsigned int sclk_max = 0; // kilohertz
 unsigned int mclk_max = 0; // kilohertz
 const void *area;
+static const void *srbm_area;
 
 // function pointers to the right backend
 int (*getgrbm)(uint32_t *out);
+int (*getsrbm)(uint32_t *out);
+int (*getsrbm2)(uint32_t *out);
 int (*getvram)(uint64_t *out);
 int (*getgtt)(uint64_t *out);
 int (*getsclk)(uint32_t *out);
@@ -75,6 +78,16 @@ static int getgrbm_pci(uint32_t *out) {
 	return 0;
 }
 
+static int getsrbm_pci(uint32_t *out) {
+	*out = *(uint32_t *)((const char *) srbm_area + SRBM_STATUS);
+	return 0;
+}
+
+static int getsrbm2_pci(uint32_t *out) {
+	*out = *(uint32_t *)((const char *) srbm_area + SRBM_STATUS2);
+	return 0;
+}
+
 static void open_pci(struct pci_device *gpu_device) {
 	// Warning: gpu_device is a copy of a freed struct. Do not access any pointers!
 	int reg = 2;
@@ -91,12 +104,18 @@ static void open_pci(struct pci_device *gpu_device) {
 	area = mmap(NULL, MMAP_SIZE, PROT_READ, MAP_PRIVATE, mem,
 			gpu_device->regions[reg].base_addr + 0x8000);
 	if (area == MAP_FAILED) die(_("mmap failed"));
+	srbm_area = mmap(NULL, SRBM_MMAP_SIZE, PROT_READ, MAP_PRIVATE, mem,
+			gpu_device->regions[reg].base_addr);
+	if (srbm_area == MAP_FAILED) die(_("mmap failed"));
 
 	getgrbm = getgrbm_pci;
+	getsrbm = getsrbm_pci;
+	getsrbm2 = getsrbm2_pci;
 }
 
 static void cleanup_pci() {
 	munmap((void *) area, MMAP_SIZE);
+	munmap((void *) srbm_area, SRBM_MMAP_SIZE);
 }
 
 static int init_drm(int drm_fd) {
@@ -247,6 +266,7 @@ void init_pci(const char *path, short *bus, unsigned int *device_id, const unsig
 	short device_bus = -1;
 	int err = 1;
 	getgrbm = getsclk = getmclk = getuint32_null;
+	getsrbm = getsrbm2 = getuint32_null;
 	getvram = getgtt = getuint64_null;
 
 	if (path) {
@@ -339,6 +359,8 @@ void initbits(int fam) {
 	bits.cr = (1U << 27);
 	bits.cb = (1U << 30);
 	bits.gui = (1U << 31);
+	bits.uvd = 0;
+	bits.vce0 = 0;
 
 	// R600 has a different texture bit, and only R600 has the TC, CR, SMX bits
 	if (fam < RV770) {
@@ -347,5 +369,12 @@ void initbits(int fam) {
 		bits.tc = 0;
 		bits.cr = 0;
 		bits.smx = 0;
+	}
+
+	if (fam >= RV610 && fam < VEGAM) {
+		bits.uvd = (1U << 19);
+		if (fam >= CAYMAN) {
+			bits.vce0 = (1U << 7);
+		}
 	}
 }
