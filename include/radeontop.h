@@ -136,6 +136,8 @@ enum radeon_family {
 	NAVY_FLOUNDER,
 	DIMGREY_CAVEFISH,
 	ALDEBARAN,
+	CYAN_SKILLFISH,
+	BEIGE_GOBY,
 };
 
 extern const char * const family_str[];
