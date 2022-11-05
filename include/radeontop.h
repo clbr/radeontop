@@ -135,6 +135,7 @@ enum radeon_family {
 	YELLOW_CARP,
 	NAVY_FLOUNDER,
 	DIMGREY_CAVEFISH,
+	NAVI23,
 	ALDEBARAN,
 };
 
