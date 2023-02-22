@@ -42,9 +42,9 @@ static void *collector(void *arg) {
 		unsigned int stat;
 		getgrbm(&stat);
 		unsigned int uvd;
-		getsrbm(&uvd);
+		if (bits.uvd) getsrbm(&uvd);
 		unsigned int vce;
-		getsrbm2(&vce);
+		if (bits.vce0) getsrbm2(&vce);
 
 		memset(&history[cur], 0, sizeof(struct bits_t));
 
