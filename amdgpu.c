@@ -19,6 +19,9 @@
 #include <libdrm/amdgpu_drm.h>
 #include <libdrm/amdgpu.h>
 
+uint32_t family_id;
+uint32_t chip_external_rev;
+
 static amdgpu_device_handle amdgpu_dev;
 
 static int getgrbm_amdgpu(uint32_t *out) {
@@ -81,6 +84,8 @@ void init_amdgpu(int fd) {
 		struct amdgpu_gpu_info gpu;
 
 		amdgpu_query_gpu_info(amdgpu_dev, &gpu);
+		family_id = gpu.family_id;
+		chip_external_rev = gpu.chip_external_rev;
 		sclk_max = gpu.max_engine_clk;
 		mclk_max = gpu.max_memory_clk;
 
@@ -125,4 +130,31 @@ void init_amdgpu(int fd) {
 void cleanup_amdgpu() {
 	if (amdgpu_dev)
 		amdgpu_device_deinitialize(amdgpu_dev);
+}
+
+int getfamily_from_id() {
+	switch(family_id) {
+		case FAMILY_GFX1100:
+			if ((0x1 <= chip_external_rev) && (chip_external_rev < 0x10)) {
+				return GFX1100;
+			} else if ((0x10 <= chip_external_rev) && (chip_external_rev < 0x20)) {
+				return GFX1102;
+			} else if ((0x20 <= chip_external_rev) && (chip_external_rev < 0xFF)) {
+				return GFX1101;
+			}
+			break;
+		case FAMILY_GFX1103:
+			if ((0x1 <= chip_external_rev) && (chip_external_rev < 0x10)) {
+				return GFX1103_R1;
+			} else if ((0x80 <= chip_external_rev) && (chip_external_rev < 0xFF)) {
+				return GFX1103_R2;
+			}
+			break;
+		case FAMILY_GC_10_3_6:
+			return GFX1036;
+		case FAMILY_GC_10_3_7:
+			return GFX1037;
+	}
+
+	return 0;
 }

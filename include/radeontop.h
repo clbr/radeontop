@@ -138,6 +138,13 @@ enum radeon_family {
 	ALDEBARAN,
 	CYAN_SKILLFISH,
 	BEIGE_GOBY,
+	GFX1100, // Navi31
+	GFX1101, // Navi32
+	GFX1102, // Navi33
+	GFX1103_R1,  // Phoenix
+	GFX1103_R2, // Phoenix
+	GFX1036, // Raphael
+	GFX1037, // Mendocino
 };
 
 extern const char * const family_str[];
@@ -171,6 +178,18 @@ extern uint64_t vramsize;
 extern uint64_t gttsize;
 extern unsigned int sclk_max;
 extern unsigned int mclk_max;
+
+#ifdef ENABLE_AMDGPU
+extern uint32_t family_id;
+extern uint32_t chip_external_rev;
+int getfamily_from_id();
+
+#define FAMILY_GFX1100 0x91
+#define FAMILY_GFX1103 0x94
+#define FAMILY_GC_10_3_6 0x95
+#define FAMILY_GC_10_3_7 0x97
+
+#endif
 
 // radeon.c
 void init_radeon(int fd, int drm_major, int drm_minor);

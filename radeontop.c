@@ -139,12 +139,15 @@ int main(int argc, char **argv) {
 
 	setuid(getuid());
 
-	const int family = getfamily(device_id);
+	int family = getfamily(device_id);
+#ifdef ENABLE_AMDGPU
+	if (!family)
+	   family = getfamily_from_id();
+#endif
 	if (!family)
 		puts(_("Unknown Radeon card. <= R500 won't work, new cards might."));
 
 	const char * const cardname = family_str[family];
-
 	initbits(family);
 
 	// runtime
