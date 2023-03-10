@@ -332,6 +332,13 @@ void cleanup() {
 
 int getfamily(unsigned int id) {
 
+#ifdef ENABLE_AMDGPU
+	int family = getfamily_from_id();
+
+	if (family)
+		return family;
+#endif
+
 	switch(id) {
 		#define CHIPSET(a,b,c) case a: return c;
 		#include "r600_pci_ids.h"

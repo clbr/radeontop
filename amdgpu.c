@@ -19,8 +19,13 @@
 #include <libdrm/amdgpu_drm.h>
 #include <libdrm/amdgpu.h>
 
-uint32_t family_id;
-uint32_t chip_external_rev;
+#define FAMILY_GFX1100 0x91
+#define FAMILY_GFX1103 0x94
+#define FAMILY_GC_10_3_6 0x95
+#define FAMILY_GC_10_3_7 0x97
+
+static uint32_t family_id;
+static uint32_t chip_external_rev;
 
 static amdgpu_device_handle amdgpu_dev;
 

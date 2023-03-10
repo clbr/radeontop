@@ -179,23 +179,12 @@ extern uint64_t gttsize;
 extern unsigned int sclk_max;
 extern unsigned int mclk_max;
 
-#ifdef ENABLE_AMDGPU
-extern uint32_t family_id;
-extern uint32_t chip_external_rev;
-int getfamily_from_id();
-
-#define FAMILY_GFX1100 0x91
-#define FAMILY_GFX1103 0x94
-#define FAMILY_GC_10_3_6 0x95
-#define FAMILY_GC_10_3_7 0x97
-
-#endif
-
 // radeon.c
 void init_radeon(int fd, int drm_major, int drm_minor);
 
 // amdgpu.c
 void init_amdgpu(int fd);
 void cleanup_amdgpu();
+int getfamily_from_id();
 
 #endif

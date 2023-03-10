@@ -139,11 +139,7 @@ int main(int argc, char **argv) {
 
 	setuid(getuid());
 
-	int family = getfamily(device_id);
-#ifdef ENABLE_AMDGPU
-	if (!family)
-	   family = getfamily_from_id();
-#endif
+	const int family = getfamily(device_id);
 	if (!family)
 		puts(_("Unknown Radeon card. <= R500 won't work, new cards might."));
 
