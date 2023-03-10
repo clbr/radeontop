@@ -24,8 +24,8 @@
 #define FAMILY_GC_10_3_6 0x95
 #define FAMILY_GC_10_3_7 0x97
 
-static uint32_t family_id;
-static uint32_t chip_external_rev;
+static uint32_t family_id = 0;
+static uint32_t chip_external_rev = 0;
 
 static amdgpu_device_handle amdgpu_dev;
 
