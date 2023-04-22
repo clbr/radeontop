@@ -31,10 +31,12 @@ Running
 
 #### Prerequisites
 
+Depending on the platform, prerequisites might append "dev" somewhere in the package name. For example, the deb package on Linux Mint 21.1 is `libdrm-dev`. Library names vary between distros, platforms, and environments.
+
 * libdrm
 * libncurses
 * libpciaccess
-* libxcb
+* libxcb-dri2
 
 
 Simply start radeontop and it auto-selects the first supported GPU:
