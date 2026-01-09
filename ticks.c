@@ -45,6 +45,8 @@ static void *collector(void *arg) {
 		if (bits.uvd) getsrbm(&uvd);
 		unsigned int vce;
 		if (bits.vce0) getsrbm2(&vce);
+		unsigned int vcnungated;
+		if (bits.vcnungated) getvcnungated(&vcnungated);
 
 		memset(&history[cur], 0, sizeof(struct bits_t));
 
@@ -64,6 +66,7 @@ static void *collector(void *arg) {
 		if (stat & bits.cb) history[cur].cb = 1;
 		if (uvd & bits.uvd) history[cur].uvd = 1;
 		if (vce & bits.vce0) history[cur].vce0 = 1;
+		if (vcnungated & bits.vcnungated) history[cur].vcnungated = 1;
 		getsclk(&history[cur].sclk);
 		getmclk(&history[cur].mclk);
 
@@ -94,6 +97,7 @@ static void *collector(void *arg) {
 				res[curres].cr += history[i].cr;
 				res[curres].uvd += history[i].uvd;
 				res[curres].vce0 += history[i].vce0;
+				res[curres].vcnungated += history[i].vcnungated;
 				res[curres].mclk += history[i].mclk;
 				res[curres].sclk += history[i].sclk;
 			}

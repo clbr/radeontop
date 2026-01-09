@@ -25,6 +25,7 @@
 #include "version.h"
 #include "gettext.h"
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
@@ -62,6 +63,9 @@ extern int (*getvram)(uint64_t *out);
 extern int (*getgtt)(uint64_t *out);
 extern int (*getsclk)(uint32_t *out);
 extern int (*getmclk)(uint32_t *out);
+
+int setupgetvcnungated(void);
+void getvcnungated(uint32_t *out);
 
 // ticks.c
 void collect(unsigned int ticks, unsigned int dumpinterval);
@@ -160,6 +164,7 @@ struct bits_t {
 	unsigned int cr;
 	unsigned int uvd;
 	unsigned int vce0;
+	unsigned int vcnungated;
 	uint64_t vram;
 	uint64_t gtt;
 	unsigned int sclk;
