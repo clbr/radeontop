@@ -152,6 +152,7 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 		float cb = 100 * results->cb * k;
 		float uvd = 100 * results->uvd * k;
 		float vce0 = 100 * results->vce0 * k;
+		float vcnungated = 100 * results->vcnungated * k;
 		float vram = 100.0f * results->vram / vramsize;
 		float vrammb = results->vram / 1024.0f / 1024.0f;
 		float vramsizemb = vramsize / 1024.0f / 1024.0f;
@@ -284,6 +285,11 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 			printright(start++, hw, _("%.2fG / %.2fG Shader Clock %6.2f%%"),
 					sclk_ghz, sclk_max * 1e-6f, sclk);
 			if (color) attroff(COLOR_PAIR(3));
+		}
+
+		if (bits.vcnungated) {
+			percentage(start, w, vcnungated);
+			printright(start++, hw, _("VCN ON/OFF %6.2f%%"), vcnungated);
 		}
 
 		//move the cursor away to fix some resizing artifacts on some terminals
