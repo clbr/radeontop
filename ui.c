@@ -18,6 +18,7 @@
 #include <math.h>
 #include <ncurses.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 static void printcenter(const unsigned int y, const unsigned int width,
 				const char * const fmt, ...) {
@@ -87,7 +88,7 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 	while(!results)
 		usleep(16000);
 
-	initscr();
+	newterm(NULL, stderr, stdin);
 	noecho();
 	halfdelay(10);
 	curs_set(0);

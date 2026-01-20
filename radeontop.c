@@ -19,7 +19,7 @@
 #include <getopt.h>
 
 void die(const char * const why) {
-	puts(why);
+	fprintf(stderr, "%s\n", why);
 	exit(1);
 }
 
@@ -141,7 +141,7 @@ int main(int argc, char **argv) {
 
 	const int family = getfamily(device_id);
 	if (!family)
-		puts(_("Unknown Radeon card. <= R500 won't work, new cards might."));
+		fprintf(stderr, _("Unknown Radeon card. <= R500 won't work, new cards might.\n"));
 
 	const char * const cardname = family_str[family];
 
