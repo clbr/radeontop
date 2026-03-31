@@ -39,11 +39,11 @@ static void *collector(void *arg) {
 	const useconds_t sleeptime = 1e6 / ticks;
 
 	while (1) {
-		unsigned int stat;
+		unsigned int stat = 0;
 		getgrbm(&stat);
-		unsigned int uvd;
+		unsigned int uvd = 0;
 		if (bits.uvd) getsrbm(&uvd);
-		unsigned int vce;
+		unsigned int vce = 0;
 		if (bits.vce0) getsrbm2(&vce);
 
 		memset(&history[cur], 0, sizeof(struct bits_t));
