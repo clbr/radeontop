@@ -361,6 +361,7 @@ void initbits(int fam) {
 	bits.gui = (1U << 31);
 	bits.uvd = 0;
 	bits.vce0 = 0;
+	bits.vcnungated = 0;
 
 	// R600 has a different texture bit, and only R600 has the TC, CR, SMX bits
 	if (fam < RV770) {
@@ -376,5 +377,9 @@ void initbits(int fam) {
 		if (fam >= CAYMAN) {
 			bits.vce0 = (1U << 7);
 		}
+	} else if (fam > VEGA20) { // amdgpu_pm.c:amdgpu_debugfs_pm_info_pp
+#ifdef ENABLE_AMDGPU
+		bits.vcnungated = setupgetvcnungated();
+#endif
 	}
 }

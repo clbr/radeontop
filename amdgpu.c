@@ -15,9 +15,33 @@
 */
 
 #include "radeontop.h"
-#include <xf86drm.h>
+#include <fcntl.h>
 #include <libdrm/amdgpu_drm.h>
 #include <libdrm/amdgpu.h>
+#include <sys/stat.h>
+#include <sys/sysmacros.h>
+#include <xf86drm.h>
+
+// kgd_pp_interface.h:amd_pp_sensors
+#define AMDGPU_PP_SENSOR_VCN_POWER_STATE 25
+
+int amdgpu_sensors_fd;
+
+static void init_amdgpu_sensors_fd(int drm_fd) {
+	struct stat st;
+	if (fstat(drm_fd, &st))
+		abort();
+	if ((st.st_mode & S_IFMT) != S_IFCHR || major(st.st_rdev) != 0xe2) {
+		fprintf(stderr, "init_amdgpu_sensors_fd weird fstat\n");
+		return;
+	}
+	char buf[255];
+	sprintf(buf, "/sys/kernel/debug/dri/%d/amdgpu_sensors", minor(st.st_rdev));
+	amdgpu_sensors_fd = open(buf, O_RDONLY | O_CLOEXEC);
+	if (amdgpu_sensors_fd < 0) {
+		fprintf(stderr, "Couldn't open %s for VCN. Try sudo\n", buf);
+	}
+}
 
 static amdgpu_device_handle amdgpu_dev;
 
@@ -120,9 +144,30 @@ void init_amdgpu(int fd) {
 		getgtt = getgtt_amdgpu;
 	else
 		drmError(ret, _("Failed to get GTT usage"));
+
+	init_amdgpu_sensors_fd(fd);
 }
 
 void cleanup_amdgpu() {
+	if (amdgpu_sensors_fd)
+		close(amdgpu_sensors_fd);
 	if (amdgpu_dev)
 		amdgpu_device_deinitialize(amdgpu_dev);
+}
+
+int setupgetvcnungated(void) {
+	return amdgpu_sensors_fd > 0;
+}
+
+void getvcnungated(uint32_t *out) {
+	*out = 0;
+	if (amdgpu_sensors_fd <= 0)
+		return;
+	const ssize_t ret = pread(amdgpu_sensors_fd, out, sizeof(uint32_t),
+		AMDGPU_PP_SENSOR_VCN_POWER_STATE * sizeof(uint32_t));
+	if (ret != sizeof(uint32_t)) {
+		perror("pread");
+		amdgpu_sensors_fd = 0;
+		*out = 0;
+	}
 }
