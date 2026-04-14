@@ -139,7 +139,9 @@ int main(int argc, char **argv) {
 
 	setuid(getuid());
 
-	const int family = getfamily(device_id);
+	int family = getfamily(device_id);
+	if (!family && gfx_version)
+		family = getfamily_gfx(gfx_version);
 	if (!family)
 		fprintf(stderr, _("Unknown Radeon card. <= R500 won't work, new cards might.\n"));
 

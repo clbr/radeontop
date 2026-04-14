@@ -69,6 +69,33 @@ void init_amdgpu(int fd) {
 	if (amdgpu_device_initialize(fd, &drm_major, &drm_minor, &amdgpu_dev))
 		return;
 
+	// Query GFX IP version for family detection fallback
+	{
+		struct drm_amdgpu_info_hw_ip gfx_ip = {};
+		if (!amdgpu_query_hw_ip_info(amdgpu_dev, AMDGPU_HW_IP_GFX,
+						0, &gfx_ip)) {
+			unsigned int major = gfx_ip.hw_ip_version_major;
+			unsigned int minor_raw = gfx_ip.hw_ip_version_minor;
+			unsigned int minor, rev;
+
+			/*
+			 * Newer kernels encode (minor << 8 | rev) in
+			 * hw_ip_version_minor. GFX11+ only exists on
+			 * these kernels, and for GFX10 a value >= 256
+			 * is unambiguously the new encoding.
+			 */
+			if (major >= 11 || minor_raw >= 256) {
+				minor = (minor_raw >> 8) & 0xff;
+				rev = minor_raw & 0xff;
+			} else {
+				minor = minor_raw;
+				rev = 0;
+			}
+
+			gfx_version = major * 100 + minor * 10 + rev;
+		}
+	}
+
 	if (!(ret = getgrbm_amdgpu(&out32))) {
 		getgrbm = getgrbm_amdgpu;
 		getsrbm = getsrbm_amdgpu;
