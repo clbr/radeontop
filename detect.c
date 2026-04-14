@@ -377,4 +377,12 @@ void initbits(int fam) {
 			bits.vce0 = (1U << 7);
 		}
 	}
+
+	// RDNA (GFX10+): VGT replaced by Geometry Engine at bit 21,
+	// Event Engine and Sequencer Instruction Cache bits undefined.
+	if (fam >= NAVI10) {
+		bits.ee = 0;
+		bits.vgt = (1U << 21);
+		bits.sh = 0;
+	}
 }

@@ -175,15 +175,20 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 
 		unsigned int start = 4;
 
-		percentage(start, w, ee);
-		printright(start++, hw, _("Event Engine %6.2f%%"), ee);
+		if (bits.ee) {
+			percentage(start, w, ee);
+			printright(start++, hw, _("Event Engine %6.2f%%"), ee);
 
-		// Enough height?
-		if (h > bigh) start++;
+			// Enough height?
+			if (h > bigh) start++;
+		}
 
 		if (color) attron(COLOR_PAIR(2));
 		percentage(start, w, vgt);
-		printright(start++, hw, _("Vertex Grouper + Tesselator %6.2f%%"), vgt);
+		if (bits.ee)
+			printright(start++, hw, _("Vertex Grouper + Tesselator %6.2f%%"), vgt);
+		else
+			printright(start++, hw, _("Geometry Engine %6.2f%%"), vgt);
 		if (color) attroff(COLOR_PAIR(2));
 
 		// Enough height?
@@ -207,8 +212,10 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 		percentage(start, w, sx);
 		printright(start++, hw, _("Shader Export %6.2f%%"), sx);
 
-		percentage(start, w, sh);
-		printright(start++, hw, _("Sequencer Instruction Cache %6.2f%%"), sh);
+		if (bits.sh) {
+			percentage(start, w, sh);
+			printright(start++, hw, _("Sequencer Instruction Cache %6.2f%%"), sh);
+		}
 
 		percentage(start, w, spi);
 		printright(start++, hw, _("Shader Interpolator %6.2f%%"), spi);
