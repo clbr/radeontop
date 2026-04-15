@@ -160,6 +160,7 @@ struct bits_t {
 	unsigned int cr;
 	unsigned int uvd;
 	unsigned int vce0;
+	unsigned int vcn;
 	uint64_t vram;
 	uint64_t gtt;
 	unsigned int sclk;

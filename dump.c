@@ -98,6 +98,7 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		float cb = 100 * results->cb * k;
 		float uvd = 100 * results->uvd * k;
 		float vce0 = 100 * results->vce0 * k;
+		float vcn = 100 * results->vcn * k;
 		float vram = 100.0f * results->vram / vramsize;
 		float vrammb = results->vram / 1024.0f / 1024.0f;
 		float gtt = 100.0f * results->gtt / gttsize;
@@ -108,15 +109,17 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 		float sclk_ghz = results->sclk * k / 1000.0f;
 
 		fprintf(f, "gpu %.2f%%, ", gui);
-		fprintf(f, "ee %.2f%%, ", ee);
-		fprintf(f, "vgt %.2f%%, ", vgt);
+		if (bits.ee)
+			fprintf(f, "ee %.2f%%, ", ee);
+		fprintf(f, "%s %.2f%%, ", bits.ee ? "vgt" : "ge", vgt);
 		fprintf(f, "ta %.2f%%, ", ta);
 
 		if (bits.tc)
 			fprintf(f, "tc %.2f%%, ", tc);
 
 		fprintf(f, "sx %.2f%%, ", sx);
-		fprintf(f, "sh %.2f%%, ", sh);
+		if (bits.sh)
+			fprintf(f, "sh %.2f%%, ", sh);
 		fprintf(f, "spi %.2f%%, ", spi);
 
 		if (bits.smx)
@@ -133,6 +136,8 @@ void dumpdata(const unsigned int ticks, const char file[], const unsigned int li
 			fprintf(f, ", uvd %.2f%%", uvd);
 		if (bits.vce0)
 			fprintf(f, ", vce0 %.2f%%", vce0);
+		if (bits.vcn)
+			fprintf(f, ", vc %.2f%%", vcn);
 
 		if (bits.vram)
 			fprintf(f, ", vram %.2f%% %.2fmb", vram, vrammb);

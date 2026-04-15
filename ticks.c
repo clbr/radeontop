@@ -43,8 +43,8 @@ static void *collector(void *arg) {
 		getgrbm(&stat);
 		unsigned int uvd;
 		if (bits.uvd) getsrbm(&uvd);
-		unsigned int vce;
-		if (bits.vce0) getsrbm2(&vce);
+		unsigned int srbm2;
+		if (bits.vce0 || bits.vcn) getsrbm2(&srbm2);
 
 		memset(&history[cur], 0, sizeof(struct bits_t));
 
@@ -63,7 +63,10 @@ static void *collector(void *arg) {
 		if (stat & bits.cr) history[cur].cr = 1;
 		if (stat & bits.cb) history[cur].cb = 1;
 		if (uvd & bits.uvd) history[cur].uvd = 1;
-		if (vce & bits.vce0) history[cur].vce0 = 1;
+		if (bits.vce0 || bits.vcn) {
+			if (srbm2 & bits.vce0) history[cur].vce0 = 1;
+			if (srbm2 & bits.vcn) history[cur].vcn = 1;
+		}
 		getsclk(&history[cur].sclk);
 		getmclk(&history[cur].mclk);
 
@@ -94,6 +97,7 @@ static void *collector(void *arg) {
 				res[curres].cr += history[i].cr;
 				res[curres].uvd += history[i].uvd;
 				res[curres].vce0 += history[i].vce0;
+				res[curres].vcn += history[i].vcn;
 				res[curres].mclk += history[i].mclk;
 				res[curres].sclk += history[i].sclk;
 			}

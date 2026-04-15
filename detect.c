@@ -361,6 +361,7 @@ void initbits(int fam) {
 	bits.gui = (1U << 31);
 	bits.uvd = 0;
 	bits.vce0 = 0;
+	bits.vcn = 0;
 
 	// R600 has a different texture bit, and only R600 has the TC, CR, SMX bits
 	if (fam < RV770) {
@@ -376,5 +377,18 @@ void initbits(int fam) {
 		if (fam >= CAYMAN) {
 			bits.vce0 = (1U << 7);
 		}
+	}
+
+	// Video Core (VCN) on RDNA: bit 1 of SRBM_STATUS2
+	if (fam >= NAVI10) {
+		bits.vcn = (1U << 1);
+	}
+
+	// RDNA (GFX10+): VGT replaced by Geometry Engine at bit 21,
+	// Event Engine and Sequencer Instruction Cache bits undefined.
+	if (fam >= NAVI10) {
+		bits.ee = 0;
+		bits.vgt = (1U << 21);
+		bits.sh = 0;
 	}
 }

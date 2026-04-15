@@ -153,6 +153,7 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 		float cb = 100 * results->cb * k;
 		float uvd = 100 * results->uvd * k;
 		float vce0 = 100 * results->vce0 * k;
+		float vcn = 100 * results->vcn * k;
 		float vram = 100.0f * results->vram / vramsize;
 		float vrammb = results->vram / 1024.0f / 1024.0f;
 		float vramsizemb = vramsize / 1024.0f / 1024.0f;
@@ -175,15 +176,20 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 
 		unsigned int start = 4;
 
-		percentage(start, w, ee);
-		printright(start++, hw, _("Event Engine %6.2f%%"), ee);
+		if (bits.ee) {
+			percentage(start, w, ee);
+			printright(start++, hw, _("Event Engine %6.2f%%"), ee);
 
-		// Enough height?
-		if (h > bigh) start++;
+			// Enough height?
+			if (h > bigh) start++;
+		}
 
 		if (color) attron(COLOR_PAIR(2));
 		percentage(start, w, vgt);
-		printright(start++, hw, _("Vertex Grouper + Tesselator %6.2f%%"), vgt);
+		if (bits.ee)
+			printright(start++, hw, _("Vertex Grouper + Tesselator %6.2f%%"), vgt);
+		else
+			printright(start++, hw, _("Geometry Engine %6.2f%%"), vgt);
 		if (color) attroff(COLOR_PAIR(2));
 
 		// Enough height?
@@ -207,8 +213,10 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 		percentage(start, w, sx);
 		printright(start++, hw, _("Shader Export %6.2f%%"), sx);
 
-		percentage(start, w, sh);
-		printright(start++, hw, _("Sequencer Instruction Cache %6.2f%%"), sh);
+		if (bits.sh) {
+			percentage(start, w, sh);
+			printright(start++, hw, _("Sequencer Instruction Cache %6.2f%%"), sh);
+		}
 
 		percentage(start, w, spi);
 		printright(start++, hw, _("Shader Interpolator %6.2f%%"), spi);
@@ -253,6 +261,10 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 		if (bits.vce0) {
 			percentage(start, w, vce0);
 			printright(start++, hw, _("VCE %6.2f%%"), vce0);
+		}
+		if (bits.vcn) {
+			percentage(start, w, vcn);
+			printright(start++, hw, _("Video Core %6.2f%%"), vcn);
 		}
 
 		if (bits.vram || bits.gtt) {
