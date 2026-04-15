@@ -27,6 +27,8 @@ uint64_t vramsize;
 uint64_t gttsize;
 unsigned int sclk_max = 0; // kilohertz
 unsigned int mclk_max = 0; // kilohertz
+unsigned int is_apu = 0; // 1 if APU (unified memory), 0 if discrete GPU
+unsigned int has_power_sensor = 0; // 1 if power sensor available, 0 if unavailable
 const void *area;
 static const void *srbm_area;
 
@@ -38,6 +40,8 @@ int (*getvram)(uint64_t *out);
 int (*getgtt)(uint64_t *out);
 int (*getsclk)(uint32_t *out);
 int (*getmclk)(uint32_t *out);
+int (*gettemp)(uint32_t *out);
+int (*getpower)(uint32_t *out);
 
 static int find_pci(short bus, struct pci_device *pci_dev) {
 	int ret = pci_system_init();
@@ -265,7 +269,7 @@ static int getuint64_null(uint64_t *out) { UNUSED(out); return -1; }
 void init_pci(const char *path, short *bus, unsigned int *device_id, const unsigned char forcemem) {
 	short device_bus = -1;
 	int err = 1;
-	getgrbm = getsclk = getmclk = getuint32_null;
+	getgrbm = getsclk = getmclk = gettemp = getpower = getuint32_null;
 	getsrbm = getsrbm2 = getuint32_null;
 	getvram = getgtt = getuint64_null;
 
@@ -361,6 +365,7 @@ void initbits(int fam) {
 	bits.gui = (1U << 31);
 	bits.uvd = 0;
 	bits.vce0 = 0;
+	bits.vcn = 0;
 
 	// R600 has a different texture bit, and only R600 has the TC, CR, SMX bits
 	if (fam < RV770) {
@@ -376,5 +381,18 @@ void initbits(int fam) {
 		if (fam >= CAYMAN) {
 			bits.vce0 = (1U << 7);
 		}
+	}
+
+	// VCN (Video Core Next) on RDNA: bit 1 of SRBM_STATUS2
+	if (fam >= NAVI10) {
+		bits.vcn = (1U << 1);
+	}
+
+	// RDNA (GFX10+): VGT replaced by Geometry Engine at bit 21,
+	// Event Engine and Sequencer Instruction Cache bits undefined.
+	if (fam >= NAVI10) {
+		bits.ee = 0;
+		bits.vgt = (1U << 21);
+		bits.sh = 0;
 	}
 }

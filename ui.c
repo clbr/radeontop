@@ -153,6 +153,7 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 		float cb = 100 * results->cb * k;
 		float uvd = 100 * results->uvd * k;
 		float vce0 = 100 * results->vce0 * k;
+		float vcn = 100 * results->vcn * k;
 		float vram = 100.0f * results->vram / vramsize;
 		float vrammb = results->vram / 1024.0f / 1024.0f;
 		float vramsizemb = vramsize / 1024.0f / 1024.0f;
@@ -163,6 +164,10 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 		float sclk = 100.0f * (results->sclk * k) / (sclk_max / 1e3f);
 		float mclk_ghz = results->mclk * k / 1000.0f;
 		float sclk_ghz = results->sclk * k / 1000.0f;
+		// Temperature in millidegrees Celsius, convert to display
+		float temp_avg = results->temperature ? (results->temperature / (ticks * dumpinterval)) / 1000.0f : 0;
+		// Power in milliwatts, convert to display
+		float power_avg = results->power ? (results->power / (ticks * dumpinterval)) / 1000.0f : 0;
 
 		mvhline(3, 0, ACS_HLINE, w);
 		mvvline(1, (w/2) + 1, ACS_VLINE, h);
@@ -175,15 +180,20 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 
 		unsigned int start = 4;
 
-		percentage(start, w, ee);
-		printright(start++, hw, _("Event Engine %6.2f%%"), ee);
+		if (bits.ee) {
+			percentage(start, w, ee);
+			printright(start++, hw, _("Event Engine %6.2f%%"), ee);
 
-		// Enough height?
-		if (h > bigh) start++;
+			// Enough height?
+			if (h > bigh) start++;
+		}
 
 		if (color) attron(COLOR_PAIR(2));
 		percentage(start, w, vgt);
-		printright(start++, hw, _("Vertex Grouper + Tesselator %6.2f%%"), vgt);
+		if (bits.ee)
+			printright(start++, hw, _("Vertex Grouper + Tesselator %6.2f%%"), vgt);
+		else
+			printright(start++, hw, _("Geometry Engine %6.2f%%"), vgt);
 		if (color) attroff(COLOR_PAIR(2));
 
 		// Enough height?
@@ -207,8 +217,10 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 		percentage(start, w, sx);
 		printright(start++, hw, _("Shader Export %6.2f%%"), sx);
 
-		percentage(start, w, sh);
-		printright(start++, hw, _("Sequencer Instruction Cache %6.2f%%"), sh);
+		if (bits.sh) {
+			percentage(start, w, sh);
+			printright(start++, hw, _("Sequencer Instruction Cache %6.2f%%"), sh);
+		}
 
 		percentage(start, w, spi);
 		printright(start++, hw, _("Shader Interpolator %6.2f%%"), spi);
@@ -254,6 +266,10 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 			percentage(start, w, vce0);
 			printright(start++, hw, _("VCE %6.2f%%"), vce0);
 		}
+		if (bits.vcn) {
+			percentage(start, w, vcn);
+			printright(start++, hw, _("VCN %6.2f%%"), vcn);
+		}
 
 		if (bits.vram || bits.gtt) {
 			// Enough height?
@@ -262,16 +278,24 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 			if (bits.vram) {
 				if (color) attron(COLOR_PAIR(2));
 				percentage(start, w, vram);
-				printright(start++, hw, _("%.0fM / %.0fM VRAM %6.2f%%"),
-						vrammb, vramsizemb, vram);
+				if (is_apu)
+					printright(start++, hw, _("%.0fM / %.0fM Reserved Memory %6.2f%%"),
+							vrammb, vramsizemb, vram);
+				else
+					printright(start++, hw, _("%.0fM / %.0fM VRAM %6.2f%%"),
+							vrammb, vramsizemb, vram);
 				if (color) attroff(COLOR_PAIR(2));
 			}
 
 			if (bits.gtt) {
 				if (color) attron(COLOR_PAIR(2));
 				percentage(start, w, gtt);
-				printright(start++, hw, _("%.0fM / %.0fM GTT %6.2f%%"),
-						gttmb, gttsizemb, gtt);
+				if (is_apu)
+					printright(start++, hw, _("%.0fM / %.0fM Unified Memory %6.2f%%"),
+							gttmb, gttsizemb, gtt);
+				else
+					printright(start++, hw, _("%.0fM / %.0fM GTT %6.2f%%"),
+							gttmb, gttsizemb, gtt);
 				if (color) attroff(COLOR_PAIR(2));
 			}
 		}
@@ -285,6 +309,16 @@ void present(const unsigned int ticks, const char card[], unsigned int color,
 			printright(start++, hw, _("%.2fG / %.2fG Shader Clock %6.2f%%"),
 					sclk_ghz, sclk_max * 1e-6f, sclk);
 			if (color) attroff(COLOR_PAIR(3));
+		}
+
+		if (temp_avg > 0 || power_avg > 0 || has_power_sensor) {
+			if (h > bigh) start++;
+			if (temp_avg > 0) {
+				printright(start++, hw, _("Temperature %6.1f°C"), temp_avg);
+			}
+			if (has_power_sensor) {
+				printright(start++, hw, _("Power Draw %6.1fW"), power_avg);
+			}
 		}
 
 		//move the cursor away to fix some resizing artifacts on some terminals

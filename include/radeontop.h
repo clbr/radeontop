@@ -62,6 +62,8 @@ extern int (*getvram)(uint64_t *out);
 extern int (*getgtt)(uint64_t *out);
 extern int (*getsclk)(uint32_t *out);
 extern int (*getmclk)(uint32_t *out);
+extern int (*gettemp)(uint32_t *out);
+extern int (*getpower)(uint32_t *out);
 
 // ticks.c
 void collect(unsigned int ticks, unsigned int dumpinterval);
@@ -160,10 +162,13 @@ struct bits_t {
 	unsigned int cr;
 	unsigned int uvd;
 	unsigned int vce0;
+	unsigned int vcn;
 	uint64_t vram;
 	uint64_t gtt;
 	unsigned int sclk;
 	unsigned int mclk;
+	uint32_t temperature;
+	uint32_t power;
 };
 
 extern struct bits_t bits;
@@ -171,6 +176,8 @@ extern uint64_t vramsize;
 extern uint64_t gttsize;
 extern unsigned int sclk_max;
 extern unsigned int mclk_max;
+extern unsigned int is_apu;
+extern unsigned int has_power_sensor;
 
 // radeon.c
 void init_radeon(int fd, int drm_major, int drm_minor);
