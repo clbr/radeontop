@@ -139,9 +139,18 @@ int main(int argc, char **argv) {
 
 	setuid(getuid());
 
-	int family = getfamily(device_id);
-	if (!family && gfx_version)
+	// The GC (Graphics & Compute) block number queried from
+	// amdgpu_query_hw_ip_info() identifies the chip unambiguously,
+	// while PCI device IDs are reused by AMD across APU SKUs (e.g.
+	// 0x150E is shared by Strix Point gfx1150 and Krackan Point
+	// gfx1152). When both are available, the GC number wins. PCI
+	// lookup is the fallback for legacy cards that don't expose a
+	// GC number (radeon driver, or amdgpu without IP query support).
+	int family = 0;
+	if (gfx_version)
 		family = getfamily_gfx(gfx_version);
+	if (!family)
+		family = getfamily(device_id);
 	if (!family)
 		fprintf(stderr, _("Unknown Radeon card. <= R500 won't work, new cards might.\n"));
 
