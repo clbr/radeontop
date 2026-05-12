@@ -662,8 +662,9 @@ CHIPSET(0x748B, 0x748B, NAVI33)
 CHIPSET(0x7499, 0x7499, NAVI33)
 CHIPSET(0x749F, 0x749F, NAVI33)
 // APU PCI device IDs are ambiguous (same ID across SKUs / pci.ids
-// versions). Identification is done via GFX IP version in
-// getfamily_gfx() when amdgpu reports it. See PR #180 discussion.
+// versions). Identification is done via the GC (Graphics &
+// Compute) block number in getfamily_gfx() when amdgpu reports it.
+// See PR #180 discussion.
 CHIPSET(0x7550, 0x7550, GFX1201)
 CHIPSET(0x7551, 0x7551, GFX1201)
 CHIPSET(0x7590, 0x7590, RADEON_9000)

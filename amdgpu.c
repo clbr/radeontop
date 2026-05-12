@@ -69,7 +69,11 @@ void init_amdgpu(int fd) {
 	if (amdgpu_device_initialize(fd, &drm_major, &drm_minor, &amdgpu_dev))
 		return;
 
-	// Query GFX IP version for family detection fallback
+	// Query the GC (Graphics & Compute) block number from amdgpu
+	// for family detection fallback. The GC number is the
+	// authoritative chip identifier on modern hardware, more
+	// reliable than the PCI device ID (which is reused across APU
+	// SKUs).
 	{
 		struct drm_amdgpu_info_hw_ip gfx_ip = {};
 		if (!amdgpu_query_hw_ip_info(amdgpu_dev, AMDGPU_HW_IP_GFX,
@@ -79,10 +83,10 @@ void init_amdgpu(int fd) {
 			unsigned int minor, rev;
 
 			/*
-			 * Newer kernels encode (minor << 8 | rev) in
-			 * hw_ip_version_minor. GFX11+ only exists on
-			 * these kernels, and for GFX10 a value >= 256
-			 * is unambiguously the new encoding.
+			 * Newer kernels pack (minor << 8 | rev) into the
+			 * minor field. GC 11.x onward only exists on
+			 * these kernels, and for GC 10.x a value >= 256
+			 * is unambiguously the new packing.
 			 */
 			if (major >= 11 || minor_raw >= 256) {
 				minor = (minor_raw >> 8) & 0xff;

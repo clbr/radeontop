@@ -139,10 +139,11 @@ int main(int argc, char **argv) {
 
 	setuid(getuid());
 
-	// GFX IP version is the authoritative identifier on modern
-	// hardware (libdrm_amdgpu queries the chip directly), so try it
-	// first. PCI ID lookup is the fallback for legacy cards that
-	// don't expose a GFX IP version, and for amdgpu init failures.
+	// The GC (Graphics & Compute) block number is the authoritative
+	// chip identifier on modern hardware (libdrm_amdgpu queries it
+	// directly via amdgpu_query_hw_ip_info), so try it first. PCI
+	// ID lookup is the fallback for legacy cards that don't expose
+	// a GC number, and for amdgpu init failures.
 	int family = 0;
 	if (gfx_version)
 		family = getfamily_gfx(gfx_version);
