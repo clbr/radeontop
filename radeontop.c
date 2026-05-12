@@ -151,12 +151,21 @@ int main(int argc, char **argv) {
 		family = getfamily(device_id);
 
 	const char *cardname;
-	static char gfx_fallback[32];
+	static char gfx_fallback[40];
 
 	if (!family) {
 		if (gfx_version) {
-			// Generate fallback name for unknown card with GFX code
-			snprintf(gfx_fallback, sizeof(gfx_fallback), "GFX%u (unknown)", gfx_version);
+			// When the family is unknown but a GC number is
+			// available, show the GC number (certain - queried
+			// straight from the chip) together with the putative
+			// GFX shader target. The two coincide for GC 10.x but
+			// diverge for GC 11.0.x APUs, hence the '?' on GFX.
+			snprintf(gfx_fallback, sizeof(gfx_fallback),
+				"gfx%u? (GC %u.%u.%u unknown)",
+				gfx_version,
+				gfx_version / 100,
+				(gfx_version / 10) % 10,
+				gfx_version % 10);
 			cardname = gfx_fallback;
 		} else {
 			cardname = family_str[family];
