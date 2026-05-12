@@ -380,6 +380,7 @@ int getfamily_gfx(unsigned int ip_ver) {
 		// RDNA 3.5 (GC 11.5.x)
 		case 1150: return STRIX_POINT;
 		case 1151: return RADEON_880M;
+		case 1152: return KRACKAN_POINT;
 		// RDNA 4m (GC 11.7.x)
 		case 1170: return MEDUSA_POINT;
 		case 1171: return MEDUSA_POINT_2;
@@ -392,20 +393,11 @@ int getfamily_gfx(unsigned int ip_ver) {
 		case 1310: return GFX1310;
 	}
 
-	// Fallback: recognize family by major.minor
-	unsigned int major_minor = (ip_ver / 10) * 10;
-	switch(major_minor) {
-		case 1010: return NAVI10;
-		case 1030: return SIENNA_CICHLID;
-		case 1100: return NAVI31;
-		case 1150: return STRIX_POINT;
-		case 1170: return MEDUSA_POINT;
-		case 1200: return RADEON_9000;
-		case 1210: return RADEON_9000;
-		case 1300: return GFX1300;
-		case 1310: return GFX1310;
-	}
-
+	// No major.minor catch-all: revisions within a family report
+	// genuinely different SKUs (e.g. GC 11.0.0 = NAVI31 vs GC 11.0.1
+	// = Phoenix iGPU), so guessing by major.minor mislabels cards.
+	// Unknown IP versions return 0 and radeontop.c prints
+	// "GFX#### (unknown)" instead.
 	return 0;
 }
 
