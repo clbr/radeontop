@@ -154,7 +154,23 @@ int main(int argc, char **argv) {
 	if (!family)
 		fprintf(stderr, _("Unknown Radeon card. <= R500 won't work, new cards might.\n"));
 
-	const char * const cardname = family_str[family];
+	// When the family is unknown but a GC number is available, show
+	// the GC number (which we know for certain) together with the
+	// best-guess GFX shader target (gfxNNNN?). The two coincide for
+	// GC 10.x but diverge for GC 11.0.x APUs, hence the '?' on GFX.
+	static char gfx_fallback[40];
+	const char *cardname;
+	if (!family && gfx_version) {
+		snprintf(gfx_fallback, sizeof(gfx_fallback),
+			"gfx%u? (GC %u.%u.%u unknown)",
+			gfx_version,
+			gfx_version / 100,
+			(gfx_version / 10) % 10,
+			gfx_version % 10);
+		cardname = gfx_fallback;
+	} else {
+		cardname = family_str[family];
+	}
 
 	initbits(family);
 
