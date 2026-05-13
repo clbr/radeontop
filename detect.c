@@ -23,6 +23,7 @@
 #include <errno.h>
 
 struct bits_t bits;
+unsigned int gfx_version;
 uint64_t vramsize;
 uint64_t gttsize;
 unsigned int sclk_max = 0; // kilohertz
@@ -336,6 +337,57 @@ int getfamily(unsigned int id) {
 		#define CHIPSET(a,b,c) case a: return c;
 		#include "r600_pci_ids.h"
 		#undef CHIPSET
+	}
+
+	return 0;
+}
+
+int getfamily_gfx(unsigned int gfx_ver) {
+
+	switch(gfx_ver) {
+		// RDNA 1 (GFX10.1)
+		case 1010: return NAVI10;
+		case 1011: return NAVI12;
+		case 1012: return NAVI14;
+		// RDNA 2 (GFX10.3)
+		case 1030: return SIENNA_CICHLID;
+		case 1031: return NAVY_FLOUNDER;
+		case 1032: return DIMGREY_CAVEFISH;
+		case 1033: return GFX1033;
+		case 1034: return GFX1034;
+		case 1035: return YELLOW_CARP;
+		case 1036: return MENDOCINO;
+		// RDNA 3 (GFX11.0)
+		case 1100: return NAVI31;
+		case 1101: return NAVI32;
+		case 1102: return NAVI33;
+		case 1103: return GFX1103;
+		// RDNA 3.5 (GFX11.5)
+		case 1150: return GFX1150;
+		case 1151: return GFX1151;
+		// RDNA 4m (GFX11.7)
+		case 1170: return GFX1170;
+		case 1171: return GFX1171;
+		case 1172: return GFX1172;
+		// RDNA 4 (GFX12.0)
+		case 1200: return GFX1200;
+		case 1201: return GFX1201;
+		// RDNA 5 (GFX13)
+		case 1300: return GFX1300;
+		case 1310: return GFX1310;
+	}
+
+	// Fallback: recognize family by major.minor
+	unsigned int major_minor = (gfx_ver / 10) * 10;
+	switch(major_minor) {
+		case 1010: return NAVI10;
+		case 1030: return SIENNA_CICHLID;
+		case 1100: return NAVI31;
+		case 1150: return GFX1150;
+		case 1170: return GFX1170;
+		case 1200: return GFX1200;
+		case 1300: return GFX1300;
+		case 1310: return GFX1310;
 	}
 
 	return 0;

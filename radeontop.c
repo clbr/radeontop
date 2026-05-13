@@ -139,11 +139,38 @@ int main(int argc, char **argv) {
 
 	setuid(getuid());
 
-	const int family = getfamily(device_id);
+	// The GC (Graphics & Compute) block number queried from
+	// amdgpu_query_hw_ip_info() identifies the chip unambiguously,
+	// while PCI device IDs are reused by AMD across APU SKUs (e.g.
+	// 0x150E is shared by Strix Point gfx1150 and Krackan Point
+	// gfx1152). When both are available, the GC number wins. PCI
+	// lookup is the fallback for legacy cards that don't expose a
+	// GC number (radeon driver, or amdgpu without IP query support).
+	int family = 0;
+	if (gfx_version)
+		family = getfamily_gfx(gfx_version);
+	if (!family)
+		family = getfamily(device_id);
 	if (!family)
 		fprintf(stderr, _("Unknown Radeon card. <= R500 won't work, new cards might.\n"));
 
-	const char * const cardname = family_str[family];
+	// When the family is unknown but a GC number is available, show
+	// the GC number (which we know for certain) together with the
+	// best-guess GFX shader target (gfxNNNN?). The two coincide for
+	// GC 10.x but diverge for GC 11.0.x APUs, hence the '?' on GFX.
+	static char gfx_fallback[40];
+	const char *cardname;
+	if (!family && gfx_version) {
+		snprintf(gfx_fallback, sizeof(gfx_fallback),
+			"gfx%u? (GC %u.%u.%u unknown)",
+			gfx_version,
+			gfx_version / 100,
+			(gfx_version / 10) % 10,
+			gfx_version % 10);
+		cardname = gfx_fallback;
+	} else {
+		cardname = family_str[family];
+	}
 
 	initbits(family);
 

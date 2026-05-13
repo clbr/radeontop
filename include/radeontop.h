@@ -52,6 +52,7 @@ void die(const char *why);
 // detect.c
 void init_pci(const char *path, short *bus, unsigned int *device_id, const unsigned char forcemem);
 int getfamily(unsigned int id);
+int getfamily_gfx(unsigned int gfx_ver);
 void initbits(int fam);
 void cleanup();
 
@@ -138,6 +139,22 @@ enum radeon_family {
 	ALDEBARAN,
 	CYAN_SKILLFISH,
 	BEIGE_GOBY,
+	MENDOCINO,		// gfx1036
+	GFX1033,		// Steam Deck (Van Gogh custom)
+	GFX1034,		// Navi 24
+	NAVI31,			// gfx1100
+	NAVI32,			// gfx1101
+	NAVI33,			// gfx1102
+	GFX1103,		// Radeon 780M iGPU
+	GFX1150,		// Strix
+	GFX1151,		// Strix Halo
+	GFX1170,		// RDNA 4m
+	GFX1171,
+	GFX1172,
+	GFX1200,		// RDNA 4
+	GFX1201,
+	GFX1300,		// RDNA 5
+	GFX1310,
 };
 
 extern const char * const family_str[];
@@ -178,5 +195,6 @@ void init_radeon(int fd, int drm_major, int drm_minor);
 // amdgpu.c
 void init_amdgpu(int fd);
 void cleanup_amdgpu();
+extern unsigned int gfx_version;
 
 #endif
