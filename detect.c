@@ -23,10 +23,13 @@
 #include <errno.h>
 
 struct bits_t bits;
+unsigned int gfx_version;
 uint64_t vramsize;
 uint64_t gttsize;
 unsigned int sclk_max = 0; // kilohertz
 unsigned int mclk_max = 0; // kilohertz
+unsigned int is_apu = 0; // 1 if APU (unified memory), 0 if discrete GPU
+unsigned int has_power_sensor = 0; // 1 if power sensor available, 0 if unavailable
 const void *area;
 static const void *srbm_area;
 
@@ -38,6 +41,8 @@ int (*getvram)(uint64_t *out);
 int (*getgtt)(uint64_t *out);
 int (*getsclk)(uint32_t *out);
 int (*getmclk)(uint32_t *out);
+int (*gettemp)(uint32_t *out);
+int (*getpower)(uint32_t *out);
 
 static int find_pci(short bus, struct pci_device *pci_dev) {
 	int ret = pci_system_init();
@@ -265,7 +270,7 @@ static int getuint64_null(uint64_t *out) { UNUSED(out); return -1; }
 void init_pci(const char *path, short *bus, unsigned int *device_id, const unsigned char forcemem) {
 	short device_bus = -1;
 	int err = 1;
-	getgrbm = getsclk = getmclk = getuint32_null;
+	getgrbm = getsclk = getmclk = gettemp = getpower = getuint32_null;
 	getsrbm = getsrbm2 = getuint32_null;
 	getvram = getgtt = getuint64_null;
 
@@ -341,6 +346,61 @@ int getfamily(unsigned int id) {
 	return 0;
 }
 
+/*
+ * Map the GC (Graphics & Compute) block number to chip family.
+ * The number is encoded as major * 100 + minor * 10 + rev, with
+ * major/minor/rev coming from amdgpu_query_hw_ip_info(GFX).
+ *
+ * Note: for GC 10.x the rev matches the GFX shader target name
+ * (GC 10.3.0 == gfx1030). For GC 11.0.x they diverge: GC 11.0.1
+ * is Phoenix (gfx1103), GC 11.0.3 is Navi 32 (gfx1101).
+ */
+int getfamily_gfx(unsigned int gc_ver) {
+
+	switch(gc_ver) {
+		// RDNA 1 (GC 10.1.x)
+		case 1010: return NAVI10;
+		case 1011: return NAVI12;
+		case 1012: return NAVI14;
+		// RDNA 2 (GC 10.3.x)
+		case 1030: return SIENNA_CICHLID;
+		case 1031: return NAVY_FLOUNDER;
+		case 1032: return DIMGREY_CAVEFISH;
+		case 1033: return GFX1033;
+		case 1034: return GFX1034;
+		case 1035: return YELLOW_CARP;
+		case 1036: return MENDOCINO;
+		case 1037: return MENDOCINO;
+		// RDNA 3 (GC 11.0.x) - GC rev != GFX shader target
+		case 1100: return NAVI31;	// GC 11.0.0 = gfx1100
+		case 1101: return RADEON_780M;	// GC 11.0.1 = gfx1103 (Phoenix1)
+		case 1102: return NAVI33;	// GC 11.0.2 = gfx1102
+		case 1103: return NAVI32;	// GC 11.0.3 = gfx1101 (Navi 32)
+		case 1104: return RADEON_780M;	// GC 11.0.4 = gfx1103 (Phoenix2)
+		// RDNA 3.5 (GC 11.5.x)
+		case 1150: return STRIX_POINT;
+		case 1151: return RADEON_880M;
+		case 1152: return KRACKAN_POINT;
+		// RDNA 4m (GC 11.7.x)
+		case 1170: return MEDUSA_POINT;
+		case 1171: return MEDUSA_POINT_2;
+		case 1172: return MEDUSA_POINT_3;
+		// RDNA 4 (GC 12.0.x)
+		case 1200: return RADEON_9000;
+		case 1201: return GFX1201;
+		// RDNA 5 (GC 13.x)
+		case 1300: return GFX1300;
+		case 1310: return GFX1310;
+	}
+
+	// No major.minor catch-all: revisions within a GC family report
+	// genuinely different SKUs (GC 11.0.0 = NAVI31 vs GC 11.0.1 =
+	// Phoenix iGPU), so rounding by major.minor mislabels cards.
+	// Unknown GC numbers return 0 and radeontop.c prints
+	// "GFX#### (unknown)" instead.
+	return 0;
+}
+
 void initbits(int fam) {
 
 	// The majority of these is the same from R600 to Southern Islands.
@@ -376,5 +436,13 @@ void initbits(int fam) {
 		if (fam >= CAYMAN) {
 			bits.vce0 = (1U << 7);
 		}
+	}
+
+	// RDNA (GFX10+): VGT replaced by Geometry Engine at bit 21,
+	// Event Engine and Sequencer Instruction Cache bits undefined.
+	if (fam >= NAVI10) {
+		bits.ee = 0;
+		bits.vgt = (1U << 21);
+		bits.sh = 0;
 	}
 }

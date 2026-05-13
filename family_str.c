@@ -81,4 +81,39 @@ const char * const family_str[] = {
 	str(ALDEBARAN),
 	str(CYAN_SKILLFISH),
 	str(BEIGE_GOBY),
+	// RDNA 2 (gfx10.x)
+	"Radeon RX 6800/6900 XT (gfx1030)",
+	"Radeon RX 6700/6750/6800M/6850M (gfx1031)",
+	"Radeon RX 6600 (gfx1032)",
+	"Radeon RX 6500/W6300 (gfx1034)",
+	// RDNA 3 APUs (gfx1103-1151)
+	"Radeon 660M/680M (gfx1035)",
+	"Radeon Graphics 128SP (gfx1036)",
+	"Steam Deck GPU (gfx1033)",
+	"Radeon 740M/760M/780M (gfx1103)",
+	"Radeon 890M (Strix Point)",
+	"Radeon 880M (Strix Halo)",
+	// RDNA 4 APUs (gfx115x - Kraken)
+	"Radeon 820M/840M/860M (Krackan Point)",
+	// RDNA 4 APUs (gfx117x - Medusa Point variants)
+	"Medusa Point (gfx1170)",
+	"Medusa Point (gfx1171)",
+	"Medusa Point (gfx1172)",
+	// RDNA 4 dGPU (gfx12xx)
+	"Radeon 9000 (gfx1200)",
+	"Radeon 9000 XT (gfx1201)",
+	// RDNA 5 (gfx13xx)
+	"Radeon (gfx1300)",
+	"Radeon (gfx1310)",
+	// Instinct MI (gfx90x)
+	"Instinct MI8/MI6 (gfx803)",
+	"Instinct MI25 (gfx900)",
+	"Instinct MI50/MI60 (gfx906)",
+	"Instinct MI100 (gfx908)",
+	"Instinct MI210/MI250/MI250X (gfx90a)",
+	"Instinct MI300/MI300X/MI325X (gfx940)",
+	// RDNA 3 dGPU (gfx110x)
+	"Radeon RX 7900 (gfx1100)",
+	"Radeon RX 7800/7700 (gfx1101)",
+	"Radeon RX 7600/7500 (gfx1102)",
 };

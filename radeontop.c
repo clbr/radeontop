@@ -139,11 +139,41 @@ int main(int argc, char **argv) {
 
 	setuid(getuid());
 
-	const int family = getfamily(device_id);
+	// The GC (Graphics & Compute) block number is the authoritative
+	// chip identifier on modern hardware (libdrm_amdgpu queries it
+	// directly via amdgpu_query_hw_ip_info), so try it first. PCI
+	// ID lookup is the fallback for legacy cards that don't expose
+	// a GC number, and for amdgpu init failures.
+	int family = 0;
+	if (gfx_version)
+		family = getfamily_gfx(gfx_version);
 	if (!family)
-		fprintf(stderr, _("Unknown Radeon card. <= R500 won't work, new cards might.\n"));
+		family = getfamily(device_id);
 
-	const char * const cardname = family_str[family];
+	const char *cardname;
+	static char gfx_fallback[40];
+
+	if (!family) {
+		if (gfx_version) {
+			// When the family is unknown but a GC number is
+			// available, show the GC number (certain - queried
+			// straight from the chip) together with the putative
+			// GFX shader target. The two coincide for GC 10.x but
+			// diverge for GC 11.0.x APUs, hence the '?' on GFX.
+			snprintf(gfx_fallback, sizeof(gfx_fallback),
+				"gfx%u? (GC %u.%u.%u unknown)",
+				gfx_version,
+				gfx_version / 100,
+				(gfx_version / 10) % 10,
+				gfx_version % 10);
+			cardname = gfx_fallback;
+		} else {
+			cardname = family_str[family];
+			fprintf(stderr, _("Unknown Radeon card. <= R500 won't work, new cards might.\n"));
+		}
+	} else {
+		cardname = family_str[family];
+	}
 
 	initbits(family);
 

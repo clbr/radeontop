@@ -52,6 +52,7 @@ void die(const char *why);
 // detect.c
 void init_pci(const char *path, short *bus, unsigned int *device_id, const unsigned char forcemem);
 int getfamily(unsigned int id);
+int getfamily_gfx(unsigned int gfx_ver);
 void initbits(int fam);
 void cleanup();
 
@@ -138,6 +139,40 @@ enum radeon_family {
 	ALDEBARAN,
 	CYAN_SKILLFISH,
 	BEIGE_GOBY,
+	// RDNA 2 (gfx10.x)
+	GFX1030,		// gfx1030, RX 6800/6900 XT, Pro W6800/V620
+	GFX1031,		// gfx1031, RX 6700/6750/6800M/6850M
+	GFX1032,		// gfx1032, RX 6600 series, Pro W6600
+	GFX1034,		// gfx1034, RX 6300/6400/6500 XT, Pro W6300/W6400
+	// RDNA 3 APUs (gfx1103-1151)
+	GFX1035,		// gfx1035, Radeon 660M/680M
+	MENDOCINO,		// gfx1036, Radeon Graphics 128SP
+	GFX1033,		// gfx1033, Steam Deck GPU
+	RADEON_780M,	// gfx1103, Radeon 740M/760M/780M/ROG Ally
+	STRIX_POINT,	// gfx1150, Radeon 890M (Strix Point)
+	RADEON_880M,	// gfx1151, Radeon 880M (Strix Halo)
+	// RDNA 4 APUs (gfx115x - Krackan)
+	KRACKAN_POINT,	// gfx1152, Radeon 820M/840M/860M (Krackan Point)
+	// RDNA 4 APUs (gfx117x - Medusa)
+	MEDUSA_POINT,	// gfx1170, Medusa Point
+	MEDUSA_POINT_2,	// gfx1171, Medusa Point (variant mapping TBD)
+	MEDUSA_POINT_3,	// gfx1172, Medusa Point (variant mapping TBD)
+	// RDNA 4 dGPU (gfx12xx)
+	RADEON_9000,	// gfx1200, Radeon 9000 series
+	GFX1201,		// gfx1201
+	// RDNA 5 (gfx13xx)
+	GFX1300,		// gfx1300, RDNA 5
+	GFX1310,		// gfx1310, RDNA 5
+	// Instinct MI (gfx90x)
+	MI8,			// gfx803, Instinct MI8/MI6
+	MI25,			// gfx900, Instinct MI25
+	MI50,			// gfx906, Instinct MI50/MI60
+	MI100,			// gfx908, Instinct MI100
+	MI210,			// gfx90a, Instinct MI210/MI250/MI250X
+	MI300,			// gfx940, Instinct MI300/MI300X/MI325X
+	NAVI31,			// gfx1100, RX 7900 series
+	NAVI32,			// gfx1101, RX 7800/7700 series
+	NAVI33,			// gfx1102, RX 7600/7500 series
 };
 
 extern const char * const family_str[];
@@ -178,5 +213,6 @@ void init_radeon(int fd, int drm_major, int drm_minor);
 // amdgpu.c
 void init_amdgpu(int fd);
 void cleanup_amdgpu();
+extern unsigned int gfx_version;
 
 #endif
